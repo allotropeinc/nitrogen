@@ -1,0 +1,33 @@
+<div class="content" *ngIf="!working">
+	<h1>Bug Reports</h1>
+	<mat-accordion *ngIf="reports">
+		<mat-expansion-panel *ngFor="let report of reports">
+			<mat-expansion-panel-header>
+				<mat-panel-title><span [class.bold]="!report.read">{{report.title}}</span></mat-panel-title>
+				<mat-panel-description>{{report.summary}}</mat-panel-description>
+			</mat-expansion-panel-header>
+			<mat-card>
+				<mat-card-title>{{report.title}}</mat-card-title>
+				<mat-card-subtitle>{{report.summary}}</mat-card-subtitle>
+				<mat-divider></mat-divider>
+				<div class="spacer"></div>
+				<mat-card-subtitle>Steps to reproduce:</mat-card-subtitle>
+				<mat-card-content>{{report.steps}}</mat-card-content>
+				<mat-card-subtitle>Comments:</mat-card-subtitle>
+				<mat-card-content>{{report.comments}}</mat-card-content>
+				<mat-card-content>
+					<button mat-button (click)="toggleRead(report)">
+						Mark as {{report.read ? 'un' : ''}}read
+					</button>
+				</mat-card-content>
+			</mat-card>
+		</mat-expansion-panel>
+	</mat-accordion>
+	<button mat-button (click)="refresh()">
+		Refresh
+	</button>
+	<div class="error" *ngIf="!reports">
+		Sorry, we couldn't load the bug reports. <a class="link" (click)="refresh()">Refresh</a>?
+	</div>
+</div>
+<mat-progress-spinner mode="indeterminate" *ngIf="working"></mat-progress-spinner>

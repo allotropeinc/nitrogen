@@ -1,0 +1,30 @@
+<a mat-list-item [routerLink]="'/edit/' + project.id">
+	<mat-icon mat-list-icon>code</mat-icon>
+	<span matLine>{{project.name}}</span>
+</a>
+<mat-menu #actions="matMenu" xPosition="before">
+	<button mat-menu-item (click)="rename()">
+		<mat-icon>edit</mat-icon>
+		<span>Rename</span>
+	</button>
+	<a mat-menu-item [disabled]="!project.publishToken"
+	   [href]="apiLocation + '/projects/published/' + project.publishToken" target="_blank">
+		<mat-icon>cloud</mat-icon>
+		<span>Visit Published</span>
+	</a>
+	<button mat-menu-item (click)="moveUp()" [disabled]="first()">
+		<mat-icon>arrow_drop_up</mat-icon>
+		<span>Move Up</span>
+	</button>
+	<button mat-menu-item (click)="moveDown()" [disabled]="last()">
+		<mat-icon>arrow_drop_down</mat-icon>
+		<span>Move Down</span>
+	</button>
+	<button mat-menu-item (click)="delete()" color="warn">
+		<mat-icon>delete</mat-icon>
+		<span>Delete</span>
+	</button>
+</mat-menu>
+<button mat-icon-button [matMenuTriggerFor]="actions" class="options">
+	<mat-icon>more_vert</mat-icon>
+</button>

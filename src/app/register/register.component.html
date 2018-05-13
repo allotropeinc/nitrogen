@@ -1,0 +1,32 @@
+<mat-card *ngIf="!working">
+	<mat-card-title>
+		Register for a new account
+	</mat-card-title>
+	<mat-card-subtitle>
+		An account is required to use save functionality.
+	</mat-card-subtitle>
+	<mat-divider></mat-divider>
+	<mat-card-content>
+		<mat-form-field>
+			<input matInput placeholder="Username" [(ngModel)]="username">
+		</mat-form-field>
+		<mat-form-field>
+			<input matInput placeholder="Password" [(ngModel)]="password" [type]="showPassword ? 'text' : 'password'">
+			<button mat-icon-button matSuffix (click)="showPassword = !showPassword">
+				<mat-icon>visibility{{showPassword ? '' : '_off'}}</mat-icon>
+			</button>
+		</mat-form-field>
+		<mat-form-field>
+			<input matInput placeholder="Confirm Password" [(ngModel)]="confirmPassword" type="password">
+		</mat-form-field>
+	</mat-card-content>
+	<app-global-footer></app-global-footer>
+	<mat-divider></mat-divider>
+	<mat-card-content>
+		<a mat-button routerLink="/signin">Sign In</a>
+		<div class="buttons">
+			<a mat-flat-button (click)="register()">Register</a>
+		</div>
+	</mat-card-content>
+</mat-card>
+<mat-progress-spinner mode="indeterminate" *ngIf="working"></mat-progress-spinner>

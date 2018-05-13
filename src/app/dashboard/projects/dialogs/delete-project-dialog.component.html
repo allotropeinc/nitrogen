@@ -1,0 +1,8 @@
+<h1>Delete Project</h1>
+<p>Are you sure you want to delete this project?</p>
+<ng-container>
+	<button mat-button (click)="dialogRef.close()">Cancel</button>
+	<div class="buttons">
+		<button mat-flat-button color="warn" [mat-dialog-close]="true">Delete</button>
+	</div>
+</ng-container>

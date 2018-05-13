@@ -1,0 +1,97 @@
+<div class="content" *ngIf="!working">
+	<ng-container *ngIf="account">
+		<div class="header">
+			<a mat-icon-button routerLink=".." class="back-button">
+				<mat-icon>
+					arrow_back
+				</mat-icon>
+			</a>
+			<h1>{{account.username}}</h1>
+			<button mat-icon-button (click)="refresh()">
+				<mat-icon>
+					refresh
+				</mat-icon>
+			</button>
+		</div>
+		<mat-accordion>
+			<mat-expansion-panel>
+				<mat-expansion-panel-header>
+					<mat-panel-title>Password</mat-panel-title>
+					<mat-panel-description>
+						The password of this account.
+					</mat-panel-description>
+				</mat-expansion-panel-header>
+				<mat-form-field>
+					<input matInput placeholder="Password hash" disabled [(ngModel)]="account.password">
+				</mat-form-field>
+				<div class="password-options">
+					<button mat-button (click)="passwordTester()">
+						Password Tester
+					</button>
+					<button mat-button (click)="passwordGenerator()">
+						Password Generator
+					</button>
+				</div>
+				<p class="error">Do not modify this without consent or in production. You have been warned. And I do NOT mean without consent of the <i>user</i>, I mean without consent of <i>me</i>.</p>
+			</mat-expansion-panel>
+			<mat-expansion-panel>
+				<mat-expansion-panel-header>
+					<mat-panel-title>Projects</mat-panel-title>
+					<mat-panel-description>
+						The projects of this account.
+					</mat-panel-description>
+				</mat-expansion-panel-header>
+				<mat-accordion>
+					<mat-expansion-panel *ngFor="let project of account.projects">
+						<mat-expansion-panel-header>
+							<mat-panel-title>{{project.name}}</mat-panel-title>
+							<mat-panel-description>
+								Published:
+								<ng-container *ngIf="!project.publishToken">
+									No
+								</ng-container>
+								<ng-container *ngIf="project.publishToken">
+									Yes, at&nbsp;
+									<a class="link" [href]="'/api/projects/published/' + project.publishToken" target="_blank">
+										{{project.publishToken}}
+									</a>
+								</ng-container>
+							</mat-panel-description>
+						</mat-expansion-panel-header>
+						<pre>{{project.code}}</pre>
+					</mat-expansion-panel>
+				</mat-accordion>
+			</mat-expansion-panel>
+			<mat-expansion-panel>
+				<mat-expansion-panel-header>
+					<mat-panel-title>Editor Settings</mat-panel-title>
+					<mat-panel-description>
+						The editor settings of this account.
+					</mat-panel-description>
+				</mat-expansion-panel-header>
+				<pre>{{getEditorSettings()}}</pre>
+			</mat-expansion-panel>
+			<mat-expansion-panel>
+				<mat-expansion-panel-header>
+					<mat-panel-title>Admin Status</mat-panel-title>
+					<mat-panel-description>
+						Whether this account is an admin or not.
+					</mat-panel-description>
+				</mat-expansion-panel-header>
+				<h1 class="error">DO NOT MODIFY THIS WITHOUT PERMISSION</h1>
+				<label>
+					Account is admin
+					<mat-slide-toggle [(ngModel)]="account.isAdmin"></mat-slide-toggle>
+				</label>
+			</mat-expansion-panel>
+		</mat-accordion>
+		<button mat-flat-button color="warn" class="save" (click)="saveChanges()">
+			Save Changes
+		</button>
+	</ng-container>
+	<p *ngIf="!account">
+		Could not load user data. <a class="link" (click)="refresh()">Retry</a> or <a class="link" routerLink="..">Go
+		Back</a>
+	</p>
+</div>
+<mat-progress-spinner mode="indeterminate" *ngIf="working"></mat-progress-spinner>

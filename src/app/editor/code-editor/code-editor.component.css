@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css?family=Inconsolata');
+
+mat-progress-spinner {
+	margin: auto;
+}
+
+:host {
+	display: flex;
+}
+
+:host, ::ng-deep ngx-monaco-editor, ::ng-deep ngx-monaco-editor > .editor-container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 100% !important;
+}

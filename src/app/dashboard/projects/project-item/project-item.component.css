@@ -1,0 +1,14 @@
+mat-progress-spinner {
+	margin: 0 auto;
+}
+
+:host {
+	position: relative;
+	display: block;
+}
+
+.options {
+	position: absolute;
+	top: 4px;
+	right: 16px;
+}

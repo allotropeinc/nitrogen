@@ -1,0 +1,67 @@
+:host {
+	padding: 0;
+}
+
+mat-sidenav-container {
+	width: 100%;
+	height: 100%;
+}
+
+mat-sidenav {
+	width: 100vw;
+	max-width: 400px;
+	box-sizing: border-box;
+	height: 100vw;
+}
+
+mat-sidenav > div {
+	margin: 24px;
+}
+
+mat-nav-list {
+	padding: 0;
+}
+
+mat-sidenav-content {
+	display: flex;
+	flex-direction: column;
+}
+
+mat-sidenav-content mat-progress-spinner {
+	margin: auto;
+}
+
+.close-button {
+	position: absolute;
+	top: 20px;
+	right: 24px;
+}
+
+.menu-button {
+	margin-right: 16px;
+}
+
+mat-toolbar {
+	flex-shrink: 0;
+}
+
+.content {
+	height: 100%;
+	display: flex;
+	overflow: auto;
+	position: relative;
+}
+
+.content ::ng-deep > *:not(router-outlet) {
+	display: flex;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow: auto;
+}
+
+.dashboard-button {
+	width: 100%;
+}

@@ -1,0 +1,26 @@
+<h1>Bug Report</h1>
+<p>Use this form to report a bug. Make sure you know how to reproduce it - this is very important if you want it fixed.</p>
+<mat-form-field>
+	<mat-label>Username</mat-label>
+	<input matInput [(ngModel)]="data.username" disabled>
+</mat-form-field>
+<mat-form-field>
+	<mat-label>Title</mat-label>
+	<input matInput [(ngModel)]="data.title" placeholder="Make it short and simple.">
+</mat-form-field>
+<mat-form-field>
+	<mat-label>Summary</mat-label>
+	<textarea matInput [(ngModel)]="data.summary" placeholder="What did you expect and what went wrong?"></textarea>
+</mat-form-field>
+<mat-form-field>
+	<mat-label>Steps</mat-label>
+	<textarea matInput [(ngModel)]="data.steps" placeholder="How did you cause the error? Be detailed and explain it simply, preferably in numbered steps." rows="3"></textarea>
+</mat-form-field>
+<mat-form-field>
+	<mat-label>Comments</mat-label>
+	<textarea matInput [(ngModel)]="data.comments" placeholder="Have any extra comments for me concerning this report?" rows="3"></textarea>
+</mat-form-field>
+<button mat-button (click)="dialogRef.close()">Cancel</button>
+<div class="buttons">
+	<button mat-flat-button color="primary" [mat-dialog-close]="data">Report Bug</button>
+</div>

@@ -1,0 +1,8 @@
+<h1>Reset Settings</h1>
+<p>Are you sure you want to reset your settings?</p>
+<ng-container>
+	<button mat-button (click)="dialogRef.close()">Cancel</button>
+	<div class="buttons">
+		<button mat-flat-button color="warn" [mat-dialog-close]="true">Reset</button>
+	</div>
+</ng-container>

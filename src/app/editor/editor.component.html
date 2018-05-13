@@ -1,0 +1,66 @@
+<mat-sidenav-container (window:keydown)="hotkey($event)">
+	<mat-sidenav mode="push" #sidenav>
+		<app-sidenav [editorOptions]="editorOptions"></app-sidenav>
+	</mat-sidenav>
+	<mat-sidenav-content>
+		<mat-toolbar>
+			<a mat-icon-button class="menu-button" routerLink="/dashboard">
+				<mat-icon>
+					home
+				</mat-icon>
+			</a>
+			<button mat-icon-button class="menu-button" (click)="sidenav.toggle()">
+				<mat-icon>
+					menu
+				</mat-icon>
+			</button>
+			<ng-container *ngIf="project">
+				{{project.name}}
+				<span matTooltip="Unsaved" *ngIf="unsaved">*</span>
+			</ng-container>
+			<div class="buttons" *ngIf="!working">
+				<button mat-button [disabled]="!unsaved || publishing || saving" (click)="revert()">
+					Revert
+				</button>
+				<mat-checkbox color="primary" [(ngModel)]="autoUpdate">Auto-update</mat-checkbox>
+				<button mat-button (click)="update()" [disabled]="publishing || saving">
+					Update
+				</button>
+				<button mat-button [disabled]="publishing || saving || unsaved" (click)="publish()"
+				        *ngIf="!project.publishToken">
+					Publish
+				</button>
+				<ng-container *ngIf="project.publishToken">
+					<button mat-button color="warn" [disabled]="publishing || saving || unsaved" (click)="unpublish()">
+						Unpublish
+					</button>
+					<a mat-button [disabled]="publishing || saving || unsaved"
+					   [href]="apiLocation + '/projects/published/' + project.publishToken" target="_blank">
+						Published
+					</a>
+				</ng-container>
+				<button mat-flat-button [disabled]="saving" (click)="save()">
+					{{saving ? 'Saving' : 'Save'}}
+				</button>
+			</div>
+		</mat-toolbar>
+		<div>
+			<ng-container *ngIf="!working">
+				<horizontal-split-pane class="split" [class.dragging]="dragging" (on-begin-resizing)="dragging = true"
+				                       (on-ended-resizing)="dragging = false"
+				                       primary-component-minsize="0"
+				                       secondary-component-minsize="0"
+				                       separator-thickness="7"
+				                       [primary-component-toggled-off]="false"
+				                       [secondary-component-toggled-off]="false"
+				                       primary-component-initialratio="0.5"
+				                       [local-storage-key]="id">
+					<app-code-editor [(code)]="code" (codeChange)="onChange()"
+					                 class="split-pane-content-primary"></app-code-editor>
+					<iframe class="split-pane-content-secondary" [src]="url | safeurl"></iframe>
+				</horizontal-split-pane>
+			</ng-container>
+			<mat-progress-spinner mode="indeterminate" *ngIf="working"></mat-progress-spinner>
+		</div>
+	</mat-sidenav-content>
+</mat-sidenav-container>

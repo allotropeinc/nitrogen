@@ -1,0 +1,51 @@
+mat-progress-spinner {
+	margin: auto;
+}
+
+.content {
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	padding: 24px;
+	box-sizing: border-box;
+}
+
+.content > h1 {
+	margin-bottom: 24px;
+}
+
+.content > button {
+	margin-top: 24px;
+}
+
+button {
+	width: 100%;
+}
+
+.mat-expansion-panel-header-title, .mat-expansion-panel-header-description {
+	flex-basis: 0;
+}
+
+.mat-expansion-panel-header-title {
+	width: 50%;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: pre;
+}
+
+.content ::ng-deep .mat-expansion-panel-body {
+	padding: 0 !important;
+}
+
+.content ::ng-deep .mat-expansion-panel-body > mat-card {
+	box-shadow: none !important;
+	padding-top: 0 !important;
+}
+
+.spacer {
+	height: 24px;
+}
+
+span.bold {
+	font-weight: bold;
+}

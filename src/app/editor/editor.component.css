@@ -1,0 +1,93 @@
+:host {
+	padding: 0;
+}
+
+mat-sidenav-container {
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
+}
+
+mat-sidenav-content {
+	padding: 0;
+	display: grid;
+	grid-template-rows: auto 1fr;
+	overflow: hidden;
+}
+
+mat-sidenav-content > div {
+	display: flex;
+}
+
+mat-progress-spinner {
+	margin: auto;
+}
+
+mat-sidenav {
+	width: 100vw;
+	max-width: 400px;
+}
+
+mat-toolbar {
+	flex-shrink: 0;
+}
+
+horizontal-split-pane {
+	margin: 0;
+	flex-grow: 1;
+}
+
+horizontal-split-pane ::ng-deep .upper-component, horizontal-split-pane ::ng-deep .lower-component {
+	position: relative;
+}
+
+horizontal-split-pane ::ng-deep horizontal-split-separator, horizontal-split-pane ::ng-deep horizontal-split-separator:hover {
+	background-color: #707070;
+	border: none;
+	border-top: 1px solid #808080;
+	border-bottom: 1px solid #606060;
+	box-sizing: border-box;
+}
+
+horizontal-split-pane ::ng-deep .lower-component > *, horizontal-split-pane ::ng-deep .upper-component > * {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 100%;
+}
+
+horizontal-split-pane ::ng-deep horizontal-split-separator ::ng-deep .handle {
+	display: none;
+}
+
+iframe {
+	width: 100%;
+	border: none;
+	box-shadow: 0 0 0 1px #fff inset;
+	background-color: #fff;
+}
+
+.dragging ::ng-deep .upper-component, .dragging ::ng-deep .lower-component {
+	pointer-events: none;
+}
+
+.buttons {
+	position: absolute;
+	top: 14px;
+	right: 16px;
+	font-size: 14px;
+}
+
+.buttons > * {
+	margin-left: 16px !important;
+}
+
+.menu-button {
+	margin-right: 16px;
+}
+
+.content {
+
+}

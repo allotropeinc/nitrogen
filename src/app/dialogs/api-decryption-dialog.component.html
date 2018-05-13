@@ -1,0 +1,21 @@
+<h1>Provide Password</h1>
+<p>We failed to decrypt your project data. Enter in the password to decrypt it. Trying previous passwords is
+	advised.</p>
+<mat-form-field>
+	<input matInput placeholder="Password" [(ngModel)]="password" [type]="showPassword ? 'text' : 'password'"
+	       (ngModelChange)="decrypted = decrypt(encrypted, password)">
+	<button mat-icon-button matSuffix (click)="showPassword = !showPassword">
+		<mat-icon>
+			{{showPassword ? 'visibility' : 'visibility_off'}}
+		</mat-icon>
+	</button>
+</mat-form-field>
+<ng-container>
+	<button mat-button (click)="dialogRef.close()">Cancel</button>
+	<div class="buttons">
+		<button mat-flat-button [disabled]="!decrypted.toLowerCase().startsWith('<!doctype html>')"
+		        [mat-dialog-close]="decrypted">
+			Decrypt
+		</button>
+	</div>
+</ng-container>

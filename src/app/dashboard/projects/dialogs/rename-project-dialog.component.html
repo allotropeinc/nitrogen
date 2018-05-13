@@ -1,0 +1,10 @@
+<h1>Rename Project</h1>
+<mat-form-field>
+	<input matInput [(ngModel)]="name" placeholder="Project Name">
+</mat-form-field>
+<ng-container>
+	<button mat-button (click)="dialogRef.close()">Cancel</button>
+	<div class="buttons">
+		<button mat-flat-button color="primary" [mat-dialog-close]="name">Rename</button>
+	</div>
+</ng-container>
