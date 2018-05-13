@@ -1,4 +1,8 @@
-# Matapp
+# Nitrogen
+
+This is the repository for Nitrogen. Any non-Pro code will go here.
+
+It's built using Angular CLI and Node.
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.4.
 
