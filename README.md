@@ -2,6 +2,14 @@
 
 Hello! We're happy you're interested in viewing the source code of the Nitrogen project. Nitrogen uses a combination of Angular and Express.
 
+## Setup
+
+Before you run Nitrogen, development or not, you'll need to give the backend a file to store its data in. An empty one is provided (`data.blank.json`), you need only copy it and name it `data.json` (and restart the backend if it's already running).
+
+### Setting yourself as admin
+
+Nitrogen features an admin panel, but to see it you'll have to set yourself as admin. There is currently no automatic way to do this if no admin already exists. Stop the backend if it's running, and edit the `data.json` file. Find your account in the `accounts` list and set `isAdmin` to `true`. Save and restart the backend and you should see the "Report Bug" button on the dashboard replaced by "Admin".
+
 ## Development
 
 I'm sure before you host it for production you're going to want to make a few changes. Those are easy if you use the development mode; using a terminal or IDE of your choice, run `ng serve` in the root directory and `ts-node index.ts` in the `backend` directory. The front-end will automatically know it's in development and use the backend on port 5015 (by default).
