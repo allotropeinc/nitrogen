@@ -2,12 +2,12 @@
 	<h1>Users</h1>
 	<mat-nav-list *ngIf="users">
 		<ng-container *ngFor="let user of users">
-			<a mat-list-item [routerLink]="[user]">
+			<a mat-list-item [routerLink]="user.username">
 				<mat-icon matListIcon>
-					account_circle
+					{{user.isAdmin ? 'supervisor_account' : 'account_circle'}}
 				</mat-icon>
 				<span matLine>
-					{{user}}
+					{{user.username}}
 				</span>
 			</a>
 		</ng-container>

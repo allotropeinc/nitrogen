@@ -35,6 +35,11 @@
 	<mat-sidenav-content>
 		<ng-container *ngIf="!working">
 			<mat-toolbar>
+				<a mat-icon-button class="menu-button" routerLink="/dashboard">
+					<mat-icon>
+						home
+					</mat-icon>
+				</a>
 				<button mat-icon-button class="menu-button" (click)="sidenav.open()">
 					<mat-icon>
 						menu

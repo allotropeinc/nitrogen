@@ -1,6 +1,7 @@
 import { Component, OnInit }       from '@angular/core'
 import { AdminDashboardComponent } from '../admin-dashboard.component'
 import { ApiService }              from '../../api.service'
+import { MinimalAccount }          from '../../../../backend/types'
 
 @Component ( {
 	selector    : 'app-admin-dashboard-users',
@@ -9,7 +10,7 @@ import { ApiService }              from '../../api.service'
 } )
 export class AdminDashboardUsersComponent implements OnInit {
 	working = true
-	users : string[]
+	users : MinimalAccount[]
 
 	constructor (
 		private parent : AdminDashboardComponent,
@@ -27,7 +28,7 @@ export class AdminDashboardUsersComponent implements OnInit {
 		this.users = null
 
 		this.api.getUsers ().subscribe (
-			( users : string[] ) => {
+			( users : MinimalAccount[] ) => {
 				if ( users ) {
 					this.users = users
 				}

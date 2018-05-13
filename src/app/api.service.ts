@@ -5,7 +5,7 @@ import { Project }                                               from './project
 import { of }                                                    from 'rxjs/observable/of'
 import { HttpClient }                                            from '@angular/common/http'
 import { Observer }                                              from 'rxjs/Observer'
-import { Account, BugReport }                                    from '../../backend/types'
+import { Account, BugReport, MinimalAccount }                    from '../../backend/types'
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
 
@@ -884,9 +884,9 @@ export class ApiService {
 		)
 	}
 
-	getUsers () : Observable<string[]> {
-		return new Observable<string[]> (
-			( observer : Observer<string[]> ) => {
+	getUsers () : Observable<MinimalAccount[]> {
+		return new Observable<MinimalAccount[]> (
+			( observer : Observer<MinimalAccount[]> ) => {
 				this.log (
 					'getUsers'
 				)
@@ -899,7 +899,7 @@ export class ApiService {
 						}
 					}
 				).subscribe (
-					( response : string[] ) => {
+					( response : MinimalAccount[] ) => {
 						observer.next ( response )
 						observer.complete ()
 					},

@@ -19,6 +19,11 @@ export interface Account {
 	isAdmin : boolean
 }
 
+export interface MinimalAccount {
+	username : string,
+	isAdmin : boolean
+}
+
 export interface PublishToken {
 	username : string,
 	projectIndex : number
