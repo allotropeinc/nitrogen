@@ -1,27 +1,15 @@
-# Matapp
+# Nitrogen
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.4.
+Hello! We're happy you're interested in viewing the source code of the Nitrogen project. Nitrogen uses a combination of Angular and Express.
 
-## Development server
+## Development
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+I'm sure before you host it for production you're going to want to make a few changes. Those are easy if you use the development mode; using a terminal or IDE of your choice, run `ng serve` in the root directory and `ts-node index.ts` in the `backend` directory. The front-end will automatically know it's in development and use the backend on port 5015 (by default).
 
-## Code scaffolding
+This is all assuming you run `npm install` in both the root and backend directories first, of course.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Production
 
-## Build
+After you're done with development, you'll probably want a way to push it to production. I've provided an easy script to help with building the app and putting it where it should be in the backend so the backend can serve it correctly.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Basically, the backend serves the `app` directory, and the `/api` endpoint is hooked up to the API. `build.sh` automatically builds Nitrogen for production and puts it where the backend expects it to be. That way the backend and frontend can run at the same time without managing 2 processes in production.
