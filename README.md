@@ -16,6 +16,8 @@ I'm sure before you host it for production you're going to want to make a few ch
 
 This is all assuming you run `npm install` in both the root and backend directories first, of course.
 
+And I'm so sorry I brutally murdered DRY (Don't Repeat Yourself).
+
 ## Production
 
 After you're done with development, you'll probably want a way to push it to production. I've provided an easy script to help with building the app and putting it where it should be in the backend so the backend can serve it correctly.
