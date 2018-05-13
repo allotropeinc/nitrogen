@@ -1,6 +1,6 @@
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
-import { Account, ApiData, BugReport, ClientProject, Project, PublishToken } from './types'
-import * as crypto                                                           from 'crypto'
+import { Account, ApiData, BugReport, ClientProject, MinimalAccount, Project, PublishToken } from './types'
+import * as crypto                                                                           from 'crypto'
 
 const fs = require ( 'fs' )
 const uuid = require ( 'uuid' )
@@ -1038,13 +1038,20 @@ export const Api = {
 			}
 		)
 	},
-	getAccounts () : Promise<string[]> {
-		return new Promise<string[]> (
+	getAccounts () : Promise<MinimalAccount[]> {
+		return new Promise<MinimalAccount[]> (
 			(
 				accept,
 				reject
 			) => {
-				accept ( Object.keys ( data.accounts ) )
+				accept ( Object.keys ( data.accounts ).map (
+					( username : string ) => {
+						return {
+							username : username,
+							isAdmin  : data.accounts[ username ].isAdmin
+						}
+					}
+				) )
 			}
 		)
 	},
