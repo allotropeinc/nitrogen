@@ -176,6 +176,7 @@ export class AccountChangePasswordComponent {
 } )
 export class AccountDeleteDialogComponent {
 	password : string
+	showPassword = false
 
 	constructor (
 		public dialogRef : MatDialogRef<AccountDeleteDialogComponent>

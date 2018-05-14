@@ -4,7 +4,12 @@
 </p>
 <p>Are you sure you want to delete this account?</p>
 <mat-form-field>
-	<input matInput placeholder="Password" [(ngModel)]="password" type="password" (keypress.enter)="dialogRef.close(password)">
+	<input matInput placeholder="Password" [(ngModel)]="password" type="password" [type]="showPassword ? 'text' : 'password'" (keypress.enter)="dialogRef.close(password)">
+	<button mat-icon-button matSuffix (click)="showPassword = !showPassword">
+		<mat-icon>
+			{{showPassword ? 'visibility' : 'visibility_off'}}
+		</mat-icon>
+	</button>
 </mat-form-field>
 <button mat-button (click)="dialogRef.close()">Cancel</button>
 <div class="buttons">
