@@ -1100,7 +1100,7 @@ export class ApiService {
 						width : '300px',
 						data  : [
 							encrypted,
-							this._decrypt
+							this._decrypt.bind(this)
 						]
 					}
 				).afterClosed ().subscribe (
