@@ -23,3 +23,9 @@ And I'm so sorry I brutally murdered DRY (Don't Repeat Yourself).
 After you're done with development, you'll probably want a way to push it to production. I've provided an easy script to help with building the app and putting it where it should be in the backend so the backend can serve it correctly.
 
 Basically, the backend serves the `app` directory, and the `/api` endpoint is hooked up to the API. `build.sh` automatically builds Nitrogen for production and puts it where the backend expects it to be. That way the backend and frontend can run at the same time without managing 2 processes in production.
+
+### HTTPS
+
+Nitrogen supports HTTPS using a certificate. You'll need to put two files, `privatekey.pem` and `certificate.crt`, in the `backend` directory, and the backend will take care of the rest. Note that this requires `port + 1` and `port + 2` to also be available for servers to run on, although they will not be exposed to the outside world and are only used by the server running on `port` to proxy connections (such as redirecting http to https).
+
+You do not require these files. If you do not provide them, the backend will run on normal (insecure; unencrypted) HTTP.

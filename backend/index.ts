@@ -4,6 +4,11 @@ import { Api }                               from './api'
 import { BugReport, ClientProject, Project } from './types'
 import * as path                             from 'path'
 import * as bodyParser                       from 'body-parser'
+import * as https                            from 'https'
+import * as fs                               from 'fs'
+import * as net                              from 'net'
+import * as http                             from 'http'
+import { IncomingMessage, ServerResponse }   from 'http'
 
 const app = express ()
 
@@ -706,10 +711,62 @@ app.get (
 	}
 )
 
-app.listen (
-	port,
-	'0.0.0.0',
-	() => {
-		console.log ( 'App is listening on port ' + port )
-	}
-)
+if ( fs.existsSync ( './privatekey.pem' ) && fs.existsSync ( './certificate.crt' ) ) {
+	net.createServer (
+		( con ) => {
+			con.once (
+				'data',
+				( buffer ) => {
+					// If `buffer` starts with 22, it's a TLS handshake
+					const proxyPort = port + ( buffer[ 0 ] === 22 ? 1 : 2 )
+					const proxy = net.createConnection (
+						proxyPort,
+						'localhost',
+						() => {
+							proxy.write ( buffer )
+							con.pipe ( proxy ).pipe ( con )
+						}
+					)
+				}
+			)
+		}
+	).listen (
+		port,
+		'0.0.0.0'
+	)
+
+	https.createServer (
+		{
+			key  : fs.readFileSync ( './privatekey.pem' ),
+			cert : fs.readFileSync ( './certificate.crt' )
+		},
+		app
+	).listen (
+		port + 1,
+		'localhost'
+	)
+
+	http.createServer (
+		(
+			req : IncomingMessage,
+			res : ServerResponse
+		) => {
+			res.writeHead (
+				301,
+				{
+					Location : 'https://' + req.headers.host + req.url
+				}
+			)
+
+			res.end ()
+		}
+	).listen (
+		port + 2,
+		'localhost'
+	)
+} else {
+	app.listen (
+		port,
+		'0.0.0.0'
+	)
+}
