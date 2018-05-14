@@ -497,7 +497,7 @@ export class ApiService {
 					}
 				).subscribe (
 					( response : Project ) => {
-						if ( !response.code.startsWith ( '<!doctype html>' ) ) { // encrypted
+						if ( !response.code.toLowerCase ().startsWith ( '<!doctype html>' ) ) { // encrypted
 							this.decrypt ( response.code ).subscribe (
 								( decrypted : string ) => {
 									response.code = decrypted
@@ -1100,7 +1100,7 @@ export class ApiService {
 						width : '300px',
 						data  : [
 							encrypted,
-							this._decrypt.bind(this)
+							this._decrypt.bind ( this )
 						]
 					}
 				).afterClosed ().subscribe (
