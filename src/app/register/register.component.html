@@ -6,7 +6,7 @@
 		An account is required to use save functionality.
 	</mat-card-subtitle>
 	<mat-divider></mat-divider>
-	<mat-card-content>
+	<mat-card-content (keydown.enter)="register()">
 		<mat-form-field>
 			<input matInput placeholder="Username" [(ngModel)]="username">
 		</mat-form-field>

@@ -11,7 +11,7 @@
 			We failed to sign you in. Are you sure you entered your account details correctly?
 		</p>
 	</mat-card-content>
-	<mat-card-content>
+	<mat-card-content (keydown.enter)="signIn()">
 		<mat-form-field>
 			<input matInput placeholder="Username" [(ngModel)]="username">
 		</mat-form-field>

@@ -3,7 +3,8 @@
 	advised.</p>
 <mat-form-field>
 	<input matInput placeholder="Password" [(ngModel)]="password" [type]="showPassword ? 'text' : 'password'"
-	       (ngModelChange)="decrypted = decrypt(encrypted, password)">
+	       (ngModelChange)="decrypted = decrypt(encrypted, password)"
+	       (keydown.enter)="submit.disabled ? undefined : dialogRef.close(decrypted)">
 	<button mat-icon-button matSuffix (click)="showPassword = !showPassword">
 		<mat-icon>
 			{{showPassword ? 'visibility' : 'visibility_off'}}
@@ -14,7 +15,7 @@
 	<button mat-button (click)="dialogRef.close()">Cancel</button>
 	<div class="buttons">
 		<button mat-flat-button [disabled]="!decrypted.toLowerCase().startsWith('<!doctype html>')"
-		        [mat-dialog-close]="decrypted">
+		        [mat-dialog-close]="decrypted" #submit>
 			Decrypt
 		</button>
 	</div>

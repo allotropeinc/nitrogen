@@ -1,14 +1,16 @@
 <h1>Change Account Username</h1>
 <p>Please enter your current password and new username below.</p>
-<mat-form-field>
-	<input matInput placeholder="Password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password">
-	<button mat-icon-button matSuffix (click)="showPassword = !showPassword">
-		<mat-icon>visibility{{showPassword ? '' : '_off'}}</mat-icon>
-	</button>
-</mat-form-field>
-<mat-form-field>
-	<input matInput placeholder="New username" [(ngModel)]="username">
-</mat-form-field>
+<div (keypress.enter)="dialogRef.close({username: username, password: password})">
+	<mat-form-field>
+		<input matInput placeholder="Password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password">
+		<button mat-icon-button matSuffix (click)="showPassword = !showPassword">
+			<mat-icon>visibility{{showPassword ? '' : '_off'}}</mat-icon>
+		</button>
+	</mat-form-field>
+	<mat-form-field>
+		<input matInput placeholder="New username" [(ngModel)]="username">
+	</mat-form-field>
+</div>
 <button mat-button (click)="dialogRef.close()">Cancel</button>
 <div class="buttons">
 	<button mat-flat-button [mat-dialog-close]="{username: username, password: password}">Change</button>
