@@ -45,5 +45,7 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# Backend data storage
+# Backend stuff
 /backend/data.json
+/backend/privatekey.pem
+/backend/certificate.crt

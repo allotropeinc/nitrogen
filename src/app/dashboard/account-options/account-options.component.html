@@ -1,6 +1,6 @@
 <mat-menu #actions="matMenu" yPosition="above">
 	<button mat-menu-item class="account">
-		<mat-icon>account_circle</mat-icon>
+		<mat-icon>{{admin ? 'supervisor_account' : 'account_circle'}}</mat-icon>
 		<span>{{this.api.username}}</span>
 	</button>
 	<mat-divider></mat-divider>

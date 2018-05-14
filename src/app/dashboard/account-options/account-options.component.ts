@@ -1,4 +1,4 @@
-import { Component, OnInit }                    from '@angular/core'
+import { Component, Input, OnInit }             from '@angular/core'
 import { MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
 import { ApiService }                           from '../../api.service'
 import { Router }                               from '@angular/router'
@@ -9,6 +9,8 @@ import { Router }                               from '@angular/router'
 	styleUrls   : [ './account-options.component.css' ]
 } )
 export class AccountOptionsComponent implements OnInit {
+	@Input ()
+	admin : boolean
 
 	constructor (
 		private dialog : MatDialog,
