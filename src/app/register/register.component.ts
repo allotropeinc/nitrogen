@@ -13,7 +13,8 @@ export class RegisterComponent implements OnInit {
 	password : string
 	confirmPassword : string
 	working = false
-	showPassword : false
+	showPassword = false
+	showPasswordConfirm = false
 
 	constructor (
 		private api : ApiService,
