@@ -149,6 +149,7 @@ export class AccountChangePasswordComponent {
 	newPasswordConfirm : string
 	showOldPassword = false
 	showNewPassword = false
+	showNewPasswordConfirm = false
 
 	constructor (
 		public dialogRef : MatDialogRef<AccountChangePasswordComponent>,
@@ -156,7 +157,7 @@ export class AccountChangePasswordComponent {
 	) {}
 
 	onClick () {
-		if ( this.newPasswordConfirm = this.newPasswordConfirm ) {
+		if ( this.newPasswordConfirm === this.newPassword ) {
 			this.dialogRef.close ( {
 				old : this.oldPassword,
 				new : this.newPassword
