@@ -9,6 +9,7 @@ import * as fs                             from 'fs'
 import * as net                            from 'net'
 import * as http                           from 'http'
 import { IncomingMessage, ServerResponse } from 'http'
+import * as Prism                          from 'prismjs'
 
 interface ApiRequest extends Request {
 	account? : Account
@@ -334,6 +335,39 @@ router.get (
 		if ( project ) {
 			res.end (
 				project.code,
+				'utf8'
+			)
+		} else {
+			res.end (
+				'This project does not exist or has been unpublished. Ask the author for a new link.',
+				'utf8'
+			)
+		}
+	}
+)
+
+router.get (
+	'/projects/published/:publishToken/source',
+	async (
+		req : ApiRequest,
+		res : Response
+	) => {
+		res.header (
+			'Content-Type',
+			'text/html'
+		)
+
+		const project : Project = await Api.getPublished ( req.params.publishToken )
+
+		if ( project ) {
+			const highlighted = Prism.highlight (
+				project.code,
+				Prism.languages.html,
+				'html'
+			)
+
+			res.end (
+				'<link rel="stylesheet" type="text/css" href="/assets/prism.css">' + highlighted,
 				'utf8'
 			)
 		} else {
