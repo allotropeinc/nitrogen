@@ -1,14 +1,18 @@
-import * as express                          from 'express'
-import { NextFunction, Request, Response }   from 'express'
-import { Api }                               from './api'
-import { BugReport, ClientProject, Project } from './types'
-import * as path                             from 'path'
-import * as bodyParser                       from 'body-parser'
-import * as https                            from 'https'
-import * as fs                               from 'fs'
-import * as net                              from 'net'
-import * as http                             from 'http'
-import { IncomingMessage, ServerResponse }   from 'http'
+import * as express                        from 'express'
+import { NextFunction, Request, Response } from 'express'
+import { Api }                             from './api'
+import { Account, BugReport, Project }     from './types'
+import * as path                           from 'path'
+import * as bodyParser                     from 'body-parser'
+import * as https                          from 'https'
+import * as fs                             from 'fs'
+import * as net                            from 'net'
+import * as http                           from 'http'
+import { IncomingMessage, ServerResponse } from 'http'
+
+interface ApiRequest extends Request {
+	account? : Account
+}
 
 const app = express ()
 
@@ -24,7 +28,7 @@ const noAuthRoutes = [
 ]
 
 router.use (
-	(
+	async (
 		req : Request,
 		res : Response,
 		next : NextFunction
@@ -41,6 +45,7 @@ router.use (
 			'Access-Control-Allow-Origin',
 			'*'
 		)
+
 		res.header (
 			'Access-Control-Allow-Headers',
 			'*'
@@ -63,27 +68,36 @@ router.use (
 					res.json ( null )
 				}
 			} else {
-				Api.validateToken ( <string> headers.token ).then ( () => next () ).catch ( () => res.json ( null ) )
+				const token = <string> headers.token
+				const isValid = await Api.validateToken ( token )
+
+				if ( isValid ) {
+					const username = await Api.getOwner ( token );
+
+					( <ApiRequest> req ).account = await Api.getAccount ( username )
+
+					next ()
+				} else {
+					res.json ( null )
+				}
 			}
 		}
-	} )
+	}
+)
 
 router.post (
 	'/accounts/auth',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
 		const body = req.body
 
 		if ( body.hasOwnProperty ( 'username' ) && body.hasOwnProperty ( 'password' ) ) {
-			Api.authenticate (
+			res.json ( await Api.authenticate (
 				body.username,
 				body.password
-			).then (
-				token => {
-					res.json ( token )
-				} ).catch ( () => res.json ( null ) )
+			) )
 		} else {
 			res.json ( null )
 		}
@@ -92,8 +106,8 @@ router.post (
 
 router.get (
 	'/accounts/check',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
 		// this is not in the noAuthRoutes list, so the authorization check will automatically return null for us if the token's invalid
@@ -104,22 +118,21 @@ router.get (
 
 router.post (
 	'/accounts/new',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
 		const body = req.body
 
 		if ( body.hasOwnProperty ( 'username' ) && body.hasOwnProperty ( 'password' ) ) {
-			Api.createAccount (
+			await Api.createAccount (
 				body.username,
 				body.password
-			).then ( () => {
-				Api.token ( body.username ).then (
-					( token : string ) => {
-						res.json ( token )
-					} ).catch ( () => res.json ( true ) )
-			} ).catch ( () => res.json ( false ) )
+			)
+
+			const token = res.json ( Api.token ( body.username ) )
+
+			res.json ( token || true )
 		} else {
 			res.json ( null )
 		}
@@ -128,48 +141,35 @@ router.post (
 
 router.post (
 	'/accounts/logout',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
-		Api.getOwner ( <string> req.headers.token ).then (
-			( username : string ) => {
-				Api.logoutAccount ( username ).then ( res.json.bind ( res ) ).catch ( res.json.bind ( res ) )
-			} ).catch ( res.json.bind ( res ) )
+		res.json ( await Api.logoutAccount ( req.account.username ) )
 	}
 )
 
 router.get (
 	'/projects',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
-		Api.getOwner ( <string> req.headers.token ).then (
-			( username : string ) => {
-				Api.getProjects ( username ).then (
-					( projects : Project[] ) => {
-						res.json ( projects )
-					}
-				).catch ( res.json.bind ( res ) )
-			} ).catch ( res.json.bind ( res ) )
+		res.json ( await Api.getProjects ( req.account.username ) )
 	}
 )
 
 router.post (
 	'/projects/new',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'name' ) ) {
-			Api.getOwner ( <string> req.headers.token ).then (
-				( username : string ) => {
-					Api.newProject (
-						username,
-						<string> req.body.name
-					).then ( () => res.json ( true ) ).catch ( res.json.bind ( res ) )
-				} ).catch ( res.json.bind ( res ) )
+			res.json ( await Api.newProject (
+				req.account.username,
+				<string> req.body.name
+			) )
 		} else {
 			res.json ( null )
 		}
@@ -178,19 +178,16 @@ router.post (
 
 router.post (
 	'/projects/rename/:id',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'name' ) ) {
-			Api.getOwner ( <string> req.headers.token ).then (
-				( username : string ) => {
-					Api.renameProject (
-						username,
-						+req.params.id,
-						<string> req.body.name
-					).then ( () => res.json ( true ) ).catch ( res.json.bind ( res ) )
-				} ).catch ( res.json.bind ( res ) )
+			res.json ( await Api.renameProject (
+				req.account.username,
+				+req.params.id,
+				<string> req.body.name
+			) )
 		} else {
 			res.json ( null )
 		}
@@ -199,18 +196,15 @@ router.post (
 
 router.post (
 	'/projects/delete/:id',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'name' ) ) {
-			Api.getOwner ( <string> req.headers.token ).then (
-				( username : string ) => {
-					Api.deleteProject (
-						username,
-						+req.params.id
-					).then ( () => res.json ( true ) ).catch ( res.json.bind ( res ) )
-				} ).catch ( res.json.bind ( res ) )
+			res.json ( await Api.deleteProject (
+				req.account.username,
+				+req.params.id
+			) )
 		} else {
 			res.json ( null )
 		}
@@ -219,35 +213,29 @@ router.post (
 
 router.get (
 	'/projects/:id',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
-		Api.getOwner ( <string> req.headers.token ).then (
-			( username : string ) => {
-				Api.getProject (
-					username,
-					+req.params.id
-				).then ( ( project : ClientProject ) => res.json ( project ) ).catch ( res.json.bind ( res ) )
-			} ).catch ( () => res.json ( null ) )
+		res.json ( await Api.getProject (
+			req.account.username,
+			+req.params.id
+		) )
 	}
 )
 
 router.post (
 	'/projects/:id',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'code' ) ) {
-			Api.getOwner ( <string> req.headers.token ).then (
-				( username : string ) => {
-					Api.setProjectCode (
-						username,
-						+req.params.id,
-						req.body.code
-					).then ( res.json.bind ( res ) ).catch ( res.json.bind ( res ) )
-				} ).catch ( res.json.bind ( res ) )
+			res.json ( await Api.setProjectCode (
+				req.account.username,
+				+req.params.id,
+				req.body.code
+			) )
 		} else {
 			res.json ( false )
 		}
@@ -256,19 +244,16 @@ router.post (
 
 router.post (
 	'/projects/move/:id',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'delta' ) ) {
-			Api.getOwner ( <string> req.headers.token ).then (
-				( username : string ) => {
-					Api.moveProject (
-						username,
-						+req.params.id,
-						+req.body.delta
-					).then ( res.json.bind ( res ) ).catch ( res.json.bind ( res ) )
-				} ).catch ( () => res.json ( false ) )
+			res.json ( await Api.moveProject (
+				req.account.username,
+				+req.params.id,
+				+req.body.delta
+			) )
 		} else {
 			res.json ( false )
 		}
@@ -277,33 +262,25 @@ router.post (
 
 router.get (
 	'/editorOptions',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
-		Api.getOwner ( <string> req.headers.token ).then (
-			( username : string ) => {
-				Api.getEditorOptions (
-					username
-				).then ( res.json.bind ( res ) ).catch ( res.json.bind ( res ) )
-			} ).catch ( res.json.bind ( res ) )
+		res.json ( await Api.getEditorOptions ( req.account.username ) )
 	}
 )
 
 router.post (
 	'/editorOptions',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'options' ) ) {
-			Api.getOwner ( <string> req.headers.token ).then (
-				( username : string ) => {
-					Api.setEditorOptions (
-						username,
-						req.body.options
-					).then ( res.json.bind ( res ) ).catch ( res.json.bind ( res ) )
-				} ).catch ( () => res.json ( false ) )
+			res.json ( await Api.setEditorOptions (
+				req.account.username,
+				req.body.options
+			) )
 		} else {
 			res.json ( false )
 		}
@@ -312,44 +289,29 @@ router.post (
 
 router.post (
 	'/editorOptions/reset',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
-		Api.getOwner ( <string> req.headers.token ).then (
-			( username : string ) => {
-				Api.resetEditorOptions (
-					username
-				).then ( res.json.bind ( res ) ).catch ( res.json.bind ( res ) )
-			} ).catch ( () => res.json ( false ) )
+		res.json ( await Api.resetEditorOptions (
+			req.account.username
+		) )
 	}
 )
 
 router.post (
 	'/accounts/delete',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
 		const body = req.body
 
 		if ( body.hasOwnProperty ( 'password' ) ) {
-			Api.getOwner ( <string> req.headers.token ).then (
-				(
-					username : string
-				) => {
-					Api.deleteAccount (
-						username,
-						body.password
-					).then (
-						res.json.bind ( res )
-					).catch (
-						res.json.bind ( res )
-					)
-				}
-			).catch (
-				() => res.json ( false )
-			)
+			res.json ( await Api.deleteAccount (
+				req.account.username,
+				body.password
+			) )
 		} else {
 			res.json ( false )
 		}
@@ -358,8 +320,8 @@ router.post (
 
 router.get (
 	'/projects/published/:publishToken',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
 		res.header (
@@ -367,73 +329,71 @@ router.get (
 			'text/html'
 		)
 
-		Api.getPublished ( req.params.publishToken ).then ( ( project : Project ) => {
-			/* res.json(project.code) */
+		const project : Project = await Api.getPublished ( req.params.publishToken )
+
+		if ( project ) {
 			res.end (
 				project.code,
 				'utf8'
 			)
-		} ).catch ( () => {
+		} else {
 			res.end (
 				'This project does not exist or has been unpublished. Ask the author for a new link.',
 				'utf8'
 			)
-		} )
+		}
 	}
 )
 
 router.post (
 	'/projects/:id/unpublish',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
-		Api.getOwner ( <string> req.headers.token ).then ( ( username : string ) => {
-			Api.unpublish (
-				username,
-				+req.params.id
-			).then ( res.json.bind ( res ) ).catch ( res.json.bind ( res ) )
-		} ).catch ( () => res.json ( false ) )
+		res.json ( await Api.unpublish (
+			req.account.username,
+			+req.params.id
+		) )
 	}
 )
 
 router.post (
 	'/projects/:id/publish',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
-		Api.getOwner ( <string> req.headers.token ).then ( ( username : string ) => {
-			Api.publish (
-				username,
-				+req.params.id
-			).then ( res.json.bind ( res ) ).catch ( res.json.bind ( res ) )
-		} ).catch ( res.json.bind ( res ) )
+		res.json ( Api.publish (
+			req.account.username,
+			+req.params.id
+		) )
 	}
 )
 
 router.post (
 	'/bugReport',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
-		if ( req.body.hasOwnProperty ( 'username' ) && req.body.hasOwnProperty ( 'title' ) && req.body.hasOwnProperty ( 'summary' ) && req.body.hasOwnProperty ( 'steps' ) && req.body.hasOwnProperty ( 'comments' ) ) {
-			Api.getOwner ( <string> req.headers.token ).then ( ( username : string ) => {
-				req.body.username = username // I don't care what the client says, their token will prove who they are
-
-				Api.submitBugReport (
-					username,
-					<BugReport> {
-						username : req.body.username,
-						title    : req.body.title,
-						summary  : req.body.summary,
-						steps    : req.body.steps,
-						comments : req.body.comments,
-						read     : false
-					}
-				).then ( res.json.bind ( res ) ).catch ( res.json.bind ( res ) )
-			} )
+		if (
+			req.body.hasOwnProperty ( 'title' ) &&
+			req.body.hasOwnProperty ( 'summary' ) &&
+			req.body.hasOwnProperty ( 'steps' ) &&
+			req.body.hasOwnProperty ( 'comments' )
+		) {
+			res.json ( await Api.submitBugReport (
+				req.account.username,
+				<BugReport> {
+					username : req.account.username,
+					title    : req.body.title,
+					summary  : req.body.summary,
+					steps    : req.body.steps,
+					comments : req.body.comments,
+					read     : false
+				}
+			) )
 		} else {
 			res.json ( false )
 		}
@@ -442,8 +402,8 @@ router.post (
 
 router.post (
 	'/accounts/changePassword',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'oldPassword' ) && req.body.hasOwnProperty ( 'password' ) ) {
@@ -472,28 +432,16 @@ router.post (
 
 router.post (
 	'/accounts/changeUsername',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'username' ) && req.body.hasOwnProperty ( 'password' ) ) {
-			Api.getOwner ( <string> req.headers.token ).then (
-				(
-					username : string
-				) => {
-					Api.changeUsername (
-						username,
-						req.body.username,
-						req.body.password
-					).then (
-						res.json.bind ( res )
-					).catch (
-						res.json.bind ( res )
-					)
-				}
-			).catch (
-				() => res.json ( false )
-			)
+			res.json ( await Api.changeUsername (
+				req.account.username,
+				req.body.username,
+				req.body.password
+			) )
 		} else {
 			res.json ( false )
 		}
@@ -502,128 +450,70 @@ router.post (
 
 router.get (
 	'/isAdmin',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
-		Api.getOwner ( <string> req.headers.token ).then (
-			( username : string ) => {
-				Api.isAdmin ( username ).then (
-					res.json.bind ( res )
-				).catch (
-					res.json.bind ( res )
-				)
-			}
-		).catch (
-			() => res.json ( false )
-		)
+		res.json ( req.account.isAdmin )
 	}
 )
 
 router.get (
 	'/accounts',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
-		Api.getOwner ( <string> req.headers.token ).then (
-			( username : string ) => {
-				Api.isAdmin ( username ).then (
-					() => {
-						Api.getAccounts ().then (
-							res.json.bind ( res )
-						).catch (
-							res.json.bind ( res )
-						)
-					}
-				).catch (
-					() => res.json ( null )
-				)
-			}
-		).catch (
-			res.json.bind ( res )
-		)
+		if ( req.account.isAdmin ) {
+			res.json ( await Api.getAccounts () )
+		} else {
+			res.json ( null )
+		}
 	}
 )
 
 router.get (
 	'/accounts/admin/:username',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
-		Api.getOwner ( <string> req.headers.token ).then (
-			( username : string ) => {
-				Api.isAdmin ( username ).then (
-					() => {
-						Api.getAccount (
-							req.params.username
-						).then (
-							res.json.bind ( res )
-						).catch (
-							res.json.bind ( res )
-						)
-					}
-				).catch (
-					() => res.json ( null )
-				)
-			}
-		).catch (
-			res.json.bind ( res )
-		)
+		if ( req.account.isAdmin ) {
+			res.json ( await Api.getAccount ( req.params.username ) )
+		} else {
+			res.json ( null )
+		}
 	}
 )
 
 router.post (
 	'/accounts/admin/:username',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
-		Api.getOwner ( <string> req.headers.token ).then (
-			( username : string ) => {
-				Api.isAdmin ( username ).then (
-					() => {
-						Api.setAccount (
-							req.params.username,
-							req.body // holy fuck I hope the client knows what it's doing
-						).then (
-							res.json.bind ( res )
-						).catch (
-							res.json.bind ( res )
-						)
-					}
-				).catch (
-					res.json.bind ( res )
-				)
-			}
-		).catch (
-			() => res.json ( false )
-		)
+		if ( req.account.isAdmin ) {
+			res.json ( await Api.setAccount (
+				req.params.username,
+				req.body // holy fuck I hope the client knows what it's doing
+			) )
+		} else {
+			res.json ( false )
+		}
 	}
 )
 
 router.post (
 	'/accounts/checkPassword',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'password' ) ) {
-			Api.getOwner ( <string> req.headers.token ).then (
-				( username : string ) => {
-					Api.validateCredentials (
-						username,
-						req.body.password
-					).then (
-						res.json.bind ( res )
-					).catch (
-						res.json.bind ( res )
-					)
-				}
-			).catch (
-				res.json.bind ( res )
-			)
+			res.json ( await Api.validateCredentials (
+				req.account.username,
+				req.body.password
+			) )
 		} else {
 			res.json ( null )
 		}
@@ -632,56 +522,40 @@ router.post (
 
 router.get (
 	'/bugReports',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
-		Api.getOwner ( <string> req.headers.token ).then (
-			( username : string ) => {
-				Api.isAdmin ( username ).then (
-					() => {
-						Api.getBugReports ().then (
-							res.json.bind ( res )
-						).catch (
-							res.json.bind ( res )
-						)
-					}
-				).catch (
-					() => res.json ( null )
-				)
-			}
-		).catch (
-			res.json.bind ( res )
-		)
+		if ( req.account.isAdmin ) {
+			res.json ( await Api.getBugReports () )
+		}
 	}
 )
 
 router.post (
 	'/bugReports/:id',
-	(
-		req : Request,
+	async (
+		req : ApiRequest,
 		res : Response
 	) => {
-		Api.getOwner ( <string> req.headers.token ).then (
-			( username : string ) => {
-				Api.isAdmin ( username ).then (
-					() => {
-						Api.setBugReport (
-							req.params.id,
-							req.body
-						).then (
-							res.json.bind ( res )
-						).catch (
-							res.json.bind ( res )
-						)
-					}
-				).catch (
-					res.json.bind ( res )
-				)
-			}
-		).catch (
-			() => res.json ( false )
-		)
+		if ( req.account.isAdmin ) {
+			res.json ( await Api.setBugReport (
+				req.params.id,
+				req.body
+			) )
+		}
+	}
+)
+
+router.use (
+	(
+		err : Error,
+		req : Request,
+		res : Response,
+		next : NextFunction
+	) => {
+		res.json ( null )
+		console.log ( err )
 	}
 )
 
