@@ -500,9 +500,14 @@ export class ApiService {
 						if ( !response.code.toLowerCase ().startsWith ( '<!doctype html>' ) ) { // encrypted
 							this.decrypt ( response.code ).subscribe (
 								( decrypted : string ) => {
-									response.code = decrypted
+									if ( decrypted ) {
+										response.code = decrypted
 
-									observer.next ( response )
+										observer.next ( response )
+									} else {
+										observer.next ( null )
+									}
+
 									observer.complete ()
 								}
 							)
