@@ -18,47 +18,119 @@
 				{{project.name}}
 				<span matTooltip="Unsaved" *ngIf="unsaved">*</span>
 			</ng-container>
-			<div class="buttons" *ngIf="!working">
-				<button mat-icon-button matTooltip="Revert all changes" [disabled]="!unsaved || publishing || saving"
-				        (click)="revert()">
-					<mat-icon>
-						reply
-					</mat-icon>
-				</button>
-				<mat-checkbox matTooltip="Auto-update" color="primary" [(ngModel)]="autoUpdate"></mat-checkbox>
-				<button matTooltip="Update preview" mat-icon-button (click)="update()"
-				        [disabled]="publishing || saving">
-					<mat-icon>
-						refresh
-					</mat-icon>
-				</button>
-				<button matTooltip="Publish project" mat-icon-button [disabled]="publishing || saving || unsaved"
-				        (click)="publish()"
-				        *ngIf="!project.publishToken">
-					<mat-icon>
-						cloud_upload
-					</mat-icon>
-				</button>
-				<ng-container *ngIf="project.publishToken">
-					<button matTooltip="Unpublish project" mat-icon-button color="warn"
-					        [disabled]="publishing || saving || unsaved" (click)="unpublish()">
+			<ng-container *ngIf="!working">
+				<div class="buttons">
+					<button mat-icon-button matTooltip="Revert all changes"
+					        [disabled]="!unsaved || publishing || saving"
+					        (click)="revert()">
 						<mat-icon>
-							cloud_off
+							reply
 						</mat-icon>
 					</button>
-					<button matTooltip="Share your published project" mat-icon-button
-					        [disabled]="publishing || saving || unsaved" (click)="share()">
+					<mat-checkbox matTooltip="Auto-update" color="primary" [(ngModel)]="autoUpdate"></mat-checkbox>
+					<button matTooltip="Update preview" mat-icon-button (click)="update()"
+					        [disabled]="publishing || saving">
 						<mat-icon>
-							share
+							refresh
 						</mat-icon>
 					</button>
-				</ng-container>
-				<button matTooltip="Save" mat-icon-button [disabled]="saving" (click)="save()">
-					<mat-icon>
-						save
-					</mat-icon>
-				</button>
-			</div>
+					<button matTooltip="Publish project" mat-icon-button [disabled]="publishing || saving || unsaved"
+					        (click)="publish()"
+					        *ngIf="!project.publishToken">
+						<mat-icon>
+							cloud_upload
+						</mat-icon>
+					</button>
+					<ng-container *ngIf="project.publishToken">
+						<button matTooltip="Unpublish project" mat-icon-button color="warn"
+						        [disabled]="publishing || saving || unsaved" (click)="unpublish()">
+							<mat-icon>
+								cloud_off
+							</mat-icon>
+						</button>
+						<button matTooltip="Share your published project" mat-icon-button
+						        [disabled]="publishing || saving || unsaved" (click)="share()">
+							<mat-icon>
+								share
+							</mat-icon>
+						</button>
+					</ng-container>
+					<button matTooltip="Save" mat-icon-button [disabled]="saving" (click)="save()">
+						<mat-icon>
+							save
+						</mat-icon>
+					</button>
+				</div>
+				<div class="mobile-buttons">
+					<mat-menu xPosition="before" #mobile_menu="matMenu">
+						<button mat-menu-item [disabled]="saving" (click)="save()">
+							<mat-icon>
+								save
+							</mat-icon>
+							<span>
+								Save
+							</span>
+						</button>
+						<ng-container *ngIf="project.publishToken">
+							<button mat-menu-item [disabled]="publishing || saving || unsaved" (click)="unpublish()"
+							        color="warn">
+								<mat-icon>
+									cloud_off
+								</mat-icon>
+								<span>
+								Unpublish
+							</span>
+							</button>
+							<button mat-menu-item [disabled]="publishing || saving || unsaved" (click)="share()">
+								<mat-icon>
+									share
+								</mat-icon>
+								<span>
+									Share
+								</span>
+							</button>
+						</ng-container>
+						<button mat-menu-item [disabled]="publishing || saving || unsaved" (click)="publish()"
+						        *ngIf="!project.publishToken">
+							<mat-icon>
+								cloud_upload
+							</mat-icon>
+							<span>
+								Publish
+							</span>
+						</button>
+						<button mat-menu-item (click)="update()" [disabled]="publishing || saving">
+							<mat-icon>
+								refresh
+							</mat-icon>
+							<span>
+								Update
+							</span>
+						</button>
+						<span mat-menu-item (click)="autoUpdate = !autoUpdate">
+							<mat-icon class="fixed-container">
+								<mat-checkbox class="fixed" color="primary" [(ngModel)]="autoUpdate"></mat-checkbox>
+							</mat-icon>
+							<span>
+								Auto-refresh
+							</span>
+						</span>
+						<button mat-menu-item [disabled]="!unsaved || publishing || saving" (click)="revert()">
+							<mat-icon>
+								reply
+							</mat-icon>
+							<span>
+								Revert Changes
+							</span>
+						</button>
+					</mat-menu>
+					<button mat-icon-button [matMenuTriggerFor]="mobile_menu">
+						<mat-icon>
+							more_vert
+						</mat-icon>
+					</button>
+				</div>
+			</ng-container>
 		</mat-toolbar>
 		<div>
 			<ng-container *ngIf="!working">

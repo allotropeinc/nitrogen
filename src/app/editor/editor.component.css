@@ -74,7 +74,7 @@ iframe {
 	pointer-events: none;
 }
 
-.buttons {
+.buttons, .mobile-buttons {
 	position: absolute;
 	top: 50%;
 	right: 16px;
@@ -86,10 +86,32 @@ iframe {
 	margin-left: 16px !important;
 }
 
+.mobile-buttons {
+	display: none;
+}
+
 .menu-button {
 	margin-right: 16px;
 }
 
-.content {
+@media screen and (max-width: 599px) {
+	.buttons {
+		display: none;
+	}
 
+	.mobile-buttons {
+		display: block;
+	}
+}
+
+.fixed-container {
+	position: relative;
+}
+
+.fixed {
+	position: absolute;
+	top: calc(50% - 2px);
+	left: 50%;
+	transform: translate(-50%, -50%);
+	pointer-events: none;
 }
