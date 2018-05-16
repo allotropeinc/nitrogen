@@ -588,8 +588,7 @@ router.use (
 		res : Response,
 		next : NextFunction
 	) => {
-		res.json ( null )
-		console.log ( err )
+		res.json ( err )
 	}
 )
 
