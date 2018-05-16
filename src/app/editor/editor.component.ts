@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild }                             from '@angular/core'
-import { ActivatedRoute, CanDeactivate, Router }                    from '@angular/router'
-import { ApiService }                                               from '../api.service'
-import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarDismiss } from '@angular/material'
-import { CodeEditorComponent }                                      from './code-editor/code-editor.component'
-import { Project }                                                  from '../project'
-import { Observable }                                               from 'rxjs/Observable'
+import { Component, Inject, OnInit, ViewChild }                                      from '@angular/core'
+import { ActivatedRoute, CanDeactivate, Router }                                     from '@angular/router'
+import { ApiService }                                                                from '../api.service'
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar, MatSnackBarDismiss } from '@angular/material'
+import { CodeEditorComponent }                                                       from './code-editor/code-editor.component'
+import { Project }                                                                   from '../project'
+import { Observable }                                                                from 'rxjs/Observable'
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
 
 @Component ( {
@@ -245,6 +245,16 @@ export class EditorComponent implements OnInit {
 			$event.preventDefault ()
 		}
 	}
+
+	share () {
+		this.dialog.open (
+			ShareProjectDialogComponent,
+			{
+				width : '300px',
+				data  : this.project
+			}
+		)
+	}
 }
 
 export class CanDeactivateEditor implements CanDeactivate<EditorComponent> {
@@ -327,4 +337,16 @@ export class ConfirmPublishDialogComponent {
 } )
 export class DoctypeMoreInfoDialogComponent {
 	constructor () {}
+}
+
+@Component ( {
+	selector    : 'app-share-project-dialog',
+	templateUrl : './dialogs/share-project-dialog.component.html'
+} )
+export class ShareProjectDialogComponent {
+	constructor (
+		@Inject ( MAT_DIALOG_DATA )
+		public project : any,
+		public api : ApiService
+	) {}
 }

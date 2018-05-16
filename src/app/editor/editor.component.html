@@ -19,28 +19,44 @@
 				<span matTooltip="Unsaved" *ngIf="unsaved">*</span>
 			</ng-container>
 			<div class="buttons" *ngIf="!working">
-				<button mat-button [disabled]="!unsaved || publishing || saving" (click)="revert()">
-					Revert
+				<button mat-icon-button matTooltip="Revert all changes" [disabled]="!unsaved || publishing || saving"
+				        (click)="revert()">
+					<mat-icon>
+						reply
+					</mat-icon>
 				</button>
-				<mat-checkbox color="primary" [(ngModel)]="autoUpdate">Auto-update</mat-checkbox>
-				<button mat-button (click)="update()" [disabled]="publishing || saving">
-					Update
+				<mat-checkbox matTooltip="Auto-update" color="primary" [(ngModel)]="autoUpdate"></mat-checkbox>
+				<button matTooltip="Update preview" mat-icon-button (click)="update()"
+				        [disabled]="publishing || saving">
+					<mat-icon>
+						refresh
+					</mat-icon>
 				</button>
-				<button mat-button [disabled]="publishing || saving || unsaved" (click)="publish()"
+				<button matTooltip="Publish project" mat-icon-button [disabled]="publishing || saving || unsaved"
+				        (click)="publish()"
 				        *ngIf="!project.publishToken">
-					Publish
+					<mat-icon>
+						cloud_upload
+					</mat-icon>
 				</button>
 				<ng-container *ngIf="project.publishToken">
-					<button mat-button color="warn" [disabled]="publishing || saving || unsaved" (click)="unpublish()">
-						Unpublish
+					<button matTooltip="Unpublish project" mat-icon-button color="warn"
+					        [disabled]="publishing || saving || unsaved" (click)="unpublish()">
+						<mat-icon>
+							cloud_off
+						</mat-icon>
 					</button>
-					<a mat-button [disabled]="publishing || saving || unsaved"
-					   [href]="apiLocation + '/projects/published/' + project.publishToken" target="_blank">
-						Published
-					</a>
+					<button matTooltip="Share your published project" mat-icon-button
+					        [disabled]="publishing || saving || unsaved" (click)="share()">
+						<mat-icon>
+							share
+						</mat-icon>
+					</button>
 				</ng-container>
-				<button mat-flat-button [disabled]="saving" (click)="save()">
-					{{saving ? 'Saving' : 'Save'}}
+				<button matTooltip="Save" mat-icon-button [disabled]="saving" (click)="save()">
+					<mat-icon>
+						save
+					</mat-icon>
 				</button>
 			</div>
 		</mat-toolbar>

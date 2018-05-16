@@ -30,6 +30,7 @@ mat-sidenav {
 
 mat-toolbar {
 	flex-shrink: 0;
+	position: relative;
 }
 
 horizontal-split-pane {
@@ -75,9 +76,10 @@ iframe {
 
 .buttons {
 	position: absolute;
-	top: 14px;
+	top: 50%;
 	right: 16px;
 	font-size: 14px;
+	transform: translateY(-50%);
 }
 
 .buttons > * {

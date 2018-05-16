@@ -26,9 +26,11 @@ import {
 	ConfirmLeaveDialogComponent,
 	ConfirmPublishDialogComponent,
 	ConfirmRevertDialogComponent,
-	ConfirmUnpublishDialogComponent, DoctypeMoreInfoDialogComponent,
-	EditorComponent
-} from './editor/editor.component'
+	ConfirmUnpublishDialogComponent,
+	DoctypeMoreInfoDialogComponent,
+	EditorComponent,
+	ShareProjectDialogComponent
+}                                                   from './editor/editor.component'
 import { SplitPaneModule }                          from 'ng2-split-pane/lib/ng2-split-pane'
 import { SafeUrlPipe }                              from './safe-url.pipe'
 import {
@@ -47,12 +49,12 @@ import {
 	AccountChangeUsernameComponent,
 	AccountDeleteDialogComponent,
 	AccountOptionsComponent
-}                                         from './dashboard/account-options/account-options.component';
-import { AdminButtonComponent }           from './dashboard/admin-button/admin-button.component';
-import { AdminDashboardComponent }        from './admin-dashboard/admin-dashboard.component';
-import { AdminDashboardUsersComponent }   from './admin-dashboard/admin-dashboard-users/admin-dashboard-users.component';
-import { AdminDashboardReportsComponent } from './admin-dashboard/admin-dashboard-reports/admin-dashboard-reports.component';
-import { AdminDashboardUserComponent }    from './admin-dashboard/admin-dashboard-users/admin-dashboard-user/admin-dashboard-user.component'
+}                                                   from './dashboard/account-options/account-options.component'
+import { AdminButtonComponent }                     from './dashboard/admin-button/admin-button.component'
+import { AdminDashboardComponent }                  from './admin-dashboard/admin-dashboard.component'
+import { AdminDashboardUsersComponent }             from './admin-dashboard/admin-dashboard-users/admin-dashboard-users.component'
+import { AdminDashboardReportsComponent }           from './admin-dashboard/admin-dashboard-reports/admin-dashboard-reports.component'
+import { AdminDashboardUserComponent }              from './admin-dashboard/admin-dashboard-users/admin-dashboard-user/admin-dashboard-user.component'
 
 @NgModule ( {
 	declarations    : [
@@ -88,7 +90,8 @@ import { AdminDashboardUserComponent }    from './admin-dashboard/admin-dashboar
 		AdminDashboardUserComponent,
 		DoctypeMoreInfoDialogComponent,
 		ApiProvidePasswordDialogComponent,
-		ApiDecryptionDialogComponent
+		ApiDecryptionDialogComponent,
+		ShareProjectDialogComponent
 	],
 	imports         : [
 		BrowserModule,
@@ -121,7 +124,8 @@ import { AdminDashboardUserComponent }    from './admin-dashboard/admin-dashboar
 		AccountDeleteDialogComponent,
 		DoctypeMoreInfoDialogComponent,
 		ApiProvidePasswordDialogComponent,
-		ApiDecryptionDialogComponent
+		ApiDecryptionDialogComponent,
+		ShareProjectDialogComponent
 	]
 } )
 export class AppModule {}
