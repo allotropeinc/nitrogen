@@ -48,7 +48,6 @@ router.use (
 
 		if ( req.method === 'OPTIONS' ) {
 			res.status ( 200 )
-			res.write ( 'Fuck off, CORS Preflight.' )
 			res.end ()
 		} else {
 			const headers = req.headers
