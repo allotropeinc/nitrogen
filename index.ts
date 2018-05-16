@@ -398,7 +398,7 @@ router.post (
 		req : ApiRequest,
 		res : Response
 	) => {
-		res.json ( Api.publish (
+		res.json ( await Api.publish (
 			req.account.username,
 			+req.params.id
 		) )
