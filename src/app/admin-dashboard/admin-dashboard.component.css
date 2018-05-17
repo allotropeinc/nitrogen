@@ -11,7 +11,7 @@ mat-sidenav {
 	width: 100vw;
 	max-width: 400px;
 	box-sizing: border-box;
-	height: 100vw;
+	height: 100vh;
 }
 
 mat-sidenav > div {
