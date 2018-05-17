@@ -13,7 +13,7 @@ import {
 }                          from '@angular/core'
 import { EditorComponent } from 'ngx-monaco-editor/editor.component'
 import { ApiService }      from '../../api.service'
-import { Observable }      from 'rxjs/Observable'
+import { Observable }      from 'rxjs'
 import IStandaloneCodeEditor = monaco.editor.IStandaloneCodeEditor
 
 @Component ( {

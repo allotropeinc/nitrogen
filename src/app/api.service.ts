@@ -1,10 +1,7 @@
 import { Component, Inject, Injectable, isDevMode }              from '@angular/core'
-import { Observable }                                            from 'rxjs/Observable'
-import 'rxjs/add/operator/delay'
+import { Observable, Observer, of }                              from 'rxjs'
 import { Project }                                               from './project'
-import { of }                                                    from 'rxjs/observable/of'
 import { HttpClient }                                            from '@angular/common/http'
-import { Observer }                                              from 'rxjs/Observer'
 import { Account, BugReport, MinimalAccount }                    from '../../backend/types'
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions

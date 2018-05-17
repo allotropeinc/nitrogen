@@ -4,7 +4,7 @@ import { ApiService }                                                           
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar, MatSnackBarDismiss } from '@angular/material'
 import { CodeEditorComponent }                                                       from './code-editor/code-editor.component'
 import { Project }                                                                   from '../project'
-import { Observable }                                                                from 'rxjs/Observable'
+import { Observable }                                                                from 'rxjs'
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
 
 @Component ( {
