@@ -1,6 +1,6 @@
 # Nitrogen
 
-Hello! We're happy you're interested in viewing the source code of the Nitrogen project. Nitrogen uses a combination of Angular and Express. The production version is runnning [here](https://nitrogenedit.com/).
+Hello! We're happy you're interested in viewing the source code of the Nitrogen project. Nitrogen uses a combination of Angular and Express. The production version is running [here](https://nitrogenedit.com/).
 
 ## Setup
 
