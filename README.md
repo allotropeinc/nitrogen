@@ -2,6 +2,14 @@
 
 Hello! We're happy you're interested in viewing the source code of the Nitrogen project. Nitrogen uses a combination of Angular and Express. The production version is running [here](https://nitrogenedit.com/).
 
+## Cloning
+
+In order to clone this repository, you'll have to use `--recursive` to clone submodules as well. The `backend` directory is a separate submodule that points to the `backend` branch, and if you don't clone recursively, the directory will be empty.
+
+```
+git clone https://github.com/allotropelabs/nitrogen.git --recursive
+```
+
 ## Setup
 
 Before you run Nitrogen, development or not, you'll need to give the backend a file to store its data in. An empty one is provided (`data.blank.json`), you need only copy it and name it `data.json` (and restart the backend if it's already running).
