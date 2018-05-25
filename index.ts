@@ -131,7 +131,7 @@ router.post (
 				body.password
 			)
 
-			const token = res.json ( Api.token ( body.username ) )
+			const token = res.json ( await Api.token ( body.username ) )
 
 			res.json ( token || true )
 		} else {
