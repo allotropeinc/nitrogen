@@ -19,6 +19,7 @@
     "https": "^1.0.0",
     "net": "^1.0.2",
     "prismjs": "^1.14.0",
+    "server-destroy": "^1.0.1",
     "ts-node": "^6.0.2",
     "typescript": "^2.8.3",
     "uuid": "^3.2.1"

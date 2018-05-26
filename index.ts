@@ -43,7 +43,7 @@ async function safeShutdown () {
 			) => {
 				const server = servers[ i ]
 
-				server.close ( accept )
+				server.destroy ( accept )
 			}
 		)
 	}
@@ -904,6 +904,8 @@ app.get (
 )
 
 if ( fs.existsSync ( './privatekey.pem' ) && fs.existsSync ( './certificate.crt' ) ) {
+	const port = config.port > 0 ? config.port : undefined
+
 	if ( port ) {
 		servers.push (
 			net.createServer (
@@ -972,3 +974,5 @@ if ( fs.existsSync ( './privatekey.pem' ) && fs.existsSync ( './certificate.crt'
 		)
 	)
 }
+
+servers.forEach ( require ( 'server-destroy' ) )
