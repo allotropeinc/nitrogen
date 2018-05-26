@@ -37,8 +37,7 @@ async function safeShutdown () {
 	for ( let i = 0 ; i < servers.length ; i++ ) {
 		await new Promise (
 			(
-				accept,
-				reject
+				accept
 			) => {
 				const server = servers[ i ]
 
@@ -778,22 +777,40 @@ router.post (
 			req.headers.hasOwnProperty ( 'X-Hub-Signature' ) &&
 			req.headers.hasOwnProperty ( 'User-Agent' )
 		) {
+			debug ( 'got webhook ping from "GitHub" (need to validate first)' )
+			debug ( 'calculating signature of request body' )
+			const sig = signature ( req.rawBody )
+
+			debug (
+				'signature is %o',
+				sig
+			)
+
 			if (
 				( <string> req.headers[ 'X-GitHub-Event' ] ) === 'push' &&
-				( <string> req.headers[ 'X-Hub-Signature' ] ) === signature ( req.rawBody ) &&
+				( <string> req.headers[ 'X-Hub-Signature' ] ) === sig &&
 				( <string> req.headers[ 'User-Agent' ] ).startsWith ( 'GitHub-Hookshot/' )
 			) {
+				debug ( 'signature matches, executing update script' )
+
 				exec (
-					'git pull',
+					'bash update.sh',
 					async (
-						err : Error,
-						stdout : string,
-						stderr : string
+						err : Error
 					) => {
+						debug ( 'execution completed' )
+
 						if ( err ) {
+							debug (
+								'error: %o',
+								err
+							)
+
 							res.status ( 500 )
 							res.json ( false )
 						} else {
+							debug ( 'command was successful' )
+
 							res.json ( true ) // respond before the server closes
 
 							await safeShutdown ()
