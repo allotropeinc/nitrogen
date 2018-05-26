@@ -20,12 +20,7 @@ Nitrogen features an admin panel, but to see it you'll have to set yourself as a
 
 ## Auto-update
 
-In order to support auto-update, you'll have to provide a `config.json`. A blank one is not currently available, but it's a simple format:```json
-{
-	"secret": "literally any string, gó c®azÿ"
-}```
-
-Put any string as the `secret` - the backend won't care, as it's using HMAC, which isn't picky about secrets. These are used to verify the payloads sent by the webhook you'll need to create ([WebHook documentation](https://developer.github.com/webhooks/#payloads)).
+In order to support auto-update, you'll have to modify the `config.json`. A blank one can be found at `config.default.json`. Put any string as the `secret` - the backend won't care, as it's using HMAC, which isn't picky about secrets. These are used to verify the payloads sent by the webhook you'll need to create ([WebHook documentation](https://developer.github.com/webhooks/#payloads)).
 
 Once you've decided on a secret, go to the settings of your repository, navigate to Webhooks, and create a new webhook. Set the URL to wherever you're putting Nitrogen, plus `/api/github`.
 
