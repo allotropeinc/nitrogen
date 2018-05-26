@@ -2,5 +2,6 @@
 
 {
 	"port" : 0, // set to zero to use the defaults (80, and 443 for HTTPS)
-	"secret": "" // set to the same secret you set in the GitHub webhook, or leave empty for no auto-update
+	"secret": "", // set to the same secret you set in the GitHub webhook, or leave empty for no auto-update
+	"branch": "master" // set this to the branch you want auto-update to watch
 }

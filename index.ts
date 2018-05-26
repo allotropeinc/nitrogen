@@ -803,7 +803,7 @@ if ( config[ 'secret' ] ) {
 						res.status ( 200 )
 						res.json ( true )
 
-						if ( req.body.ref === 'refs/heads/master' ) {
+						if ( req.body.ref === 'refs/heads/' + config.branch ) {
 							debug ( 'bringing down servers for update' )
 
 							await safeShutdown ()
