@@ -14,6 +14,19 @@ git clone https://github.com/allotropelabs/nitrogen.git --recursive
 
 Before you run Nitrogen, development or not, you'll need to give the backend a file to store its data in. An empty one is provided (`data.blank.json`), you need only copy it and name it `data.json` (and restart the backend if it's already running).
 
+## Auto-update
+
+In order to support auto-update, you'll have to provide a `config.json`. A blank one is not currently available, but it's a simple format:```json
+{
+	"secret": "literally any string, gó c®azÿ"
+}```
+
+Put any string as the `secret` - the backend won't care, as it's using HMAC, which isn't picky about secrets. These are used to verify the payloads sent by the webhook you'll need to create ([WebHook documentation](https://developer.github.com/webhooks/#payloads)).
+
+Once you've decided on a secret, go to the settings of your repository, navigate to Webhooks, and create a new webhook. Set the URL to wherever you're putting Nitrogen, plus `/api/github`.
+
+For example, if you were hosting it on `example.com:5015`, you'd put `http://example.com:5015/api/github` there. Use `https://` instead of `http://` if you have a certificate. Set the content type to `application/json`, set the secret to your secret you set in the JSON file, select "Just the `push` event", and then uncheck "Active".
+
 ### Setting yourself as admin
 
 Nitrogen features an admin panel, but to see it you'll have to set yourself as admin. There is currently no automatic way to do this if no admin already exists. Stop the backend if it's running, and edit the `data.json` file. Find your account in the `accounts` list and set `isAdmin` to `true`. Save and restart the backend and you should see the "Report Bug" button on the dashboard replaced by "Admin".
