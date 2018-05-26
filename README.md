@@ -36,9 +36,11 @@ Your `config.json` secret is not the same as the one in the webhook. Fix this by
 
 You didn't add your secret to the webhook. Fix this by taking the secret in your `config.json` and adding it to the webhook.
 
-### Warning
+Additionally, there is one more message you might see when you push:
 
-Auto-update is not fully functional yet, although the `update.sh` can be run manually and the backend restarted.
+#### Assuming backend has been pushed and master will follow
+
+This shouldn't be an error unless you're pushing to a branch other than `master`. If you are, modify the `branch` in `config.json` to the name of the branch you're using. Either that or push to `master`. We push to `backend` and then to `master` with every change.
 
 ## Development
 
