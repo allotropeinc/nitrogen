@@ -4,8 +4,8 @@
 git push origin backend
 cd ..
 git add .
-echo 'Enter your commit message (for master):'
-read -e -i "Update backend" commitmsg
-git commit -m "$commitmsg"
+DEFAULTCOMMITMSG="Update backend"
+read -e -p "Enter your commit message (leave blank for '$DEFAULTCOMMITMSG'): " COMMITMSG
+git commit -m "${COMMITMSG:-$DEFAULTCOMMITMSG}"
 git push -u origin master
 cd backend
