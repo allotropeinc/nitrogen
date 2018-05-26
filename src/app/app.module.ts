@@ -54,7 +54,10 @@ import { AdminButtonComponent }                     from './dashboard/admin-butt
 import { AdminDashboardComponent }                  from './admin-dashboard/admin-dashboard.component'
 import { AdminDashboardUsersComponent }             from './admin-dashboard/admin-dashboard-users/admin-dashboard-users.component'
 import { AdminDashboardReportsComponent }           from './admin-dashboard/admin-dashboard-reports/admin-dashboard-reports.component'
-import { AdminDashboardUserComponent }              from './admin-dashboard/admin-dashboard-users/admin-dashboard-user/admin-dashboard-user.component'
+import {
+	AdminDashboardUserComponent,
+	UserDeleteAccountDialogComponent
+} from './admin-dashboard/admin-dashboard-users/admin-dashboard-user/admin-dashboard-user.component'
 
 @NgModule ( {
 	declarations    : [
@@ -91,7 +94,8 @@ import { AdminDashboardUserComponent }              from './admin-dashboard/admi
 		DoctypeMoreInfoDialogComponent,
 		ApiProvidePasswordDialogComponent,
 		ApiDecryptionDialogComponent,
-		ShareProjectDialogComponent
+		ShareProjectDialogComponent,
+		UserDeleteAccountDialogComponent
 	],
 	imports         : [
 		BrowserModule,
@@ -125,7 +129,8 @@ import { AdminDashboardUserComponent }              from './admin-dashboard/admi
 		DoctypeMoreInfoDialogComponent,
 		ApiProvidePasswordDialogComponent,
 		ApiDecryptionDialogComponent,
-		ShareProjectDialogComponent
+		ShareProjectDialogComponent,
+		UserDeleteAccountDialogComponent
 	]
 } )
 export class AppModule {}

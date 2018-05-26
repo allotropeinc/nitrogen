@@ -1181,6 +1181,38 @@ export class ApiService {
 			}
 		)
 	}
+
+	deleteOtherAccount (
+		username : string
+	) : Observable<boolean> {
+		return new Observable<boolean> (
+			( observer : Observer<boolean> ) => {
+				this.log (
+					'deleteOtherAccount',
+					username
+				)
+
+				this.http.post (
+					this.apiLocation + '/accounts/delete/' + encodeURIComponent ( username ),
+					{},
+					{
+						headers : {
+							token : this.token
+						}
+					}
+				).subscribe (
+					( response : boolean ) => {
+						observer.next ( response )
+						observer.complete ()
+					},
+					() => {
+						observer.next ( false )
+						observer.complete ()
+					}
+				)
+			}
+		)
+	}
 }
 
 @Component ( {

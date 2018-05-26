@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core'
-import { ActivatedRoute }    from '@angular/router'
-import { Account }           from '../../../account'
-import { ApiService }        from '../../../api.service'
-import { MatSnackBar }       from '@angular/material'
+import { Component, OnInit }                    from '@angular/core'
+import { ActivatedRoute, Router }               from '@angular/router'
+import { Account }                              from '../../../account'
+import { ApiService }                           from '../../../api.service'
+import { MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
 
 @Component ( {
 	selector    : 'app-admin-dashboard-user',
@@ -17,7 +17,9 @@ export class AdminDashboardUserComponent implements OnInit {
 	constructor (
 		private route : ActivatedRoute,
 		private api : ApiService,
-		private snackbar : MatSnackBar
+		private snackbar : MatSnackBar,
+		private dialog : MatDialog,
+		private router : Router
 	) {}
 
 	ngOnInit () {
@@ -65,4 +67,46 @@ export class AdminDashboardUserComponent implements OnInit {
 			}
 		)
 	}
+
+	deleteAccount () {
+		this.working = true
+
+		this.dialog.open (
+			UserDeleteAccountDialogComponent,
+			{
+				width : '300px'
+			}
+		).afterClosed ().subscribe (
+			( del : boolean ) => {
+				if ( del ) {
+					this.api.deleteOtherAccount ( this.username ).subscribe (
+						( success : boolean ) => {
+							if ( !success ) {
+								this.snackbar.open (
+									'The account could not be deleted.',
+									'Close'
+								)
+
+								this.working = false
+							} else {
+								this.router.navigateByUrl ( '/admin/users' )
+							}
+						}
+					)
+				} else {
+					this.working = false
+				}
+			}
+		)
+	}
+}
+
+@Component ( {
+	selector    : 'app-user-delete-account-dialog',
+	templateUrl : './dialogs/user-delete-account-dialog.component.html'
+} )
+export class UserDeleteAccountDialogComponent {
+	constructor (
+		public dialogRef : MatDialogRef<UserDeleteAccountDialogComponent>
+	) {}
 }
