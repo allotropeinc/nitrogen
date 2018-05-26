@@ -903,9 +903,9 @@ app.get (
 	}
 )
 
-if ( fs.existsSync ( './privatekey.pem' ) && fs.existsSync ( './certificate.crt' ) ) {
-	const port = config.port > 0 ? config.port : undefined
+const port = config.port > 0 ? config.port : undefined
 
+if ( fs.existsSync ( './privatekey.pem' ) && fs.existsSync ( './certificate.crt' ) ) {
 	if ( port ) {
 		servers.push (
 			net.createServer (
