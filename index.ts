@@ -837,6 +837,11 @@ if ( config ) {
 
 						res.status ( 200 )
 						res.json ( true )
+					} else {
+						debug ( 'unsupported event' )
+
+						res.status ( 400 )
+						res.json ( false )
 					}
 				} else {
 					debug ( 'signature doesn\'t match' )
