@@ -1,6 +1,7 @@
 #!/bin/bash
-# Run this script after committing here.
+# Run this script after committing from the `backend` directory
 
+git push origin backend
 cd ..
 git add .
 git commit -m 'Update backend'
