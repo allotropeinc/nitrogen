@@ -1,9 +1,11 @@
 #!/bin/bash
-# Run this script after committing from the `backend` directory
+# Run this script after committing to backend, but BEFORE committing to master
 
 git push origin backend
 cd ..
 git add .
-git commit -m 'Update backend'
+echo 'Enter your commit message (for master):'
+read -e -i "Update backend" commitmsg
+git commit -m "$commitmsg"
 git push -u origin master
 cd backend
