@@ -803,7 +803,7 @@ if ( config[ 'secret' ] ) {
 						event
 					)
 
-					if ( ( event ) === 'push' ) {
+					if ( ( event ) === 'push' && req.body.ref === 'refs/heads/master' ) { // guaranteed to be committed after backend
 						debug ( 'executing update script' )
 
 						exec (
