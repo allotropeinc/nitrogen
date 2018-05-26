@@ -3,34 +3,106 @@ import { NextFunction, Request, Response } from 'express'
 import { Api }                             from './api'
 import { Account, BugReport, Project }     from './types'
 import * as path                           from 'path'
-import * as bodyParser                     from 'body-parser'
 import * as https                          from 'https'
 import * as fs                             from 'fs'
 import * as net                            from 'net'
 import * as http                           from 'http'
 import { IncomingMessage, ServerResponse } from 'http'
 import * as Prism                          from 'prismjs'
+import { exec }                            from 'child_process'
+import * as crypto                         from 'crypto'
+
+const debug = require ( 'debug' ) (
+	'hexazine'
+)
+
+debug.enabled = true
+
+async function safeShutdown () {
+	debug ( 'shutting down hexazine safely' )
+	debug (
+		'we have %d server(s) to shutdown',
+		servers.length
+	)
+
+	for ( let i = 0 ; i < servers.length ; i++ ) {
+		await new Promise (
+			(
+				accept,
+				reject
+			) => {
+				const server = servers[ i ]
+
+				server.close ( accept )
+			}
+		)
+	}
+
+	debug ( 'exiting' )
+
+	process.exit ( 0 )
+}
+
+const config = JSON.parse (
+	fs.readFileSync (
+		'config.json',
+		'utf8'
+	)
+)
+
+debug ( 'Loaded config' )
 
 interface ApiRequest extends Request {
-	account? : Account
+	account? : Account,
+	rawBody? : string
 }
 
 const app = express ()
 
-app.use ( bodyParser.json () )
-
-const port   = 5015,
-      router = express.Router ()
+const port    = 5015,
+      router  = express.Router (),
+      servers = []
 
 const noAuthRoutes = [
 	'/accounts/auth',
 	'/accounts/new',
-	'/'
+	'/github'
 ]
+
+app.use (
+	async (
+		req : ApiRequest,
+		res : Response,
+		next : NextFunction
+	) => {
+		req.rawBody = ''
+		req.setEncoding ( 'utf8' )
+
+		req.on (
+			'data',
+			( chunk : string ) => {
+				req.rawBody += chunk
+			}
+		)
+
+		req.on (
+			'end',
+			() => {
+				try {
+					req.body = req.rawBody.length === 0 ? {} : JSON.parse ( req.rawBody )
+				} catch ( e ) {
+					req.body = {}
+				}
+
+				next ()
+			}
+		)
+	}
+)
 
 router.use (
 	async (
-		req : Request,
+		req : ApiRequest,
 		res : Response,
 		next : NextFunction
 	) => {
@@ -40,7 +112,13 @@ router.use (
 			censored.password = '[censored]'
 		}
 
-		console.log ( req.ip + ': ' + req.method + ' /api' + req.url + ': ' + JSON.stringify ( censored ) )
+		debug (
+			'%s: %s /api%s: %O',
+			req.ip,
+			req.method,
+			req.url,
+			censored
+		)
 
 		res.header (
 			'Access-Control-Allow-Origin',
@@ -60,10 +138,8 @@ router.use (
 
 			if ( !headers.hasOwnProperty ( 'token' ) ) {
 				if ( noAuthRoutes.indexOf ( req.url ) !== -1 ) {
-					res.status ( 200 )
 					next ()
 				} else if ( req.url.startsWith ( '/projects/published/' ) && req.url.length > 20 ) {
-					res.status ( 200 )
 					next ()
 				} else {
 					res.json ( null )
@@ -73,9 +149,9 @@ router.use (
 				const isValid = await Api.validateToken ( token )
 
 				if ( isValid ) {
-					const username = await Api.getOwner ( token );
+					const username = await Api.getOwner ( token )
 
-					( <ApiRequest> req ).account = await Api.getAccount ( username )
+					req.account = await Api.getAccount ( username )
 
 					next ()
 				} else {
@@ -581,6 +657,52 @@ router.post (
 	}
 )
 
+function signature ( body ) {
+	return crypto.createHmac (
+		'sha1',
+		config.secret
+	).update ( body ).digest ( 'hex' )
+}
+
+router.post (
+	'/github',
+	async (
+		req : ApiRequest,
+		res : Response
+	) => {
+		if (
+			req.headers.hasOwnProperty ( 'X-GitHub-Event' ) &&
+			req.headers.hasOwnProperty ( 'X-GitHub-Delivery' ) &&
+			req.headers.hasOwnProperty ( 'X-Hub-Signature' ) &&
+			req.headers.hasOwnProperty ( 'User-Agent' )
+		) {
+			if (
+				( <string> req.headers[ 'X-GitHub-Event' ] ) === 'push' &&
+				( <string> req.headers[ 'X-Hub-Signature' ] ) === signature ( req.rawBody ) &&
+				( <string> req.headers[ 'User-Agent' ] ).startsWith ( 'GitHub-Hookshot/' )
+			) {
+				exec (
+					'git pull',
+					async (
+						err : Error,
+						stdout : string,
+						stderr : string
+					) => {
+						if ( err ) {
+							res.status ( 500 )
+							res.json ( false )
+						} else {
+							res.json ( true ) // respond before the server closes
+
+							await safeShutdown ()
+						}
+					}
+				)
+			}
+		}
+	}
+)
+
 router.use (
 	(
 		err : Error,
@@ -602,6 +724,14 @@ process.on (
 	e => console.log ( e )
 )
 
+process.on (
+	'SIGINT',
+	async () => {
+		debug ( 'received SIGINT' )
+		await safeShutdown ()
+	}
+)
+
 app.use ( express.static ( 'app' ) )
 
 app.get (
@@ -618,61 +748,69 @@ app.get (
 )
 
 if ( fs.existsSync ( './privatekey.pem' ) && fs.existsSync ( './certificate.crt' ) ) {
-	net.createServer (
-		( con ) => {
-			con.once (
-				'data',
-				( buffer ) => {
-					// If `buffer` starts with 22, it's a TLS handshake
-					const proxyPort = port + ( buffer[ 0 ] === 22 ? 1 : 2 )
-					const proxy = net.createConnection (
-						proxyPort,
-						'localhost',
-						() => {
-							proxy.write ( buffer )
-							con.pipe ( proxy ).pipe ( con )
-						}
-					)
-				}
-			)
-		}
-	).listen (
-		port,
-		'0.0.0.0'
+	servers.push (
+		net.createServer (
+			( con ) => {
+				con.once (
+					'data',
+					( buffer ) => {
+						// If `buffer` starts with 22, it's a TLS handshake
+						const proxyPort = port + ( buffer[ 0 ] === 22 ? 1 : 2 )
+						const proxy = net.createConnection (
+							proxyPort,
+							'localhost',
+							() => {
+								proxy.write ( buffer )
+								con.pipe ( proxy ).pipe ( con )
+							}
+						)
+					}
+				)
+			}
+		).listen (
+			port,
+			'0.0.0.0'
+		)
 	)
 
-	https.createServer (
-		{
-			key  : fs.readFileSync ( './privatekey.pem' ),
-			cert : fs.readFileSync ( './certificate.crt' )
-		},
-		app
-	).listen (
-		port + 1,
-		'localhost'
+	servers.push (
+		https.createServer (
+			{
+				key  : fs.readFileSync ( './privatekey.pem' ),
+				cert : fs.readFileSync ( './certificate.crt' )
+			},
+			app
+		).listen (
+			port + 1,
+			'localhost'
+		)
 	)
 
-	http.createServer (
-		(
-			req : IncomingMessage,
-			res : ServerResponse
-		) => {
-			res.writeHead (
-				301,
-				{
-					Location : 'https://' + req.headers.host + req.url
-				}
-			)
+	servers.push (
+		http.createServer (
+			(
+				req : IncomingMessage,
+				res : ServerResponse
+			) => {
+				res.writeHead (
+					301,
+					{
+						Location : 'https://' + req.headers.host + req.url
+					}
+				)
 
-			res.end ()
-		}
-	).listen (
-		port + 2,
-		'localhost'
+				res.end ()
+			}
+		).listen (
+			port + 2,
+			'localhost'
+		)
 	)
 } else {
-	app.listen (
-		port,
-		'0.0.0.0'
+	servers.push (
+		app.listen (
+			port,
+			'0.0.0.0'
+		)
 	)
 }

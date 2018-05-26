@@ -1,9 +1,15 @@
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
 import { Account, ApiData, BugReport, ClientProject, MinimalAccount, Project, PublishToken } from './types'
 import * as crypto                                                                           from 'crypto'
+import * as fs                                                                               from 'fs'
+import * as uuid                                                                             from 'uuid'
 
-const fs = require ( 'fs' )
-const uuid = require ( 'uuid' )
+const debug = require ( 'debug' ) (
+	'hexazine:api'
+)
+
+debug.enabled = true
+
 let data : ApiData = null
 
 const starterEditorOptions : IEditorConstructionOptions = {
@@ -89,7 +95,7 @@ const starterCode = '<!doctype html>\n' +
 	'<html>\n' +
 	'\t<head>\n' +
 	'\t\t<meta charset="utf-8">\n' +
-	'\t\t<title>Getting Started with the HTML Editor</title>\n' +
+	'\t\t<title>Welcome to Nitrogen</title>\n' +
 	'\t\t<style type="text/css">\n' +
 	'\t\t\t/* put CSS styles here */\n' +
 	'\t\t</style>\n' +
@@ -98,26 +104,8 @@ const starterCode = '<!doctype html>\n' +
 	'\t\t</script>\n' +
 	'\t</head>\n' +
 	'\t<body>\n' +
-	'\t\t<h1>Welcome to the new real-time HTML editor!</h1>\n' +
-	'\t\t<p>I hope you like it! Here\'s a quick tutorial on how to use some common functions:</p>\n' +
-	'\t\t<h2>Changing Editor Options</h2>\n' +
-	'\t\t<p>There\'s a button on the top-left of the screen. It looks like this:</p>\n' +
-	'\t\t<p><img src="https://puu.sh/AibHf/de5213fb3a.png"></p>\n' +
-	'\t\t<p>If you click it, it will bring up a menu. In that menu is an option to return to the dashboard, and a whole ton of editor options down below. Leaving them alone won\'t do any harm, but if you want to use Comic Sans, go ahead and use Comic Sans! I\'ll hate you, but it won\'t break anything.</p>\n' +
-	'\t\t<p><img src="https://puu.sh/AibJN/02edf0d97b.png" style="border: 2em solid #424242; height: 39px"></p>\n' +
-	'\t\t<p>Don\'t forget to hit that save button when you\'re done!</p>\n' +
-	'\t\t<p><img src="https://puu.sh/AibOO/f88c13ff6e.png" style="border: 2em solid #424242; height: 36px"></p>\n' +
-	'\t\t<h2>Publishing a Project</h2>\n' +
-	'\t\t<p>Let\'s say you\'ve created this amazing project and you want to share it with someone else, but you don\'t want to give them your username and password. That\'s fine! With the power of <b>publishing</b>, you can share your project with others easily and safely.</p>\n' +
-	'\t\t<p>So.. how exactly do we publish? Well, let me walk you through it!</p>\n' +
-	'\t\t<ol>\n' +
-	'\t\t\t<li>Open an amazing project (like this one!)</li>\n' +
-	'\t\t\t<li>Find that attractive-looking <b>Publish</b> button, it looks like this:<br /><br /><img src="https://puu.sh/AibUE/01dc2e1602.png"  style="border: 2em solid #212121; height: 36px"></li>\n' +
-	'\t\t\t<li>Click it! Soon, that button will <b>multiply</b>. Not really, but it will turn into two buttons: a scary-looking <b>Unpublish</b> button, and a jolly <b>Published</b> button!<br /><br /><img src="https://puu.sh/Aic2e/3f9555cce4.png"  style="border: 2em solid #212121; height: 36px"></li>\n' +
-	'\t\t\t<li>Click the <b>Published</b> button to visit your published page. Don\'t worry, you won\'t lose your work, it\'ll open in a new tab. The link will be super attractive, like <a href="https://html.localtunnel.me/api/projects/published/677225cc-116b-4f62-9341-511d07f6f8df" target="_blank">https://magic.unicorns</a>. Okay, I cheated a bit there, it\'s going to be a bit uglier.</li>\n' +
-	'\t\t\t<li>You can always click the <b>Unpublish</b> button to unpublish your project.</li>\n' +
-	'\t\t</ol>\n' +
-	'\t\t<p>You can share that URL with anyone! They won\'t have to be logged in. Don\'t worry about being up to date - if you save your project while it\'s published, the page will automatically update. Don\'t worry about unpublishing it either - you can publish it again at any time, though the link will be different if you do.</p>\n' +
+	'\t\t<h1>New Project</h1>\n' +
+	'\t\t<p>Welcome to Nitrogen!</p>\n' +
 	'\t</body>\n' +
 	'</html>'
 
@@ -126,6 +114,8 @@ function getData () : Promise<ApiData> {
 		accept,
 		reject
 		) => {
+			debug ( 'loading data' )
+
 			fs.readFile (
 				'./data.json',
 				'utf8',
@@ -134,8 +124,13 @@ function getData () : Promise<ApiData> {
 					content : string
 				) => {
 					if ( !err ) {
+						debug ( 'no error in loading data' )
 						accept ( JSON.parse ( content ) )
 					} else {
+						debug (
+							'error in loading data: %O',
+							err
+						)
 						reject ( null )
 					}
 				}
@@ -149,6 +144,8 @@ function saveData () : Promise<boolean> {
 		accept,
 		reject
 		) => {
+			debug ( 'saving data' )
+
 			fs.writeFile (
 				'./data.json',
 				JSON.stringify (
@@ -158,8 +155,13 @@ function saveData () : Promise<boolean> {
 				),
 				( err : NodeJS.ErrnoException ) => {
 					if ( !err ) {
+						debug ( 'no error in saving data' )
 						accept ( true )
 					} else {
+						debug (
+							'error in saving data: %O',
+							err
+						)
 						reject ( false )
 					}
 				}
@@ -175,6 +177,11 @@ function getAccount (
 		accept,
 		reject
 		) => {
+			debug (
+				'getting account %o',
+				username
+			)
+
 			if ( data.accounts.hasOwnProperty ( username ) ) {
 				accept ( data.accounts[ username ] )
 			} else {
@@ -189,6 +196,11 @@ const hashFunctions = {
 		username : string,
 		password : string
 	) : string {
+		debug (
+			'calculating v1 hash for %o',
+			username
+		)
+
 		return crypto.createHash ( 'sha256' ).update (
 			password,
 			'utf8'
@@ -198,6 +210,11 @@ const hashFunctions = {
 		username : string,
 		password : string
 	) : string {
+		debug (
+			'calculating v2 hash for %o',
+			username
+		)
+
 		return crypto.createHmac (
 			'sha256',
 			password
@@ -210,6 +227,11 @@ const hashFunctions = {
 		username : string,
 		password : string
 	) : string {
+		debug (
+			'calculating v3 hash for %o',
+			username
+		)
+
 		return crypto.createHmac (
 			'sha256',
 			username
@@ -230,9 +252,19 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'validating token'
+				)
+
 				if ( data.activeTokens.hasOwnProperty ( token ) ) {
+					debug (
+						'token belongs to %o',
+						data.activeTokens[ token ]
+					)
+
 					accept ( true )
 				} else {
+					debug ( 'inactive or fake token' )
 					reject ( false )
 				}
 			}
@@ -246,28 +278,42 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'creating account %o',
+					username
+				)
+
 				getAccount ( username ).then (
 					() => {
 						reject ( false )
 					}
 				).catch (
 					() => {
-						data.accounts[ username ] = {
-							username      : username,
-							password      : currentHashVersion + '!' + hashFunctions[ currentHashVersion ] (
-								username,
-								password
-							),
-							projects      : [],
-							editorOptions : starterEditorOptions,
-							isAdmin       : false
-						}
+						if ( /^[\w\d]{1,16}$/.test ( username ) ) {
+							data.accounts[ username ] = {
+								username      : username,
+								password      : currentHashVersion + '!' + hashFunctions[ currentHashVersion ] (
+									username,
+									password
+								),
+								projects      : [],
+								editorOptions : starterEditorOptions,
+								isAdmin       : false
+							}
 
-						saveData ().then (
-							accept
-						).catch (
-							reject
-						)
+							saveData ().then (
+								accept
+							).catch (
+								reject
+							)
+						} else {
+							debug (
+								'username %o is too exotic',
+								username
+							)
+
+							reject ()
+						}
 					}
 				)
 			}
@@ -280,13 +326,21 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'creating token for %o',
+					username
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
 						if ( account.activeToken ) {
+							debug ( 'token already exists' )
 							accept ( account.activeToken )
 						} else {
+							debug ( 'generating token' )
 							const token = uuid.v4 ()
 
+							debug ( 'activating token' )
 							account.activeToken = token
 							data.activeTokens[ token ] = username
 
@@ -312,12 +366,19 @@ export const Api = {
 				accept,
 				reject
 			) => {
+				debug (
+					'validating credentials for %o',
+					username
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
 						const hashed = account.password.split ( '!' )
 						let algorithm = 'v1'
 
 						if ( hashed.length !== 1 ) { // length === 1 means v1, before hashes were versioned
+							debug ( 'account is using v1 hash' )
+
 							algorithm = hashed[ 0 ]
 						}
 
@@ -325,11 +386,7 @@ export const Api = {
 							username,
 							password
 						) === hashed[ hashed.length - 1 ] ) {
-							let token : string
-
-							if ( account.activeToken ) {
-								token = account.activeToken
-							}
+							debug ( 'credentials are valid' )
 
 							Api.upgradeHash (
 								username,
@@ -340,6 +397,8 @@ export const Api = {
 								reject
 							)
 						} else {
+							debug ( 'credentials are invalid' )
+
 							reject ( false )
 						}
 					}
@@ -358,6 +417,11 @@ export const Api = {
 				accept,
 				reject
 			) => {
+				debug (
+					'authenticating %o',
+					username
+				)
+
 				Api.validateCredentials (
 					username,
 					password
@@ -368,7 +432,11 @@ export const Api = {
 								let token : string
 
 								if ( account.activeToken ) {
+									debug ( 'account has active token' )
+
 									token = account.activeToken
+								} else {
+									debug ( 'account has no token' )
 								}
 
 								if ( token ) {
@@ -391,19 +459,28 @@ export const Api = {
 			}
 		)
 	},
-	logoutAccount : (
+	logoutAccount (
 		username : string
-	) : Promise<boolean> => {
+	) : Promise<boolean> {
 		return new Promise<boolean> (
 			(
 				accept,
 				reject
 			) => {
+				debug (
+					'logging out %o',
+					username
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
 						if ( !account.activeToken ) {
+							debug ( 'account has no active token' )
+
 							accept ( true )
 						} else {
+							debug ( 'deactivating token' )
+
 							delete data.activeTokens[ account.activeToken ]
 							delete account.activeToken
 
@@ -427,6 +504,11 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'getting projects for %o',
+					username
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
 						accept ( account.projects.map (
@@ -456,13 +538,11 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug ( 'getting owner of token' )
+
 				Api.validateToken ( token ).then (
 					() => {
-						if ( data.activeTokens.hasOwnProperty ( token ) ) {
-							accept ( data.activeTokens[ token ] )
-						} else {
-							reject ( null )
-						}
+						accept ( data.activeTokens[ token ] )
 					}
 				).catch (
 					() => reject ( null )
@@ -478,6 +558,12 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'creating new project for %o with name %o',
+					username,
+					name
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
 						account.projects.push ( <Project> {
@@ -507,6 +593,13 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'renaming project with id %d to %o for %o',
+					id,
+					name,
+					username
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
 						if ( id >= 0 && id < account.projects.length && id % 1 === 0 ) {
@@ -517,6 +610,13 @@ export const Api = {
 							).catch (
 								reject
 							)
+						} else {
+							debug (
+								'invalid project id %d',
+								id
+							)
+
+							reject ( false )
 						}
 					}
 				).catch (
@@ -533,6 +633,12 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'deleting project %d for %o',
+					id,
+					username
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
 						if ( id >= 0 && id < account.projects.length && id % 1 === 0 ) {
@@ -553,6 +659,11 @@ export const Api = {
 								reject
 							)
 						} else {
+							debug (
+								'invalid project id %d',
+								id
+							)
+
 							reject ( false )
 						}
 					}
@@ -571,29 +682,46 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'moving project %d to %d for %o',
+					id, id + delta,
+					username
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
-						if ( id >= 0 && id < account.projects.length && id % 1 === 0 && id + delta >= 0 && id + delta < account.projects.length && ( id + delta ) % 1 === 0 ) {
-							const src = account.projects[ id ]
-							const dest = account.projects[ id + delta ]
+						if ( id >= 0 && id < account.projects.length && id % 1 === 0 ) {
+							if ( id + delta >= 0 && id + delta < account.projects.length && ( id + delta ) % 1 === 0 ) {
+								const src = account.projects[ id ]
+								const dest = account.projects[ id + delta ]
 
-							account.projects[ id + delta ] = src
-							account.projects[ id ] = dest
+								account.projects[ id + delta ] = src
+								account.projects[ id ] = dest
 
-							if ( src.hasOwnProperty ( 'publishToken' ) ) {
-								data.publishTokens[ src.publishToken ].projectIndex += delta
+								if ( src.hasOwnProperty ( 'publishToken' ) ) {
+									data.publishTokens[ src.publishToken ].projectIndex += delta
+								}
+
+								if ( dest.hasOwnProperty ( 'publishToken' ) ) {
+									data.publishTokens[ dest.publishToken ].projectIndex -= delta
+								}
+
+								saveData ().then (
+									accept
+								).catch (
+									reject
+								)
+							} else {
+								debug ( 'moving to an invalid project id %d', id + delta )
+
+								reject ( false )
 							}
-
-							if ( dest.hasOwnProperty ( 'publishToken' ) ) {
-								data.publishTokens[ dest.publishToken ].projectIndex -= delta
-							}
-
-							saveData ().then (
-								accept
-							).catch (
-								reject
-							)
 						} else {
+							debug (
+								'moving from an invalid project id %d',
+								id
+							)
+
 							reject ( false )
 						}
 					}
@@ -611,6 +739,12 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'getting project %d for %o',
+					id,
+					username
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
 						if ( id >= 0 && id < account.projects.length && id % 1 === 0 ) {
@@ -624,6 +758,11 @@ export const Api = {
 								}
 							)
 						} else {
+							debug (
+								'invalid project id %d',
+								id
+							)
+
 							reject ( null )
 						}
 					}
@@ -642,6 +781,12 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'setting project %d code for %o',
+					id,
+					username
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
 						if ( id >= 0 && id < account.projects.length && id % 1 === 0 ) {
@@ -653,6 +798,11 @@ export const Api = {
 								reject
 							)
 						} else {
+							debug (
+								'invalid project id %d',
+								id
+							)
+
 							reject ( false )
 						}
 					}
@@ -669,6 +819,11 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'getting editor options for %o',
+					username
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
 						accept ( account.editorOptions )
@@ -687,6 +842,11 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'setting editor options for %o',
+					username
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
 						account.editorOptions = options
@@ -711,6 +871,11 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'submitting bug report for %o',
+					username
+				)
+
 				data.bugReports.push ( bugReport )
 
 				saveData ().then (
@@ -729,6 +894,11 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'deleting account of %o',
+					username
+				)
+
 				Api.validateCredentials (
 					username,
 					password
@@ -736,12 +906,15 @@ export const Api = {
 					() => {
 						getAccount ( username ).then (
 							( account : Account ) => {
+								debug ( 'removing account from list' )
 								delete data.accounts[ username ]
 
+								debug ( 'wiping active token' )
 								if ( account.hasOwnProperty ( 'activeToken' ) ) {
 									delete data.activeTokens[ account.activeToken ]
 								}
 
+								debug ( 'wiping projects' )
 								if ( account.projects.length > 0 ) {
 									account.projects.forEach ( ( project : Project ) => {
 											if ( project.hasOwnProperty ( 'publishToken' ) ) {
@@ -774,11 +947,26 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'getting published project for %o',
+					publishToken
+				)
+
 				if ( data.publishTokens.hasOwnProperty ( publishToken ) ) {
+					debug (
+						'project at %o exists',
+						publishToken
+					)
+
 					const token : PublishToken = data.publishTokens[ publishToken ]
 
 					accept ( data.accounts[ token.username ].projects[ token.projectIndex ] )
 				} else {
+					debug (
+						'project at %o does not exist',
+						publishToken
+					)
+
 					reject ( null )
 				}
 			}
@@ -792,6 +980,12 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'publishing project %d for %o',
+					id,
+					username
+				)
+
 				getAccount ( username ).then (
 					(
 						account : Account
@@ -800,8 +994,10 @@ export const Api = {
 							const project = account.projects[ id ]
 
 							if ( !project.publishToken ) {
+								debug ( 'generating publish token' )
 								const publishToken = uuid.v4 ()
 
+								debug ( 'activating publish token' )
 								project.publishToken = publishToken
 								data.publishTokens[ publishToken ] = <PublishToken> {
 									username     : username,
@@ -814,9 +1010,16 @@ export const Api = {
 									() => reject ( null )
 								)
 							} else {
+								debug ( 'project already published' )
+
 								reject ( null )
 							}
 						} else {
+							debug (
+								'invalid project id %d',
+								id
+							)
+
 							reject ( null )
 						}
 					}
@@ -834,14 +1037,24 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'unpublishing project %d for %o',
+					id,
+					username
+				)
+
 				getAccount ( username ).then (
 					(
 						account : Account
 					) => {
 						if ( id >= 0 && id < account.projects.length && id % 1 === 0 ) {
+							debug ( 'getting project' )
+
 							const project = account.projects[ id ]
 
 							if ( project.hasOwnProperty ( 'publishToken' ) ) {
+								debug ( 'deactivating publish token' )
+
 								delete data.publishTokens[ project.publishToken ]
 								delete project.publishToken
 
@@ -851,9 +1064,16 @@ export const Api = {
 									reject
 								)
 							} else {
+								debug ( 'project is not published' )
+
 								reject ( false )
 							}
 						} else {
+							debug (
+								'invalid project id %d',
+								id
+							)
+
 							reject ( false )
 						}
 					}
@@ -870,6 +1090,11 @@ export const Api = {
 			accept,
 			reject
 			) => {
+				debug (
+					'resetting editor options for %o',
+					username
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
 						account.editorOptions = starterEditorOptions
@@ -895,6 +1120,11 @@ export const Api = {
 				accept,
 				reject
 			) => {
+				debug (
+					'upgrading hash for %o',
+					username
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
 						account.password = currentHashVersion + '!' + hashFunctions[ currentHashVersion ] (
@@ -924,6 +1154,11 @@ export const Api = {
 				accept,
 				reject
 			) => {
+				debug (
+					'changing password for %o',
+					username
+				)
+
 				Api.validateCredentials (
 					username,
 					oldPassword
@@ -966,6 +1201,12 @@ export const Api = {
 				accept,
 				reject
 			) => {
+				debug (
+					'changing username of %o to %o',
+					oldUsername,
+					newUsername
+				)
+
 				if ( !data.accounts.hasOwnProperty ( newUsername ) ) {
 					Api.validateCredentials (
 						oldUsername,
@@ -978,12 +1219,14 @@ export const Api = {
 								(
 									account : Account
 								) => {
+									debug ( 'setting username' )
 									account.username = newUsername
 									account.password = currentHashVersion + '!' + hashFunctions[ currentHashVersion ] (
 										newUsername,
 										password
 									)
 
+									debug ( 'migrating published projects to new username' )
 									account.projects.forEach (
 										(
 											project : Project
@@ -994,10 +1237,12 @@ export const Api = {
 										}
 									)
 
+									debug ( 'migrating active token to new username' )
 									if ( account.activeToken ) {
 										data.activeTokens[ account.activeToken ] = newUsername
 									}
 
+									debug ( 'migrating account to new username' )
 									delete data.accounts[ oldUsername ]
 									data.accounts[ newUsername ] = account
 
@@ -1028,6 +1273,11 @@ export const Api = {
 				accept,
 				reject
 			) => {
+				debug (
+					'checking if %o is admin',
+					username
+				)
+
 				getAccount ( username ).then (
 					( account : Account ) => {
 						accept ( account.isAdmin )
@@ -1044,6 +1294,8 @@ export const Api = {
 				accept,
 				reject
 			) => {
+				debug ( 'getting accounts' )
+
 				accept ( Object.keys ( data.accounts ).map (
 					( username : string ) => {
 						return {
@@ -1063,9 +1315,18 @@ export const Api = {
 				accept,
 				reject
 			) => {
+				debug (
+					'getting account of %o',
+					username
+				)
+
 				if ( data.accounts.hasOwnProperty ( username ) ) {
+					debug ( 'account exists' )
+
 					accept ( data.accounts[ username ] )
 				} else {
+					debug ( 'account does not exist' )
+
 					reject ( null )
 				}
 			}
@@ -1080,7 +1341,15 @@ export const Api = {
 				accept,
 				reject
 			) => {
+				debug (
+					'setting data of account %o to %O',
+					username,
+					account
+				)
+
 				if ( data.accounts.hasOwnProperty ( username ) ) {
+					debug ( 'account exists' )
+
 					data.accounts[ username ] = account
 
 					saveData ().then (
@@ -1089,6 +1358,8 @@ export const Api = {
 						reject
 					)
 				} else {
+					debug ( 'account exists' )
+
 					reject ( false )
 				}
 			}
@@ -1100,6 +1371,8 @@ export const Api = {
 				accept,
 				reject
 			) => {
+				debug ( 'getting bug reports' )
+
 				accept ( data.bugReports.map (
 					(
 						report : BugReport,
@@ -1122,6 +1395,12 @@ export const Api = {
 				accept,
 				reject
 			) => {
+				debug (
+					'setting bug report %d to %O',
+					id,
+					bugReport
+				)
+
 				data.bugReports[ id ] = bugReport
 
 				saveData ().then (
@@ -1134,8 +1413,12 @@ export const Api = {
 	}
 }
 
+debug ( 'api functions exported' )
+
 getData ().then (
 	( apiData : ApiData ) => {
 		data = apiData
+
+		debug ( 'data loaded' )
 	}
 )
