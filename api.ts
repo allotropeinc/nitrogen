@@ -183,11 +183,11 @@ function getAccount (
 			)
 
 			if ( data.accounts.hasOwnProperty ( username ) ) {
-				debug('account exists')
+				debug ( 'account exists' )
 
 				accept ( data.accounts[ username ] )
 			} else {
-				debug('account does not exist')
+				debug ( 'account does not exist' )
 
 				reject ( false )
 			}
@@ -247,6 +247,7 @@ const hashFunctions = {
 }
 
 const currentHashVersion = 'v3'
+const usernamePattern = /^[\w\d]{1,16}$/
 
 export const Api = {
 	validateToken (
@@ -293,7 +294,7 @@ export const Api = {
 					}
 				).catch (
 					() => {
-						if ( /^[\w\d]{1,16}$/.test ( username ) ) {
+						if ( usernamePattern.test ( username ) ) {
 							data.accounts[ username ] = {
 								username      : username,
 								password      : currentHashVersion + '!' + hashFunctions[ currentHashVersion ] (
@@ -1201,7 +1202,7 @@ export const Api = {
 					newUsername
 				)
 
-				if ( !data.accounts.hasOwnProperty ( newUsername ) ) {
+				if ( !data.accounts.hasOwnProperty ( newUsername ) && usernamePattern.test ( newUsername ) ) {
 					Api.validateCredentials (
 						oldUsername,
 						password
