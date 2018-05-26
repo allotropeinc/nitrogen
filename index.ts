@@ -781,6 +781,11 @@ if ( config ) {
 			req : ApiRequest,
 			res : Response
 		) => {
+			debug (
+				'%O',
+				req.headers
+			)
+
 			if (
 				req.headers.hasOwnProperty ( 'X-GitHub-Event' ) &&
 				req.headers.hasOwnProperty ( 'X-GitHub-Delivery' ) &&
@@ -827,7 +832,13 @@ if ( config ) {
 							}
 						}
 					)
+				} else {
+					res.status ( 403 )
+					res.json ( false )
 				}
+			} else {
+				res.status ( 400 )
+				res.json ( false )
 			}
 		}
 	)
