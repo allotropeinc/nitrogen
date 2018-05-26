@@ -12,6 +12,8 @@ import * as Prism                          from 'prismjs'
 import { exec }                            from 'child_process'
 import * as crypto                         from 'crypto'
 
+// auto-update is working
+
 const debug = require ( 'debug' ) (
 	'hexazine'
 )
