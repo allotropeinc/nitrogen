@@ -781,16 +781,12 @@ if ( config ) {
 			req : ApiRequest,
 			res : Response
 		) => {
-			debug (
-				'%O',
-				req.headers
-			)
-
 			if (
-				req.headers.hasOwnProperty ( 'X-GitHub-Event' ) &&
-				req.headers.hasOwnProperty ( 'X-GitHub-Delivery' ) &&
-				req.headers.hasOwnProperty ( 'X-Hub-Signature' ) &&
-				req.headers.hasOwnProperty ( 'User-Agent' )
+				req.headers.hasOwnProperty ( 'x-github-event' ) &&
+				req.headers.hasOwnProperty ( 'x-github-delivery' ) &&
+				req.headers.hasOwnProperty ( 'x-hub-signature' ) &&
+				req.headers.hasOwnProperty ( 'user-agent' ) &&
+				( <string> req.headers[ 'user-agent' ] ).startsWith ( 'GitHub-Hookshot/' )
 			) {
 				debug ( 'got webhook ping from "GitHub" (need to validate first)' )
 				debug ( 'calculating signature of request body' )
@@ -801,42 +797,56 @@ if ( config ) {
 					sig
 				)
 
-				if (
-					( <string> req.headers[ 'X-GitHub-Event' ] ) === 'push' &&
-					( <string> req.headers[ 'X-Hub-Signature' ] ) === sig &&
-					( <string> req.headers[ 'User-Agent' ] ).startsWith ( 'GitHub-Hookshot/' )
-				) {
-					debug ( 'signature matches, executing update script' )
+				if ( ( <string> req.headers[ 'x-hub-signature' ] ) === 'sha1=' + sig ) {
+					const event = <string> req.headers[ 'x-github-event' ]
 
-					exec (
-						'bash update.sh',
-						async (
-							err : Error
-						) => {
-							debug ( 'execution completed' )
-
-							if ( err ) {
-								debug (
-									'error: %o',
-									err
-								)
-
-								res.status ( 500 )
-								res.json ( false )
-							} else {
-								debug ( 'command was successful' )
-
-								res.json ( true ) // respond before the server closes
-
-								await safeShutdown ()
-							}
-						}
+					debug (
+						'signature matches, event is %s',
+						event
 					)
+
+					if ( ( event ) === 'push' ) {
+						debug ( 'executing update script' )
+
+						exec (
+							'bash update.sh',
+							async (
+								err : Error
+							) => {
+								debug ( 'execution completed' )
+
+								if ( err ) {
+									debug (
+										'error: %o',
+										err
+									)
+
+									res.status ( 500 )
+									res.json ( false )
+								} else {
+									debug ( 'command was successful' )
+
+									res.json ( true ) // respond before the server closes
+
+									await safeShutdown ()
+								}
+							}
+						)
+					} else if ( event === 'ping' ) {
+						debug ( 'ping event successfully received' )
+
+						res.status ( 200 )
+						res.json ( true )
+					}
 				} else {
+					debug ( 'signature doesn\'t match' )
+
 					res.status ( 403 )
 					res.json ( false )
 				}
 			} else {
+				debug ( 'not a valid GitHub event' )
+
 				res.status ( 400 )
 				res.json ( false )
 			}
