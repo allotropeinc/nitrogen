@@ -45,10 +45,6 @@ async function safeShutdown () {
 			}
 		)
 	}
-
-	debug ( 'exiting' )
-
-	process.exit ( 0 )
 }
 
 const configLocation = fs.existsSync ( 'config.json' ) ? 'config.json' : 'config.default.json'
@@ -804,6 +800,13 @@ if ( config[ 'secret' ] ) {
 					)
 
 					if ( ( event ) === 'push' && req.body.ref === 'refs/heads/master' ) { // guaranteed to be committed after backend
+						res.status ( 200 )
+						res.json ( true )
+
+						debug ( 'bringing down servers for update' )
+
+						await safeShutdown ()
+
 						debug ( 'executing update script' )
 
 						exec (
@@ -818,15 +821,8 @@ if ( config[ 'secret' ] ) {
 										'error: %o',
 										err
 									)
-
-									res.status ( 500 )
-									res.json ( false )
 								} else {
 									debug ( 'command was successful' )
-
-									res.json ( true ) // respond before the server closes
-
-									await safeShutdown ()
 								}
 							}
 						)
