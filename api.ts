@@ -183,8 +183,12 @@ function getAccount (
 			)
 
 			if ( data.accounts.hasOwnProperty ( username ) ) {
+				debug('account exists')
+
 				accept ( data.accounts[ username ] )
 			} else {
+				debug('account does not exist')
+
 				reject ( false )
 			}
 		}
@@ -887,8 +891,7 @@ export const Api = {
 		)
 	},
 	deleteAccount (
-		username : string,
-		password : string
+		username : string
 	) : Promise<boolean> {
 		return new Promise ( (
 			accept,
@@ -899,43 +902,34 @@ export const Api = {
 					username
 				)
 
-				Api.validateCredentials (
-					username,
-					password
-				).then (
-					() => {
-						getAccount ( username ).then (
-							( account : Account ) => {
-								debug ( 'removing account from list' )
-								delete data.accounts[ username ]
+				getAccount ( username ).then (
+					( account : Account ) => {
+						debug ( 'removing account from list' )
+						delete data.accounts[ username ]
 
-								debug ( 'wiping active token' )
-								if ( account.hasOwnProperty ( 'activeToken' ) ) {
-									delete data.activeTokens[ account.activeToken ]
+						debug ( 'wiping active token' )
+						if ( account.hasOwnProperty ( 'activeToken' ) ) {
+							delete data.activeTokens[ account.activeToken ]
+						}
+
+						debug ( 'wiping projects' )
+						if ( account.projects.length > 0 ) {
+							account.projects.forEach ( ( project : Project ) => {
+									if ( project.hasOwnProperty ( 'publishToken' ) ) {
+										delete data.publishTokens[ project.publishToken ]
+									}
 								}
+							)
+						}
 
-								debug ( 'wiping projects' )
-								if ( account.projects.length > 0 ) {
-									account.projects.forEach ( ( project : Project ) => {
-											if ( project.hasOwnProperty ( 'publishToken' ) ) {
-												delete data.publishTokens[ project.publishToken ]
-											}
-										}
-									)
-								}
-
-								saveData ().then (
-									accept
-								).catch (
-									reject
-								)
-							}
+						saveData ().then (
+							accept
 						).catch (
-							() => reject ( false )
+							reject
 						)
 					}
 				).catch (
-					reject
+					() => reject ( false )
 				)
 			}
 		)

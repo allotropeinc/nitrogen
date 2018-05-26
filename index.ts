@@ -446,10 +446,32 @@ router.post (
 
 		if ( body.hasOwnProperty ( 'password' ) ) {
 			try {
-				res.json ( await Api.deleteAccount (
+				await Api.validateCredentials (
 					req.account.username,
 					body.password
+				)
+
+				res.json ( await Api.deleteAccount (
+					req.account.username
 				) )
+			} catch {
+				res.json ( false )
+			}
+		} else {
+			res.json ( false )
+		}
+	}
+)
+
+router.post (
+	'/accounts/delete/:username',
+	async (
+		req : ApiRequest,
+		res : Response
+	) => {
+		if ( req.account.isAdmin ) {
+			try {
+				res.json ( await Api.deleteAccount ( req.params.username ) )
 			} catch {
 				res.json ( false )
 			}
