@@ -53,16 +53,17 @@ async function safeShutdown () {
 	process.exit ( 0 )
 }
 
-let config = null
+const configLocation = fs.existsSync ( 'config.json' ) ? 'config.json' : 'config.default.json'
 
-if ( fs.existsSync ( 'config.json' ) ) {
-	config = JSON.parse (
-		fs.readFileSync (
-			'config.json',
-			'utf8'
-		)
-	)
-}
+const config = JSON.parse (
+	fs.readFileSync (
+		configLocation,
+		'utf8'
+	).replace (
+		/\s+\/\/.*$/gm,
+		''
+	).trim ()
+)
 
 debug ( 'Loaded config' )
 
@@ -73,16 +74,15 @@ interface ApiRequest extends Request {
 
 const app = express ()
 
-const port : number = null, // set to a number if you want to use black magic, else it'll just use 80 (and 443 if certificates are provided)
-      router        = express.Router (),
-      servers       = []
+const router  = express.Router (),
+      servers = []
 
 const noAuthRoutes = [
 	'/accounts/auth',
 	'/accounts/new'
 ]
 
-if ( config ) {
+if ( config[ 'secret' ] ) {
 	noAuthRoutes.push ( '/github' )
 }
 
@@ -774,7 +774,7 @@ function signature ( body ) {
 	).update ( body ).digest ( 'hex' )
 }
 
-if ( config ) {
+if ( config[ 'secret' ] ) {
 	router.post (
 		'/github',
 		async (

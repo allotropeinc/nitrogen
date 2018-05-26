@@ -1,0 +1,6 @@
+// You can modify this file, or preferably copy it to a `config.json`.
+
+{
+	"port" : 0, // set to zero to use the defaults (80, and 443 for HTTPS)
+	"secret": "" // set to the same secret you set in the GitHub webhook, or leave empty for no auto-update
+}
