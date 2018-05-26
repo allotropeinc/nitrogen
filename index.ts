@@ -799,33 +799,37 @@ if ( config[ 'secret' ] ) {
 						event
 					)
 
-					if ( ( event ) === 'push' && req.body.ref === 'refs/heads/master' ) { // guaranteed to be committed after backend
+					if ( ( event ) === 'push' ) { // guaranteed to be committed after backend
 						res.status ( 200 )
 						res.json ( true )
 
-						debug ( 'bringing down servers for update' )
+						if ( req.body.ref === 'refs/heads/master' ) {
+							debug ( 'bringing down servers for update' )
 
-						await safeShutdown ()
+							await safeShutdown ()
 
-						debug ( 'executing update script' )
+							debug ( 'executing update script' )
 
-						exec (
-							'bash update.sh',
-							async (
-								err : Error
-							) => {
-								debug ( 'execution completed' )
+							exec (
+								'bash update.sh',
+								async (
+									err : Error
+								) => {
+									debug ( 'execution completed' )
 
-								if ( err ) {
-									debug (
-										'error: %o',
-										err
-									)
-								} else {
-									debug ( 'command was successful' )
+									if ( err ) {
+										debug (
+											'error: %o',
+											err
+										)
+									} else {
+										debug ( 'command was successful' )
+									}
 								}
-							}
-						)
+							)
+						} else {
+							debug ( 'assuming backend has been pushed and master will follow' )
+						}
 					} else if ( event === 'ping' ) {
 						debug ( 'ping event successfully received' )
 
