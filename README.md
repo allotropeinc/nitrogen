@@ -14,6 +14,10 @@ git clone https://github.com/allotropelabs/nitrogen.git --recursive
 
 Before you run Nitrogen, development or not, you'll need to give the backend a file to store its data in. An empty one is provided (`data.blank.json`), you need only copy it and name it `data.json` (and restart the backend if it's already running).
 
+### Setting yourself as admin
+
+Nitrogen features an admin panel, but to see it you'll have to set yourself as admin. There is currently no automatic way to do this if no admin already exists. Stop the backend if it's running, and edit the `data.json` file. Find your account in the `accounts` list and set `isAdmin` to `true`. Save and restart the backend and you should see the "Report Bug" button on the dashboard replaced by "Admin".
+
 ## Auto-update
 
 In order to support auto-update, you'll have to provide a `config.json`. A blank one is not currently available, but it's a simple format:```json
@@ -27,9 +31,15 @@ Once you've decided on a secret, go to the settings of your repository, navigate
 
 For example, if you were hosting it on `example.com:5015`, you'd put `http://example.com:5015/api/github` there. Use `https://` instead of `http://` if you have a certificate. Set the content type to `application/json`, set the secret to your secret you set in the JSON file, select "Just the `push` event", and then uncheck "Active".
 
-### Setting yourself as admin
+Once you create the webhook, GitHub will send a ping event to your API server. `ping event successfully received` should be visible in the logs. Here are two common error messages you might see if you did something wrong:
 
-Nitrogen features an admin panel, but to see it you'll have to set yourself as admin. There is currently no automatic way to do this if no admin already exists. Stop the backend if it's running, and edit the `data.json` file. Find your account in the `accounts` list and set `isAdmin` to `true`. Save and restart the backend and you should see the "Report Bug" button on the dashboard replaced by "Admin".
+#### Signature doesn't match
+
+Your `config.json` secret is not the same as the one in the webhook. Fix this by either correcting your webhook or `config.json`.
+
+#### Not a valid GitHub event
+
+You didn't add your secret to the webhook. Fix this by taking the secret in your `config.json` and adding it to the webhook.
 
 ## Development
 
