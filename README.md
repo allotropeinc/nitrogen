@@ -36,6 +36,10 @@ Your `config.json` secret is not the same as the one in the webhook. Fix this by
 
 You didn't add your secret to the webhook. Fix this by taking the secret in your `config.json` and adding it to the webhook.
 
+### Warning
+
+Auto-update is not fully functional yet, although the `update.sh` can be run manually and the backend restarted.
+
 ## Development
 
 I'm sure before you host it for production you're going to want to make a few changes. Those are easy if you use the development mode; using a terminal or IDE of your choice, run `ng serve` in the root directory and `ts-node index.ts` in the `backend` directory. The front-end will automatically know it's in development and use the backend on port 5015 (by default).
