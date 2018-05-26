@@ -53,12 +53,16 @@ async function safeShutdown () {
 	process.exit ( 0 )
 }
 
-const config = JSON.parse (
-	fs.readFileSync (
-		'config.json',
-		'utf8'
+let config = null
+
+if ( fs.existsSync ( 'config.json' ) ) {
+	config = JSON.parse (
+		fs.readFileSync (
+			'config.json',
+			'utf8'
+		)
 	)
-)
+}
 
 debug ( 'Loaded config' )
 
@@ -75,9 +79,12 @@ const port : number = null, // set to a number if you want to use black magic, e
 
 const noAuthRoutes = [
 	'/accounts/auth',
-	'/accounts/new',
-	'/github'
+	'/accounts/new'
 ]
+
+if ( config ) {
+	noAuthRoutes.push ( '/github' )
+}
 
 app.use (
 	async (
@@ -767,62 +774,64 @@ function signature ( body ) {
 	).update ( body ).digest ( 'hex' )
 }
 
-router.post (
-	'/github',
-	async (
-		req : ApiRequest,
-		res : Response
-	) => {
-		if (
-			req.headers.hasOwnProperty ( 'X-GitHub-Event' ) &&
-			req.headers.hasOwnProperty ( 'X-GitHub-Delivery' ) &&
-			req.headers.hasOwnProperty ( 'X-Hub-Signature' ) &&
-			req.headers.hasOwnProperty ( 'User-Agent' )
-		) {
-			debug ( 'got webhook ping from "GitHub" (need to validate first)' )
-			debug ( 'calculating signature of request body' )
-			const sig = signature ( req.rawBody )
-
-			debug (
-				'signature is %o',
-				sig
-			)
-
+if ( config ) {
+	router.post (
+		'/github',
+		async (
+			req : ApiRequest,
+			res : Response
+		) => {
 			if (
-				( <string> req.headers[ 'X-GitHub-Event' ] ) === 'push' &&
-				( <string> req.headers[ 'X-Hub-Signature' ] ) === sig &&
-				( <string> req.headers[ 'User-Agent' ] ).startsWith ( 'GitHub-Hookshot/' )
+				req.headers.hasOwnProperty ( 'X-GitHub-Event' ) &&
+				req.headers.hasOwnProperty ( 'X-GitHub-Delivery' ) &&
+				req.headers.hasOwnProperty ( 'X-Hub-Signature' ) &&
+				req.headers.hasOwnProperty ( 'User-Agent' )
 			) {
-				debug ( 'signature matches, executing update script' )
+				debug ( 'got webhook ping from "GitHub" (need to validate first)' )
+				debug ( 'calculating signature of request body' )
+				const sig = signature ( req.rawBody )
 
-				exec (
-					'bash update.sh',
-					async (
-						err : Error
-					) => {
-						debug ( 'execution completed' )
-
-						if ( err ) {
-							debug (
-								'error: %o',
-								err
-							)
-
-							res.status ( 500 )
-							res.json ( false )
-						} else {
-							debug ( 'command was successful' )
-
-							res.json ( true ) // respond before the server closes
-
-							await safeShutdown ()
-						}
-					}
+				debug (
+					'signature is %o',
+					sig
 				)
+
+				if (
+					( <string> req.headers[ 'X-GitHub-Event' ] ) === 'push' &&
+					( <string> req.headers[ 'X-Hub-Signature' ] ) === sig &&
+					( <string> req.headers[ 'User-Agent' ] ).startsWith ( 'GitHub-Hookshot/' )
+				) {
+					debug ( 'signature matches, executing update script' )
+
+					exec (
+						'bash update.sh',
+						async (
+							err : Error
+						) => {
+							debug ( 'execution completed' )
+
+							if ( err ) {
+								debug (
+									'error: %o',
+									err
+								)
+
+								res.status ( 500 )
+								res.json ( false )
+							} else {
+								debug ( 'command was successful' )
+
+								res.json ( true ) // respond before the server closes
+
+								await safeShutdown ()
+							}
+						}
+					)
+				}
 			}
 		}
-	}
-)
+	)
+}
 
 router.use (
 	(
