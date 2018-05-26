@@ -18,7 +18,16 @@ const debug = require ( 'debug' ) (
 
 debug.enabled = true
 
+let shuttingDown = false
+
 async function safeShutdown () {
+	if ( shuttingDown ) {
+		debug ( 'already shutting down' )
+		return
+	} else {
+		shuttingDown = true
+	}
+
 	debug ( 'shutting down hexazine safely' )
 	debug (
 		'we have %d server(s) to shutdown',
@@ -90,7 +99,7 @@ app.use (
 			() => {
 				try {
 					req.body = req.rawBody.length === 0 ? {} : JSON.parse ( req.rawBody )
-				} catch ( e ) {
+				} catch {
 					req.body = {}
 				}
 
@@ -146,15 +155,14 @@ router.use (
 				}
 			} else {
 				const token = <string> headers.token
-				const isValid = await Api.validateToken ( token )
 
-				if ( isValid ) {
-					const username = await Api.getOwner ( token )
+				try {
+					await Api.validateToken ( token )
 
-					req.account = await Api.getAccount ( username )
+					req.account = await Api.getAccount ( await Api.getOwner ( token ) )
 
 					next ()
-				} else {
+				} catch {
 					res.json ( null )
 				}
 			}
@@ -171,10 +179,14 @@ router.post (
 		const body = req.body
 
 		if ( body.hasOwnProperty ( 'username' ) && body.hasOwnProperty ( 'password' ) ) {
-			res.json ( await Api.authenticate (
-				body.username,
-				body.password
-			) )
+			try {
+				res.json ( await Api.authenticate (
+					body.username,
+					body.password
+				) )
+			} catch {
+				res.json ( null )
+			}
 		} else {
 			res.json ( null )
 		}
@@ -202,14 +214,16 @@ router.post (
 		const body = req.body
 
 		if ( body.hasOwnProperty ( 'username' ) && body.hasOwnProperty ( 'password' ) ) {
-			await Api.createAccount (
-				body.username,
-				body.password
-			)
+			try {
+				await Api.createAccount (
+					body.username,
+					body.password
+				)
 
-			const token = await Api.token ( body.username )
-
-			res.json ( token || true )
+				res.json ( await Api.token ( body.username ) )
+			} catch {
+				res.json ( null )
+			}
 		} else {
 			res.json ( null )
 		}
@@ -222,7 +236,11 @@ router.post (
 		req : ApiRequest,
 		res : Response
 	) => {
-		res.json ( await Api.logoutAccount ( req.account.username ) )
+		try {
+			res.json ( await Api.logoutAccount ( req.account.username ) )
+		} catch {
+			res.json ( false )
+		}
 	}
 )
 
@@ -232,7 +250,11 @@ router.get (
 		req : ApiRequest,
 		res : Response
 	) => {
-		res.json ( await Api.getProjects ( req.account.username ) )
+		try {
+			res.json ( await Api.getProjects ( req.account.username ) )
+		} catch {
+			res.json ( null )
+		}
 	}
 )
 
@@ -243,12 +265,16 @@ router.post (
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'name' ) ) {
-			res.json ( await Api.newProject (
-				req.account.username,
-				<string> req.body.name
-			) )
+			try {
+				res.json ( await Api.newProject (
+					req.account.username,
+					<string> req.body.name
+				) )
+			} catch {
+				res.json ( false )
+			}
 		} else {
-			res.json ( null )
+			res.json ( false )
 		}
 	}
 )
@@ -260,13 +286,17 @@ router.post (
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'name' ) ) {
-			res.json ( await Api.renameProject (
-				req.account.username,
-				+req.params.id,
-				<string> req.body.name
-			) )
+			try {
+				res.json ( await Api.renameProject (
+					req.account.username,
+					+req.params.id,
+					<string> req.body.name
+				) )
+			} catch {
+				res.json ( false )
+			}
 		} else {
-			res.json ( null )
+			res.json ( false )
 		}
 	}
 )
@@ -278,10 +308,14 @@ router.post (
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'name' ) ) {
-			res.json ( await Api.deleteProject (
-				req.account.username,
-				+req.params.id
-			) )
+			try {
+				res.json ( await Api.deleteProject (
+					req.account.username,
+					+req.params.id
+				) )
+			} catch {
+				res.json ( null )
+			}
 		} else {
 			res.json ( null )
 		}
@@ -294,10 +328,14 @@ router.get (
 		req : ApiRequest,
 		res : Response
 	) => {
-		res.json ( await Api.getProject (
-			req.account.username,
-			+req.params.id
-		) )
+		try {
+			res.json ( await Api.getProject (
+				req.account.username,
+				+req.params.id
+			) )
+		} catch {
+			res.json ( null )
+		}
 	}
 )
 
@@ -308,11 +346,15 @@ router.post (
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'code' ) ) {
-			res.json ( await Api.setProjectCode (
-				req.account.username,
-				+req.params.id,
-				req.body.code
-			) )
+			try {
+				res.json ( await Api.setProjectCode (
+					req.account.username,
+					+req.params.id,
+					req.body.code
+				) )
+			} catch {
+				res.json ( false )
+			}
 		} else {
 			res.json ( false )
 		}
@@ -326,11 +368,15 @@ router.post (
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'delta' ) ) {
-			res.json ( await Api.moveProject (
-				req.account.username,
-				+req.params.id,
-				+req.body.delta
-			) )
+			try {
+				res.json ( await Api.moveProject (
+					req.account.username,
+					+req.params.id,
+					+req.body.delta
+				) )
+			} catch {
+				res.json ( false )
+			}
 		} else {
 			res.json ( false )
 		}
@@ -343,7 +389,11 @@ router.get (
 		req : ApiRequest,
 		res : Response
 	) => {
-		res.json ( await Api.getEditorOptions ( req.account.username ) )
+		try {
+			res.json ( await Api.getEditorOptions ( req.account.username ) )
+		} catch {
+			res.json ( null )
+		}
 	}
 )
 
@@ -354,10 +404,14 @@ router.post (
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'options' ) ) {
-			res.json ( await Api.setEditorOptions (
-				req.account.username,
-				req.body.options
-			) )
+			try {
+				res.json ( await Api.setEditorOptions (
+					req.account.username,
+					req.body.options
+				) )
+			} catch {
+				res.json ( false )
+			}
 		} else {
 			res.json ( false )
 		}
@@ -370,9 +424,13 @@ router.post (
 		req : ApiRequest,
 		res : Response
 	) => {
-		res.json ( await Api.resetEditorOptions (
-			req.account.username
-		) )
+		try {
+			res.json ( await Api.resetEditorOptions (
+				req.account.username
+			) )
+		} catch {
+			res.json ( false )
+		}
 	}
 )
 
@@ -385,10 +443,14 @@ router.post (
 		const body = req.body
 
 		if ( body.hasOwnProperty ( 'password' ) ) {
-			res.json ( await Api.deleteAccount (
-				req.account.username,
-				body.password
-			) )
+			try {
+				res.json ( await Api.deleteAccount (
+					req.account.username,
+					body.password
+				) )
+			} catch {
+				res.json ( false )
+			}
 		} else {
 			res.json ( false )
 		}
@@ -406,14 +468,14 @@ router.get (
 			'text/html'
 		)
 
-		const project : Project = await Api.getPublished ( req.params.publishToken )
+		try {
+			const project : Project = await Api.getPublished ( req.params.publishToken )
 
-		if ( project ) {
 			res.end (
 				project.code,
 				'utf8'
 			)
-		} else {
+		} catch {
 			res.end (
 				'This project does not exist or has been unpublished. Ask the author for a new link.',
 				'utf8'
@@ -433,9 +495,9 @@ router.get (
 			'text/html'
 		)
 
-		const project : Project = await Api.getPublished ( req.params.publishToken )
+		try {
+			const project : Project = await Api.getPublished ( req.params.publishToken )
 
-		if ( project ) {
 			const highlighted = Prism.highlight (
 				project.code,
 				Prism.languages.html,
@@ -446,7 +508,7 @@ router.get (
 				'<link rel="stylesheet" type="text/css" href="/assets/prism.css">' + highlighted,
 				'utf8'
 			)
-		} else {
+		} catch {
 			res.end (
 				'This project does not exist or has been unpublished. Ask the author for a new link.',
 				'utf8'
@@ -461,10 +523,14 @@ router.post (
 		req : ApiRequest,
 		res : Response
 	) => {
-		res.json ( await Api.unpublish (
-			req.account.username,
-			+req.params.id
-		) )
+		try {
+			res.json ( await Api.unpublish (
+				req.account.username,
+				+req.params.id
+			) )
+		} catch {
+			res.json ( false )
+		}
 	}
 )
 
@@ -474,10 +540,14 @@ router.post (
 		req : ApiRequest,
 		res : Response
 	) => {
-		res.json ( await Api.publish (
-			req.account.username,
-			+req.params.id
-		) )
+		try {
+			res.json ( await Api.publish (
+				req.account.username,
+				+req.params.id
+			) )
+		} catch {
+			res.json ( null )
+		}
 	}
 )
 
@@ -493,17 +563,21 @@ router.post (
 			req.body.hasOwnProperty ( 'steps' ) &&
 			req.body.hasOwnProperty ( 'comments' )
 		) {
-			res.json ( await Api.submitBugReport (
-				req.account.username,
-				<BugReport> {
-					username : req.account.username,
-					title    : req.body.title,
-					summary  : req.body.summary,
-					steps    : req.body.steps,
-					comments : req.body.comments,
-					read     : false
-				}
-			) )
+			try {
+				res.json ( await Api.submitBugReport (
+					req.account.username,
+					<BugReport> {
+						username : req.account.username,
+						title    : req.body.title,
+						summary  : req.body.summary,
+						steps    : req.body.steps,
+						comments : req.body.comments,
+						read     : false
+					}
+				) )
+			} catch {
+				res.json ( false )
+			}
 		} else {
 			res.json ( false )
 		}
@@ -547,11 +621,15 @@ router.post (
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'username' ) && req.body.hasOwnProperty ( 'password' ) ) {
-			res.json ( await Api.changeUsername (
-				req.account.username,
-				req.body.username,
-				req.body.password
-			) )
+			try {
+				res.json ( await Api.changeUsername (
+					req.account.username,
+					req.body.username,
+					req.body.password
+				) )
+			} catch {
+				res.json ( false )
+			}
 		} else {
 			res.json ( false )
 		}
@@ -575,7 +653,11 @@ router.get (
 		res : Response
 	) => {
 		if ( req.account.isAdmin ) {
-			res.json ( await Api.getAccounts () )
+			try {
+				res.json ( await Api.getAccounts () )
+			} catch {
+				res.json ( null )
+			}
 		} else {
 			res.json ( null )
 		}
@@ -589,7 +671,11 @@ router.get (
 		res : Response
 	) => {
 		if ( req.account.isAdmin ) {
-			res.json ( await Api.getAccount ( req.params.username ) )
+			try {
+				res.json ( await Api.getAccount ( req.params.username ) )
+			} catch {
+				res.json ( null )
+			}
 		} else {
 			res.json ( null )
 		}
@@ -603,10 +689,14 @@ router.post (
 		res : Response
 	) => {
 		if ( req.account.isAdmin ) {
-			res.json ( await Api.setAccount (
-				req.params.username,
-				req.body // holy fuck I hope the client knows what it's doing
-			) )
+			try {
+				res.json ( await Api.setAccount (
+					req.params.username,
+					req.body // holy fuck I hope the client knows what it's doing
+				) )
+			} catch {
+				res.json ( false )
+			}
 		} else {
 			res.json ( false )
 		}
@@ -620,10 +710,14 @@ router.post (
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'password' ) ) {
-			res.json ( await Api.validateCredentials (
-				req.account.username,
-				req.body.password
-			) )
+			try {
+				res.json ( await Api.validateCredentials (
+					req.account.username,
+					req.body.password
+				) )
+			} catch {
+				res.json ( null )
+			}
 		} else {
 			res.json ( null )
 		}
@@ -637,7 +731,11 @@ router.get (
 		res : Response
 	) => {
 		if ( req.account.isAdmin ) {
-			res.json ( await Api.getBugReports () )
+			try {
+				res.json ( await Api.getBugReports () )
+			} catch {
+				res.json ( null )
+			}
 		}
 	}
 )
@@ -649,10 +747,14 @@ router.post (
 		res : Response
 	) => {
 		if ( req.account.isAdmin ) {
-			res.json ( await Api.setBugReport (
-				req.params.id,
-				req.body
-			) )
+			try {
+				res.json ( await Api.setBugReport (
+					req.params.id,
+					req.body
+				) )
+			} catch {
+				res.json ( false )
+			}
 		}
 	}
 )
