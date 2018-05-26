@@ -59,9 +59,9 @@ interface ApiRequest extends Request {
 
 const app = express ()
 
-const port    = 5015,
-      router  = express.Router (),
-      servers = []
+const port : number = null, // set to a number if you want to use black magic, else it'll just use 80 (and 443 if certificates are provided)
+      router        = express.Router (),
+      servers       = []
 
 const noAuthRoutes = [
 	'/accounts/auth',
@@ -748,30 +748,32 @@ app.get (
 )
 
 if ( fs.existsSync ( './privatekey.pem' ) && fs.existsSync ( './certificate.crt' ) ) {
-	servers.push (
-		net.createServer (
-			( con ) => {
-				con.once (
-					'data',
-					( buffer ) => {
-						// If `buffer` starts with 22, it's a TLS handshake
-						const proxyPort = port + ( buffer[ 0 ] === 22 ? 1 : 2 )
-						const proxy = net.createConnection (
-							proxyPort,
-							'localhost',
-							() => {
-								proxy.write ( buffer )
-								con.pipe ( proxy ).pipe ( con )
-							}
-						)
-					}
-				)
-			}
-		).listen (
-			port,
-			'0.0.0.0'
+	if ( port ) {
+		servers.push (
+			net.createServer (
+				( con ) => {
+					con.once (
+						'data',
+						( buffer ) => {
+							// If `buffer` starts with 22, it's a TLS handshake
+							const proxyPort = port + ( buffer[ 0 ] === 22 ? 1 : 2 )
+							const proxy = net.createConnection (
+								proxyPort,
+								'localhost',
+								() => {
+									proxy.write ( buffer )
+									con.pipe ( proxy ).pipe ( con )
+								}
+							)
+						}
+					)
+				}
+			).listen (
+				port,
+				'0.0.0.0'
+			)
 		)
-	)
+	}
 
 	servers.push (
 		https.createServer (
@@ -781,8 +783,8 @@ if ( fs.existsSync ( './privatekey.pem' ) && fs.existsSync ( './certificate.crt'
 			},
 			app
 		).listen (
-			port + 1,
-			'localhost'
+			( port || 442 ) + 1, // fancy way of saying port + 1 or 443
+			port ? 'localhost' : '0.0.0.0'
 		)
 	)
 
@@ -802,14 +804,14 @@ if ( fs.existsSync ( './privatekey.pem' ) && fs.existsSync ( './certificate.crt'
 				res.end ()
 			}
 		).listen (
-			port + 2,
-			'localhost'
+			( port || 78 ) + 2, // fancy way of saying port + 2 or 80
+			port ? 'localhost' : '0.0.0.0'
 		)
 	)
 } else {
 	servers.push (
 		app.listen (
-			port,
+			port || 80,
 			'0.0.0.0'
 		)
 	)
