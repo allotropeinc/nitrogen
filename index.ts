@@ -861,6 +861,11 @@ if ( config[ 'secret' ] ) {
 								'data',
 								( data ) => process.stdout.write ( data.toString () )
 							)
+
+							child.stderr.on (
+								'data',
+								( data ) => process.stderr.write ( data.toString () )
+							)
 						} else {
 							debug ( 'assuming backend has been pushed and master will follow' )
 						}
