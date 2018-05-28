@@ -873,7 +873,10 @@ if ( config[ 'secret' ] ) {
 
 										process.exit ( 1 )
 									} else {
-										debug ( 'exit status was zero' )
+										debug (
+											'exit status was zero (signal: %s)',
+											signal
+										)
 									}
 								}
 							)
