@@ -867,6 +867,8 @@ if ( config[ 'secret' ] ) {
 											code,
 											signal
 										)
+
+										process.exit ( 1 )
 									} else {
 										debug ( 'exit status was zero' )
 									}
