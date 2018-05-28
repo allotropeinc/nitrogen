@@ -9,7 +9,7 @@ import * as net                            from 'net'
 import * as http                           from 'http'
 import { IncomingMessage, ServerResponse } from 'http'
 import * as Prism                          from 'prismjs'
-import { exec }                            from 'child_process'
+import { spawn }                           from 'child_process'
 import * as crypto                         from 'crypto'
 import Signals = NodeJS.Signals
 
@@ -833,22 +833,33 @@ if ( config[ 'secret' ] ) {
 
 							debug ( 'executing update script' )
 
-							exec (
-								'bash update.sh',
+							const child = spawn (
+								'bash update.sh'
+							)
+
+							child.on (
+								'close',
 								async (
-									err : Error
+									code : number,
+									signal : string
 								) => {
 									debug ( 'execution completed' )
 
-									if ( err ) {
+									if ( code !== 0 ) {
 										debug (
-											'error: %o',
-											err
+											'exit status was non-zero: %d (signal: %s)',
+											code,
+											signal
 										)
 									} else {
-										debug ( 'command was successful' )
+										debug ( 'exit status was zero' )
 									}
 								}
+							)
+
+							child.stdout.on (
+								'data',
+								( data ) => process.stdout.write ( data.toString () )
 							)
 						} else {
 							debug ( 'assuming backend has been pushed and master will follow' )
