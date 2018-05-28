@@ -11,6 +11,7 @@ import { IncomingMessage, ServerResponse } from 'http'
 import * as Prism                          from 'prismjs'
 import { exec }                            from 'child_process'
 import * as crypto                         from 'crypto'
+import Signals = NodeJS.Signals
 
 const debug = require ( 'debug' ) (
 	'hexazine'
@@ -900,7 +901,7 @@ process.on (
 	e => console.log ( e )
 )
 
-for ( const name of [
+for ( const name of <Signals[]> [
 	'SIGINT', // CTRL+C
 	'SIGTERM', // `kill` command
 	'SIGUSR1', // `kill` command
