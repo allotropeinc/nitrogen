@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express'
 import { Api }                             from './api'
 import { Account, BugReport, Project }     from './types'
 import * as path                           from 'path'
+import { join }                            from 'path'
 import * as https                          from 'https'
 import * as fs                             from 'fs'
 import * as net                            from 'net'
@@ -834,7 +835,20 @@ if ( config[ 'secret' ] ) {
 							debug ( 'executing update script' )
 
 							const child = spawn (
-								'bash update.sh'
+								join (
+									__dirname,
+									'update.sh'
+								)
+							)
+
+							child.stdout.on (
+								'data',
+								( data ) => process.stdout.write ( data.toString () )
+							)
+
+							child.stderr.on (
+								'data',
+								( data ) => process.stderr.write ( data.toString () )
 							)
 
 							child.on (
@@ -855,16 +869,6 @@ if ( config[ 'secret' ] ) {
 										debug ( 'exit status was zero' )
 									}
 								}
-							)
-
-							child.stdout.on (
-								'data',
-								( data ) => process.stdout.write ( data.toString () )
-							)
-
-							child.stderr.on (
-								'data',
-								( data ) => process.stderr.write ( data.toString () )
 							)
 						} else {
 							debug ( 'assuming backend has been pushed and master will follow' )
