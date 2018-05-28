@@ -47,6 +47,8 @@ async function safeShutdown () {
 			}
 		)
 	}
+
+	debug ( 'successfully shut down servers' )
 }
 
 const configLocation = fs.existsSync ( 'config.json' ) ? 'config.json' : 'config.default.json'
