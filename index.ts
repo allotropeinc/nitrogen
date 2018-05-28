@@ -900,13 +900,24 @@ process.on (
 	e => console.log ( e )
 )
 
-process.on (
-	'SIGINT',
-	async () => {
-		debug ( 'received SIGINT' )
-		await safeShutdown ()
-	}
-)
+for ( const name of [
+	'SIGINT', // CTRL+C
+	'SIGTERM', // `kill` command
+	'SIGUSR1', // `kill` command
+	'SIGUSR2' // `kill` command
+] ) {
+	process.on (
+		name,
+		async () => {
+			debug (
+				'recieved %s',
+				name
+			)
+
+			await safeShutdown ()
+		}
+	)
+}
 
 app.use ( express.static ( 'app' ) )
 
