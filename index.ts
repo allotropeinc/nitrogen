@@ -939,6 +939,11 @@ const port = config.port > 0 ? config.port : undefined
 
 if ( fs.existsSync ( './privatekey.pem' ) && fs.existsSync ( './certificate.crt' ) ) {
 	if ( port ) {
+		debug (
+			'using HTTPS on port %d',
+			port
+		)
+
 		servers.push (
 			net.createServer (
 				( con ) => {
@@ -960,9 +965,12 @@ if ( fs.existsSync ( './privatekey.pem' ) && fs.existsSync ( './certificate.crt'
 				}
 			).listen (
 				port,
-				'0.0.0.0'
+				'0.0.0.0',
+				() => debug ( 'proxy server has started' )
 			)
 		)
+	} else {
+		debug ( 'using HTTPS on default ports' )
 	}
 
 	servers.push (
@@ -974,7 +982,8 @@ if ( fs.existsSync ( './privatekey.pem' ) && fs.existsSync ( './certificate.crt'
 			app
 		).listen (
 			( port || 442 ) + 1, // fancy way of saying port + 1 or 443
-			port ? 'localhost' : '0.0.0.0'
+			port ? 'localhost' : '0.0.0.0',
+			() => debug ( 'https server has started' )
 		)
 	)
 
@@ -995,14 +1004,21 @@ if ( fs.existsSync ( './privatekey.pem' ) && fs.existsSync ( './certificate.crt'
 			}
 		).listen (
 			( port || 78 ) + 2, // fancy way of saying port + 2 or 80
-			port ? 'localhost' : '0.0.0.0'
+			port ? 'localhost' : '0.0.0.0',
+			() => debug ( 'http server has started' )
 		)
 	)
 } else {
+	debug (
+		'using insecure HTTP on port %d',
+		port || 80
+	)
+
 	servers.push (
 		app.listen (
 			port || 80,
-			'0.0.0.0'
+			'0.0.0.0',
+			() => debug ( 'server has started' )
 		)
 	)
 }
