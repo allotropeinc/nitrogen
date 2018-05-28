@@ -837,10 +837,13 @@ if ( config[ 'secret' ] ) {
 							debug ( 'executing update script' )
 
 							const child = spawn (
-								join (
-									__dirname,
-									'update.sh'
-								)
+								'bash',
+								[
+									join (
+										__dirname,
+										'update.sh'
+									)
+								]
 							)
 
 							child.stdout.on (
