@@ -53,4 +53,7 @@ export interface ApiData {
 	}
 
 	bugReports : BugReport[]
+	version : number
 }
+
+export type Upgrades = ( ( data : ApiData ) => Promise<void> )[]

@@ -3,6 +3,7 @@ import { Account, ApiData, BugReport, ClientProject, MinimalAccount, Project, Pu
 import * as crypto                                                                           from 'crypto'
 import * as fs                                                                               from 'fs'
 import * as uuid                                                                             from 'uuid'
+import { upgradeData }                                                                       from './upgrade'
 
 const debug = require ( 'debug' ) (
 	'hexazine:api'
@@ -1411,9 +1412,17 @@ export const Api = {
 debug ( 'api functions exported' )
 
 getData ().then (
-	( apiData : ApiData ) => {
+	async ( apiData : ApiData ) => {
+		debug ( 'data loaded' )
+
 		data = apiData
 
-		debug ( 'data loaded' )
+		const upgraded = await upgradeData ( apiData )
+
+		if ( upgraded ) {
+			try {
+				await saveData ()
+			} catch {}
+		}
 	}
 )

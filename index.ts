@@ -22,7 +22,7 @@ debug.enabled = true
 
 let shuttingDown = false
 
-async function safeShutdown () {
+export async function safeShutdown () {
 	if ( shuttingDown ) {
 		debug ( 'already shutting down' )
 		return
