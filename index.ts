@@ -77,7 +77,8 @@ const router  = express.Router (),
 
 const noAuthRoutes = [
 	'/accounts/auth',
-	'/accounts/new'
+	'/accounts/new',
+	'/health'
 ]
 
 if ( config[ 'secret' ] ) {
@@ -909,6 +910,16 @@ if ( config[ 'secret' ] ) {
 		}
 	)
 }
+
+router.get (
+	'/health',
+	async (
+		req : ApiRequest,
+		res : Response
+	) => {
+		res.json ( true )
+	}
+)
 
 router.use (
 	(
