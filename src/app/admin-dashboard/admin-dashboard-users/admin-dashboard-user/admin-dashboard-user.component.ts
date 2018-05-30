@@ -1,8 +1,8 @@
 import { Component, OnInit }                    from '@angular/core'
 import { ActivatedRoute, Router }               from '@angular/router'
-import { Account }                              from '../../../account'
 import { ApiService }                           from '../../../api.service'
 import { MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
+import { Account }                              from '../../../../../backend/types'
 
 @Component ( {
 	selector    : 'app-admin-dashboard-user',
