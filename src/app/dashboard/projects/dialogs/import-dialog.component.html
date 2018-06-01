@@ -1,0 +1,12 @@
+<h1>Import</h1>
+<p>Currently, you can only import from JSFiddle.</p>
+<mat-form-field>
+	<mat-label>URL</mat-label>
+	<input matInput [(ngModel)]="url">
+</mat-form-field>
+<ng-container>
+	<button mat-button (click)="dialogRef.close()">Cancel</button>
+	<div class="buttons">
+		<button mat-flat-button [mat-dialog-close]="url">Import</button>
+	</div>
+</ng-container>

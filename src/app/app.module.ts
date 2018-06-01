@@ -13,6 +13,7 @@ import { SigninComponent }                          from './signin/signin.compon
 import { RegisterComponent }                        from './register/register.component'
 import { DashboardComponent }                       from './dashboard/dashboard.component'
 import {
+	ImportDialogComponent,
 	NewProjectDialogComponent,
 	ProjectsComponent
 }                                                   from './dashboard/projects/projects.component'
@@ -57,7 +58,7 @@ import { AdminDashboardReportsComponent }           from './admin-dashboard/admi
 import {
 	AdminDashboardUserComponent,
 	UserDeleteAccountDialogComponent
-} from './admin-dashboard/admin-dashboard-users/admin-dashboard-user/admin-dashboard-user.component'
+}                                                   from './admin-dashboard/admin-dashboard-users/admin-dashboard-user/admin-dashboard-user.component'
 
 @NgModule ( {
 	declarations    : [
@@ -70,6 +71,7 @@ import {
 		ProjectItemComponent,
 		EditorComponent,
 		NewProjectDialogComponent,
+		ImportDialogComponent,
 		RenameProjectDialogComponent,
 		DeleteProjectDialogComponent,
 		SafeUrlPipe,
@@ -114,6 +116,7 @@ import {
 	bootstrap       : [ AppComponent ],
 	entryComponents : [
 		NewProjectDialogComponent,
+		ImportDialogComponent,
 		RenameProjectDialogComponent,
 		DeleteProjectDialogComponent,
 		BugReportDialogComponent,

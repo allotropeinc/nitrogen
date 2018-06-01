@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit }                             from '@angular/core'
-import { ApiService }                                            from '../../api.service'
-import { Project }                                               from '../../project'
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
+import { Component, OnInit }                    from '@angular/core'
+import { ApiService }                           from '../../api.service'
+import { Project }                              from '../../project'
+import { MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
 
 @Component ( {
 	selector    : 'app-projects',
@@ -36,7 +36,7 @@ export class ProjectsComponent implements OnInit {
 		const dialogRef = this.dialog.open (
 			NewProjectDialogComponent,
 			{
-				width: '300px'
+				width : '300px'
 			}
 		)
 
@@ -63,6 +63,38 @@ export class ProjectsComponent implements OnInit {
 				}
 			} )
 	}
+
+	import () {
+		this.working = true
+
+		this.dialog.open (
+			ImportDialogComponent,
+			{
+				width : '300px'
+			}
+		).afterClosed ().subscribe (
+			url => {
+				if ( url ) {
+					this.api.import ( url ).subscribe (
+						success => {
+							if ( success ) {
+								this.refresh ()
+							} else {
+								this.snackbar.open (
+									'Could not import',
+									'Close'
+								)
+
+								this.working = false
+							}
+						}
+					)
+				} else {
+					this.working = false
+				}
+			}
+		)
+	}
 }
 
 @Component ( {
@@ -74,5 +106,17 @@ export class NewProjectDialogComponent {
 
 	constructor (
 		public dialogRef : MatDialogRef<NewProjectDialogComponent>
+	) {}
+}
+
+@Component ( {
+	selector    : 'app-import-dialog',
+	templateUrl : './dialogs/import-dialog.component.html'
+} )
+export class ImportDialogComponent {
+	url = ''
+
+	constructor (
+		public dialogRef : MatDialogRef<ImportDialogComponent>
 	) {}
 }

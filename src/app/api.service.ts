@@ -4,6 +4,7 @@ import { Project }                                               from './project
 import { HttpClient }                                            from '@angular/common/http'
 import { Account, BugReport, MinimalAccount }                    from '../../backend/types'
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
+import { URL }                                                   from 'url-parse'
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
 
 declare const CryptoJS : any
@@ -1195,6 +1196,35 @@ export class ApiService {
 				this.http.post (
 					this.apiLocation + '/accounts/delete/' + encodeURIComponent ( username ),
 					{},
+					{
+						headers : {
+							token : this.token
+						}
+					}
+				).subscribe (
+					( response : boolean ) => {
+						observer.next ( response )
+						observer.complete ()
+					},
+					() => {
+						observer.next ( false )
+						observer.complete ()
+					}
+				)
+			}
+		)
+	}
+
+	import (
+		url : string
+	) : Observable<boolean> {
+		return new Observable<boolean> (
+			( observer : Observer<boolean> ) => {
+				this.http.post (
+					this.apiLocation + '/projects/import',
+					{
+						url : url
+					},
 					{
 						headers : {
 							token : this.token
