@@ -12,6 +12,11 @@ import { IncomingMessage, ServerResponse } from 'http'
 import * as Prism                          from 'prismjs'
 import { spawn }                           from 'child_process'
 import * as crypto                         from 'crypto'
+import * as normalizeUrl                   from 'normalize-url'
+import * as URL                            from 'url-parse'
+import { get }                             from 'request-promise-native'
+import { load }                            from 'cheerio'
+import * as beautify                       from 'js-beautify'
 import Signals = NodeJS.Signals
 
 const debug = require ( 'debug' ) (
@@ -325,6 +330,155 @@ router.post (
 			}
 		} else {
 			res.json ( null )
+		}
+	}
+)
+
+router.post (
+	'/projects/import',
+	async (
+		req : ApiRequest,
+		res : Response
+	) => {
+		if ( req.body.hasOwnProperty ( 'url' ) ) {
+			const url = URL ( normalizeUrl ( req.body.url ) )
+
+			if ( url.hostname === 'jsfiddle.net' ) {
+				debug ( 'project is JSFiddle' )
+
+				const segments = url.pathname.slice ( 1 ).split ( path.sep )
+
+				let fiddleId = ''
+
+				if ( segments[ segments.length - 1 ] === 'embed' ) {
+					segments.pop ()
+				}
+
+				if ( segments.length === 1 ) {
+					debug ( 'has no version' )
+
+					fiddleId = segments[ 0 ]
+				} else if ( segments.length === 2 && Number.isInteger ( +segments[ 1 ] ) ) {
+					debug ( 'has version' )
+
+					fiddleId = segments[ 0 ] + '/ ' + segments[ 1 ]
+				}
+
+				if ( fiddleId ) {
+					debug (
+						'getting fiddle with ID %s',
+						fiddleId
+					)
+
+					const jshellUrl = `https://fiddle.jshell.net/${fiddleId}/show/light`
+
+					try {
+						const result = await get (
+							jshellUrl,
+							{
+								headers : {
+									Referer : jshellUrl
+								}
+							}
+						)
+
+						if ( result ) {
+							const $ = load (
+								result,
+								{
+									normalizeWhitespace : true
+								}
+							)
+
+							$ ( 'body > script:last-child' ).remove ()
+
+							for ( const i of [
+								'href',
+								'src'
+							] ) {
+								$ ( `[${i}^="/"]` ).each (
+									(
+										_,
+										elem
+									) => {
+										const element = $ ( elem )
+										const attr = element.attr ( i )
+
+										element.attr (
+											i,
+											( attr.startsWith ( '//' ) ? 'https:' : 'https://fiddle.jshell.net' ) + attr
+										)
+
+										if ( attr === '/css/result-light.css' ) {
+											element.remove ()
+										}
+									}
+								)
+							}
+
+							$ ( 'style, script' ).each (
+								(
+									_,
+									elem
+								) => {
+									if ( elem.children.length > 0 ) {
+										const text = elem.children[ 0 ]
+
+										text.data = text.data.replace (
+											/(["'`])\/\//g,
+											'$1https://'
+										)
+									}
+								}
+							)
+
+							try {
+								await Api.newProject (
+									req.account.username,
+									`Imported: JSFiddle ${fiddleId}`,
+									beautify.html_beautify (
+										$.html (),
+										{
+											indent_inner_html : true,
+											indent_with_tabs  : true,
+											wrap_line_length  : 0,
+											brace_style       : 'end-expand',
+											preserve_newlines : false,
+											extra_liners      : ['style']
+										}
+									)
+								)
+
+								debug ( 'success' )
+
+								res.json ( true )
+							} catch {
+								debug ( 'failed to create new project' )
+
+								res.json ( false )
+							}
+						} else {
+							debug ( 'fiddle does not exist' )
+
+							res.json ( false )
+						}
+					} catch ( e ) {
+						debug ( e )
+
+						res.json ( false )
+					}
+				} else {
+					debug ( 'invalid URL (?)' )
+
+					res.json ( false )
+				}
+			} else {
+				debug ( 'can\'t import' )
+
+				res.json ( false )
+			}
+		} else {
+			res.json ( false )
 		}
 	}
 )

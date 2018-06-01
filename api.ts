@@ -558,7 +558,8 @@ export const Api = {
 	},
 	newProject (
 		username : string,
-		name : string
+		name : string,
+		code? : string
 	) : Promise<boolean> {
 		return new Promise ( (
 			accept,
@@ -574,7 +575,7 @@ export const Api = {
 					( account : Account ) => {
 						account.projects.push ( <Project> {
 								name : name,
-								code : starterCode
+								code : code || starterCode
 							}
 						)
 
