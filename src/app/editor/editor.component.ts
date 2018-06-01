@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar, MatSnackBarDismi
 import { CodeEditorComponent }                                                       from './code-editor/code-editor.component'
 import { Project }                                                                   from '../project'
 import { Observable }                                                                from 'rxjs'
+import * as beautify                                                                 from 'js-beautify'
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
 
 @Component ( {
@@ -253,6 +254,22 @@ export class EditorComponent implements OnInit {
 				width : '300px',
 				data  : this.project
 			}
+		)
+	}
+
+	tidy () {
+		this.editor.setValue (
+			beautify.html (
+				this.code,
+				{
+					indent_inner_html : true,
+					indent_with_tabs  : true,
+					wrap_line_length  : 0,
+					brace_style       : 'end-expand',
+					preserve_newlines : false,
+					extra_liners      : [ 'style' ]
+				}
+			)
 		)
 	}
 }

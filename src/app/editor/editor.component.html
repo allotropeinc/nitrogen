@@ -20,6 +20,11 @@
 			</ng-container>
 			<ng-container *ngIf="!working">
 				<div class="buttons">
+					<button mat-icon-button matTooltip="Tidy" [disabled]="publishing || saving" (click)="tidy()">
+						<mat-icon>
+							brush
+						</mat-icon>
+					</button>
 					<button mat-icon-button matTooltip="Revert all changes"
 					        [disabled]="!unsaved || publishing || saving"
 					        (click)="revert()">
@@ -55,7 +60,7 @@
 							</mat-icon>
 						</button>
 					</ng-container>
-					<button matTooltip="Save" mat-icon-button [disabled]="saving" (click)="save()">
+					<button matTooltip="Save" mat-icon-button [disabled]="!unsaved || saving" (click)="save()">
 						<mat-icon>
 							save
 						</mat-icon>
@@ -63,7 +68,7 @@
 				</div>
 				<div class="mobile-buttons">
 					<mat-menu xPosition="before" #mobile_menu="matMenu">
-						<button mat-menu-item [disabled]="saving" (click)="save()">
+						<button mat-menu-item [disabled]="!unsaved || saving" (click)="save()">
 							<mat-icon>
 								save
 							</mat-icon>
@@ -121,6 +126,14 @@
 							</mat-icon>
 							<span>
 								Revert Changes
+							</span>
+						</button>
+						<button mat-menu-item [disabled]="publishing || saving" (click)="tidy()">
+							<mat-icon>
+								brush
+							</mat-icon>
+							<span>
+								Tidy
 							</span>
 						</button>
 					</mat-menu>
