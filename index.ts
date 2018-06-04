@@ -444,7 +444,7 @@ router.post (
 											wrap_line_length  : 0,
 											brace_style       : 'end-expand',
 											preserve_newlines : false,
-											extra_liners      : ['style']
+											extra_liners      : [ 'style' ]
 										}
 									)
 								)
@@ -985,9 +985,6 @@ if ( config[ 'secret' ] ) {
 						res.json ( true )
 
 						if ( req.body.ref === 'refs/heads/' + config.branch ) {
-							debug ( 'bringing down servers for update' )
-
-							await safeShutdown ()
 
 							debug ( 'executing update script' )
 
@@ -1025,6 +1022,12 @@ if ( config[ 'secret' ] ) {
 											code,
 											signal
 										)
+
+										debug ( 'bringing down servers for update' )
+
+										await safeShutdown ()
+
+										debug ( 'stopping hexazine' )
 
 										process.exit ( 1 )
 									} else {
