@@ -1,17 +1,26 @@
-import { Component, OnInit } from '@angular/core'
-import { ApiService }        from '../api.service'
-import { Router }            from '@angular/router'
-import { MatSnackBar }       from '@angular/material'
+import { Component, OnInit }       from '@angular/core'
+import { ApiService }              from '../api.service'
+import { Router }                  from '@angular/router'
+import { MatSnackBar }             from '@angular/material'
+import { FormControl, Validators } from '@angular/forms'
+import { usernamePattern }         from '../../../backend/types'
 
 @Component ( {
-	selector : 'app-register',
+	selector    : 'app-register',
 	templateUrl : './register.component.html',
-	styleUrls : [ './register.component.css' ]
+	styleUrls   : [ './register.component.css' ]
 } )
 export class RegisterComponent implements OnInit {
-	username : string
-	password : string
-	confirmPassword : string
+	username = new FormControl (
+		'',
+		[
+			Validators.max ( 16 ),
+			Validators.required,
+			Validators.pattern ( usernamePattern )
+		]
+	)
+	password = ''
+	confirmPassword = ''
 	working = false
 	showPassword = false
 	showPasswordConfirm = false
@@ -32,35 +41,52 @@ export class RegisterComponent implements OnInit {
 				} else {
 					this.working = false
 				}
-			} )
+			}
+		)
 	}
 
 	register () {
-		if ( this.password === this.confirmPassword ) {
-			this.working = true
+		if ( !this.username.invalid ) {
+			if ( this.password === this.confirmPassword ) {
+				this.working = true
 
-			this.api.register (
-				this.username,
-				this.password
-			).subscribe (
-				result => {
-					if ( !result ) {
-						this.working = false
+				this.api.register (
+					<string> this.username.value,
+					this.password
+				).subscribe (
+					result => {
+						if ( !result ) {
+							this.working = false
 
-						this.snackbar.open (
-							'Could not register a new account.',
-							'Close'
-						)
-					} else {
-						this.router.navigate ( [ '/signin' ] )
-					}
-				} )
+							this.snackbar.open (
+								'Could not register a new account.',
+								'Close'
+							)
+						} else {
+							this.router.navigate ( [ '/signin' ] )
+						}
+					} )
+			} else {
+				this.snackbar.open (
+					'Passwords do not match.',
+					'Close'
+				)
+			}
 		} else {
 			this.snackbar.open (
-				'Passwords do not match.',
+				'Invalid username.',
 				'Close'
 			)
 		}
 	}
 
+	getErrorMessage () {
+		if ( this.username.value.length > 16 ) {
+			return 'Usernames can be up to 16 characters long'
+		} else if ( this.username.hasError ( 'required' ) ) {
+			return 'This field is required'
+		} else if ( this.username.hasError ( 'pattern' ) ) {
+			return 'Letters and numbers only, no spaces'
+		}
+	}
 }

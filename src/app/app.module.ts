@@ -3,7 +3,7 @@ import { BrowserAnimationsModule }                                              
 import { NgModule }                                                                    from '@angular/core'
 import { MaterialModule }                                                              from './material.module'
 import { ApiDecryptionDialogComponent, ApiProvidePasswordDialogComponent, ApiService } from './api.service'
-import { FormsModule }                                                                 from '@angular/forms'
+import { FormsModule, ReactiveFormsModule }                                            from '@angular/forms'
 import { MonacoEditorModule }                                                          from 'ngx-monaco-editor'
 
 import { AppComponent }                             from './app.component'
@@ -105,6 +105,7 @@ import {
 		MaterialModule,
 		AppRoutingModule,
 		FormsModule,
+		ReactiveFormsModule,
 		SplitPaneModule,
 		MonacoEditorModule.forRoot (),
 		HttpClientModule
