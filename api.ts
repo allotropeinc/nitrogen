@@ -1,9 +1,9 @@
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
-import { Account, ApiData, BugReport, ClientProject, MinimalAccount, Project, PublishToken } from './types'
-import * as crypto                                                                           from 'crypto'
-import * as fs                                                                               from 'fs'
-import * as uuid                                                                             from 'uuid'
-import { upgradeData }                                                                       from './upgrade'
+import { Account, ApiData, BugReport, ClientProject, MinimalAccount, Project, PublishToken, usernamePattern } from './types'
+import * as crypto                                                                                            from 'crypto'
+import * as fs                                                                                                from 'fs'
+import * as uuid                                                                                              from 'uuid'
+import { upgradeData }                                                                                        from './upgrade'
 
 const debug = require ( 'debug' ) (
 	'hexazine:api'
@@ -248,7 +248,6 @@ const hashFunctions = {
 }
 
 const currentHashVersion = 'v3'
-const usernamePattern = /^[\w\d]{1,16}$/
 
 export const Api = {
 	validateToken (

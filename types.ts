@@ -57,3 +57,5 @@ export interface ApiData {
 }
 
 export type Upgrades = ( ( data : ApiData ) => Promise<void> )[]
+
+export const usernamePattern = /^[\w\d]{1,16}$/
