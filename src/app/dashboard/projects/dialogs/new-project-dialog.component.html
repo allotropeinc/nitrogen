@@ -1,10 +1,20 @@
 <h1>New Project</h1>
 <mat-form-field>
-	<input matInput [(ngModel)]="name" placeholder="Project Name" (keydown.enter)="dialogRef.close(name)">
+	<input matInput [(ngModel)]="data.name" placeholder="Project Name" (keydown.enter)="dialogRef.close(name)">
+</mat-form-field>
+<mat-form-field>
+	<mat-select [(ngModel)]="data.type">
+		<mat-option [value]="0">
+			HTML
+		</mat-option>
+		<mat-option [value]="1">
+			Markdown
+		</mat-option>
+	</mat-select>
 </mat-form-field>
 <ng-container>
 	<button mat-button (click)="dialogRef.close()">Cancel</button>
 	<div class="buttons">
-		<button mat-flat-button color="primary" [mat-dialog-close]="name">Create</button>
+		<button mat-flat-button color="primary" [mat-dialog-close]="data">Create</button>
 	</div>
 </ng-container>

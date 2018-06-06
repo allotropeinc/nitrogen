@@ -28,7 +28,6 @@ import {
 	ConfirmPublishDialogComponent,
 	ConfirmRevertDialogComponent,
 	ConfirmUnpublishDialogComponent,
-	DoctypeMoreInfoDialogComponent,
 	EditorComponent,
 	ShareProjectDialogComponent
 }                                                   from './editor/editor.component'
@@ -93,7 +92,6 @@ import {
 		AdminDashboardUsersComponent,
 		AdminDashboardReportsComponent,
 		AdminDashboardUserComponent,
-		DoctypeMoreInfoDialogComponent,
 		ApiProvidePasswordDialogComponent,
 		ApiDecryptionDialogComponent,
 		ShareProjectDialogComponent,
@@ -130,7 +128,6 @@ import {
 		AccountChangeUsernameComponent,
 		AccountChangePasswordComponent,
 		AccountDeleteDialogComponent,
-		DoctypeMoreInfoDialogComponent,
 		ApiProvidePasswordDialogComponent,
 		ApiDecryptionDialogComponent,
 		ShareProjectDialogComponent,

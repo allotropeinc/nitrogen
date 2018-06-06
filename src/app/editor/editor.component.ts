@@ -1,11 +1,11 @@
-import { Component, Inject, OnInit, ViewChild }                                      from '@angular/core'
-import { ActivatedRoute, CanDeactivate, Router }                                     from '@angular/router'
-import { ApiService }                                                                from '../api.service'
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar, MatSnackBarDismiss } from '@angular/material'
-import { CodeEditorComponent }                                                       from './code-editor/code-editor.component'
-import { Project }                                                                   from '../project'
-import { Observable }                                                                from 'rxjs'
-import * as beautify                                                                 from 'js-beautify'
+import { Component, Inject, OnInit, ViewChild }                  from '@angular/core'
+import { ActivatedRoute, CanDeactivate, Router }                 from '@angular/router'
+import { ApiService }                                            from '../api.service'
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
+import { CodeEditorComponent }                                   from './code-editor/code-editor.component'
+import { Project }                                               from '../project'
+import { Observable }                                            from 'rxjs'
+import * as beautify                                             from 'js-beautify'
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
 
 @Component ( {
@@ -109,47 +109,26 @@ export class EditorComponent implements OnInit {
 			return
 		}
 
-		if ( this.code.toLowerCase ().startsWith ( '<!doctype html>' ) ) {
-			this.saving = true
+		this.saving = true
 
-			this.api.setProjectCode (
-				this.id,
-				this.code,
-				!this.project.publishToken
-			).subscribe (
-				success => {
-					if ( !success ) {
-						this.snackbar.open (
-							'The project could not be saved.',
-							'Close'
-						)
-					} else {
-						this.originalCode = this.code
-						this.unsaved = false
-					}
+		this.api.setProjectCode (
+			this.id,
+			this.code,
+			!this.project.publishToken
+		).subscribe (
+			success => {
+				if ( !success ) {
+					this.snackbar.open (
+						'The project could not be saved.',
+						'Close'
+					)
+				} else {
+					this.originalCode = this.code
+					this.unsaved = false
+				}
 
-					this.saving = false
-				} )
-		} else {
-			this.snackbar.open (
-				'Your file does not begin with <!doctype html>',
-				'More info',
-				{
-					duration : 5000
-				}
-			).afterDismissed ().subscribe (
-				( info : MatSnackBarDismiss ) => {
-					if ( info.dismissedByAction ) {
-						this.dialog.open (
-							DoctypeMoreInfoDialogComponent,
-							{
-								width : '300px'
-							}
-						)
-					}
-				}
-			)
-		}
+				this.saving = false
+			} )
 	}
 
 	reloadCodeEditor () {
@@ -346,14 +325,6 @@ export class ConfirmPublishDialogComponent {
 	constructor (
 		public dialogRef : MatDialogRef<ConfirmPublishDialogComponent>
 	) {}
-}
-
-@Component ( {
-	selector    : 'app-doctype-more-info-dialog',
-	templateUrl : './dialogs/doctype-more-info-dialog.component.html'
-} )
-export class DoctypeMoreInfoDialogComponent {
-	constructor () {}
 }
 
 @Component ( {

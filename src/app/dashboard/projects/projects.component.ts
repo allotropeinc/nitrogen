@@ -43,9 +43,12 @@ export class ProjectsComponent implements OnInit {
 		this.working = true
 
 		dialogRef.afterClosed ().subscribe (
-			name => {
-				if ( name ) {
-					this.api.newProject ( name ).subscribe (
+			data => {
+				if ( data ) {
+					this.api.newProject (
+						data.name,
+						data.type
+					).subscribe (
 						success => {
 							if ( !success ) {
 								this.snackbar.open (
@@ -102,7 +105,10 @@ export class ProjectsComponent implements OnInit {
 	templateUrl : './dialogs/new-project-dialog.component.html'
 } )
 export class NewProjectDialogComponent {
-	name = 'New Project'
+	data = {
+		name : 'New Project',
+		type : 0
+	}
 
 	constructor (
 		public dialogRef : MatDialogRef<NewProjectDialogComponent>

@@ -1,10 +1,10 @@
-import { Component, Inject, Injectable, isDevMode }              from '@angular/core'
-import { Observable, Observer, of }                              from 'rxjs'
-import { Project }                                               from './project'
-import { HttpClient }                                            from '@angular/common/http'
-import { Account, BugReport, MinimalAccount }                    from '../../backend/types'
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
-import { URL }                                                   from 'url-parse'
+import { Component, Inject, Injectable, isDevMode }                           from '@angular/core'
+import { Observable, Observer, of }                                           from 'rxjs'
+import { Project }                                                            from './project'
+import { HttpClient }                                                         from '@angular/common/http'
+import { Account, BugReport, DECRYPTION_CONFIRMATION_HEADER, MinimalAccount } from '../../backend/types'
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar }              from '@angular/material'
+import { URL }                                                                from 'url-parse'
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
 
 declare const CryptoJS : any
@@ -314,7 +314,10 @@ export class ApiService {
 		)
 	}
 
-	newProject ( name : string ) : Observable<boolean> {
+	newProject (
+		name : string,
+		type : number
+	) : Observable<boolean> {
 		this.log (
 			'newProject',
 			name
@@ -325,7 +328,8 @@ export class ApiService {
 				this.http.post (
 					this.apiLocation + '/projects/new',
 					{
-						name : name
+						name : name,
+						type : type
 					},
 					{
 						headers : {
@@ -495,7 +499,7 @@ export class ApiService {
 					}
 				).subscribe (
 					( response : Project ) => {
-						if ( !response.code.toLowerCase ().startsWith ( '<!doctype html>' ) ) { // encrypted
+						if ( response ) {
 							this.decrypt ( response.code ).subscribe (
 								( decrypted : string ) => {
 									if ( decrypted ) {
@@ -510,7 +514,7 @@ export class ApiService {
 								}
 							)
 						} else {
-							observer.next ( response )
+							observer.next ( null )
 							observer.complete ()
 						}
 					},
@@ -1030,7 +1034,7 @@ export class ApiService {
 
 				observer.next (
 					CryptoJS.AES.encrypt (
-						code,
+						DECRYPTION_CONFIRMATION_HEADER + code,
 						this.password
 					).toString ()
 				)
@@ -1039,15 +1043,36 @@ export class ApiService {
 		)
 	}
 
+	_getDecrypted ( code : string ) {
+		this.log (
+			'_getDecrypted',
+			code
+		)
+
+		if ( code.startsWith ( DECRYPTION_CONFIRMATION_HEADER ) ) {
+			return code.substr ( 40 )
+		} else if ( code.toLowerCase ().startsWith ( '<!doctype html>' ) ) {
+			return code
+		} else {
+			return
+		}
+	}
+
 	_decrypt (
 		encrypted : string,
 		password? : string
 	) : string {
 		this.log (
-			'decrypt',
+			'_decrypt',
 			encrypted,
 			password
 		)
+
+		const decrypted = this._getDecrypted ( encrypted )
+
+		if ( decrypted ) {
+			return decrypted
+		}
 
 		try {
 			return CryptoJS.AES.decrypt (
@@ -1072,16 +1097,16 @@ export class ApiService {
 
 				const decrypted = this._decrypt ( encrypted )
 
-				if ( !decrypted.toLowerCase ().startsWith ( '<!doctype html>' ) ) { // decrypted wrong
+				if ( decrypted ) {
+					observer.next ( decrypted )
+					observer.complete ()
+				} else {
 					this.decryptionDialog ( encrypted ).subscribe (
-						( decryptedAgain : string ) => {
+						( decryptedAgain ) => {
 							observer.next ( decryptedAgain )
 							observer.complete ()
 						}
 					)
-				} else {
-					observer.next ( decrypted )
-					observer.complete ()
 				}
 			}
 		)
@@ -1103,7 +1128,8 @@ export class ApiService {
 						width : '300px',
 						data  : [
 							encrypted,
-							this._decrypt.bind ( this )
+							this._decrypt.bind ( this ),
+							this._getDecrypted.bind ( this )
 						]
 					}
 				).afterClosed ().subscribe (
@@ -1273,6 +1299,7 @@ export class ApiDecryptionDialogComponent {
 		password : string
 	) => string
 	decrypted = ''
+	getDecrypted = Function
 
 	constructor (
 		public dialogRef : MatDialogRef<ApiDecryptionDialogComponent>,
@@ -1281,5 +1308,6 @@ export class ApiDecryptionDialogComponent {
 	) {
 		this.encrypted = data[ 0 ]
 		this.decrypt = data[ 1 ]
+		this.getDecrypted = data[ 2 ]
 	}
 }

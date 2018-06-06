@@ -1,6 +1,7 @@
 <a mat-list-item [routerLink]="'/edit/' + project.id">
 	<mat-icon mat-list-icon>code</mat-icon>
 	<span matLine>{{project.name}}</span>
+	<mat-hint matLine>{{project.type == 0 ? 'HTML' : 'Markdown'}}</mat-hint>
 </a>
 <mat-menu #actions="matMenu" xPosition="before">
 	<button mat-menu-item (click)="rename()">
