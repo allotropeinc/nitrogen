@@ -349,19 +349,31 @@ router.post (
 				const segments = url.pathname.slice ( 1 ).split ( path.sep )
 
 				let fiddleId = ''
+				let currentPop = segments.pop ()
 
-				if ( segments[ segments.length - 1 ] === 'embed' ) {
-					segments.pop ()
+				if ( +currentPop ) {
+					debug (
+						'fiddle has ID %s',
+						currentPop
+					)
+
+					fiddleId = '/' + currentPop
+
+					if ( segments.length < 1 ) { // can't have version without id
+						res.json ( false )
+
+						return
+					}
+
+					currentPop = segments.pop ()
 				}
 
-				if ( segments.length === 1 ) {
-					debug ( 'has no version' )
+				if ( currentPop ) {
+					fiddleId = currentPop + fiddleId
+				} else {
+					res.json ( false )
 
-					fiddleId = segments[ 0 ]
-				} else if ( segments.length === 2 && Number.isInteger ( +segments[ 1 ] ) ) {
-					debug ( 'has version' )
-
-					fiddleId = segments[ 0 ] + '/ ' + segments[ 1 ]
+					return
 				}
 
 				if ( fiddleId ) {
