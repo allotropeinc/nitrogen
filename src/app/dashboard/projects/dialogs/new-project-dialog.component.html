@@ -1,6 +1,6 @@
 <h1>New Project</h1>
 <mat-form-field>
-	<input matInput [(ngModel)]="data.name" placeholder="Project Name" (keydown.enter)="dialogRef.close(name)">
+	<input matInput [(ngModel)]="data.name" placeholder="Project Name" (keydown.enter)="dialogRef.close(data.name)">
 </mat-form-field>
 <mat-form-field>
 	<mat-select [(ngModel)]="data.type">
