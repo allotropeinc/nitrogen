@@ -1,9 +1,14 @@
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
 
 export interface Project {
-	name : string,
-	code : string,
+	name : string
+	code : string
 	publishToken? : string
+	/**
+	 * 0: HTML
+	 * 1: Markdown
+	 */
+	type : number
 }
 
 export interface ClientProject extends Project {
@@ -11,21 +16,21 @@ export interface ClientProject extends Project {
 }
 
 export interface Account {
-	activeToken? : string,
-	username : string,
-	password : string,
-	projects : Project[],
-	editorOptions : IEditorConstructionOptions,
+	activeToken? : string
+	username : string
+	password : string
+	projects : Project[]
+	editorOptions : IEditorConstructionOptions
 	isAdmin : boolean
 }
 
 export interface MinimalAccount {
-	username : string,
+	username : string
 	isAdmin : boolean
 }
 
 export interface PublishToken {
-	username : string,
+	username : string
 	projectIndex : number
 }
 
@@ -59,3 +64,4 @@ export interface ApiData {
 export type Upgrades = ( ( data : ApiData ) => Promise<void> )[]
 
 export const usernamePattern = /^[\w\d]{1,16}$/
+export const DECRYPTION_CONFIRMATION_HEADER = '!!!!!DECRYPTION_CONFIRMATION_HEADER!!!!!'

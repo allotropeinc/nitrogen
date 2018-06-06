@@ -1,9 +1,19 @@
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
-import { Account, ApiData, BugReport, ClientProject, MinimalAccount, Project, PublishToken, usernamePattern } from './types'
-import * as crypto                                                                                            from 'crypto'
-import * as fs                                                                                                from 'fs'
-import * as uuid                                                                                              from 'uuid'
-import { upgradeData }                                                                                        from './upgrade'
+import {
+	Account,
+	ApiData,
+	BugReport,
+	ClientProject,
+	DECRYPTION_CONFIRMATION_HEADER,
+	MinimalAccount,
+	Project,
+	PublishToken,
+	usernamePattern
+}                      from './types'
+import * as crypto     from 'crypto'
+import * as fs         from 'fs'
+import * as uuid       from 'uuid'
+import { upgradeData } from './upgrade'
 
 const debug = require ( 'debug' ) (
 	'hexazine:api'
@@ -87,12 +97,13 @@ const starterEditorOptions : IEditorConstructionOptions = {
 	wordWrapMinified                  : true,
 	wrappingIndent                    : 'same', // 'none',
 
-	language             : 'html',
+	// language             : 'html',
 	theme                : 'vs-dark',
 	accessibilityHelpUrl : ''
 }
 
-const starterCode = '<!doctype html>\n' +
+const starterCodes = [
+	'<!doctype html>\n' +
 	'<html>\n' +
 	'\t<head>\n' +
 	'\t\t<meta charset="utf-8">\n' +
@@ -105,10 +116,13 @@ const starterCode = '<!doctype html>\n' +
 	'\t\t</script>\n' +
 	'\t</head>\n' +
 	'\t<body>\n' +
-	'\t\t<h1>New Project</h1>\n' +
+	'\t\t<h1>New HTML Project</h1>\n' +
 	'\t\t<p>Welcome to Nitrogen!</p>\n' +
 	'\t</body>\n' +
-	'</html>'
+	'</html>',
+	'# New Markdown project\n' +
+	'Welcome to Nitrogen!'
+]
 
 function getData () : Promise<ApiData> {
 	return new Promise ( (
@@ -522,10 +536,8 @@ export const Api = {
 								index : number
 							) => {
 								return <ClientProject> {
-									id           : index,
-									name         : project.name,
-									code         : project.code,
-									publishToken : project.publishToken
+									... project,
+									id : index
 								}
 							}
 						) )
@@ -558,6 +570,7 @@ export const Api = {
 	newProject (
 		username : string,
 		name : string,
+		type : number,
 		code? : string
 	) : Promise<boolean> {
 		return new Promise ( (
@@ -574,7 +587,8 @@ export const Api = {
 					( account : Account ) => {
 						account.projects.push ( <Project> {
 								name : name,
-								code : code || starterCode
+								type : type,
+								code : DECRYPTION_CONFIRMATION_HEADER + ( code || starterCodes[ type ] )
 							}
 						)
 

@@ -276,13 +276,18 @@ router.post (
 		req : ApiRequest,
 		res : Response
 	) => {
-		if ( req.body.hasOwnProperty ( 'name' ) ) {
-			try {
-				res.json ( await Api.newProject (
-					req.account.username,
-					<string> req.body.name
-				) )
-			} catch {
+		if ( req.body.hasOwnProperty ( 'name' ) && req.body.hasOwnProperty ( 'type' ) ) {
+			if ( +req.body.type && req.body.type % 1 == 0 && req.body.type >= 0 && req.body.type <= 1 ) {
+				try {
+					res.json ( await Api.newProject (
+						req.account.username,
+						<string> req.body.name,
+						req.body.type
+					) )
+				} catch {
+					res.json ( false )
+				}
+			} else {
 				res.json ( false )
 			}
 		} else {
@@ -448,6 +453,7 @@ router.post (
 								await Api.newProject (
 									req.account.username,
 									`Imported: JSFiddle ${fiddleId}`,
+									0,
 									beautify.html_beautify (
 										$.html (),
 										{

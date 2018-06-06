@@ -10,7 +10,17 @@ const debug = require ( 'debug' ) (
 
 debug.enabled = true
 
-const allUpgrades : Upgrades = []
+const allUpgrades : Upgrades = [
+	async ( data ) => {
+		for ( const accKey of Object.keys ( data.accounts ) ) {
+			const acc = data.accounts[ accKey ]
+
+			for ( const proj of acc.projects ) {
+				proj.type = 0
+			}
+		}
+	}
+]
 
 export async function upgradeData ( data : ApiData ) {
 	debug ( 'upgrading data' )
