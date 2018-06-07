@@ -7,17 +7,17 @@
 			<ng-container *ngFor="let project of projects">
 				<app-project-item [project]="project" *ngIf="project"></app-project-item>
 			</ng-container>
-			<mat-divider inset></mat-divider>
+			<mat-divider inset class="full"></mat-divider>
 		</ng-container>
-		<a mat-list-item (click)="newProject()">
+		<a mat-list-item (click)="newProject()" class="full">
 			<mat-icon mat-list-icon>add</mat-icon>
 			<span matLine>New Project</span>
 		</a>
-		<a mat-list-item (click)="import()">
+		<a mat-list-item (click)="import()" class="full">
 			<mat-icon mat-list-icon>cloud_download</mat-icon>
 			<span matLine>Import from JSFiddle</span>
 		</a>
-		<a mat-list-item (click)="refresh()">
+		<a mat-list-item (click)="refresh()" class="full">
 			<mat-icon mat-list-icon>refresh</mat-icon>
 			<span matLine>Refresh</span>
 		</a>

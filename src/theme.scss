@@ -4,21 +4,21 @@
 @import '~@angular/material/theming';
 
 @include mat-core(mat-typography-config(
-	$font-family: 'Overpass',
-	$display-4: mat-typography-level(112px, 112px, 300),
-	$display-3: mat-typography-level(56px, 56px, 300),
-	$display-2: mat-typography-level(45px, 48px, 300),
-	$display-1: mat-typography-level(34px, 40px, 300),
-	$headline: mat-typography-level(24px, 32px, 300),
-	$title: mat-typography-level(20px, 32px, 400),
-	$subheading-2: mat-typography-level(16px, 28px, 300),
-	$subheading-1: mat-typography-level(15px, 24px, 300),
-	$body-2: mat-typography-level(14px, 24px, 400),
-	$body-1: mat-typography-level(14px, 20px, 300),
-	$caption: mat-typography-level(12px, 20px, 300),
-	$button: mat-typography-level(14px, 14px, 800),
-		// Line-height must be unit-less fraction of the font-size.
-	$input: mat-typography-level(inherit, 1.125, 300)
+		$font-family: 'Overpass',
+		$display-4: mat-typography-level(112px, 112px, 300),
+		$display-3: mat-typography-level(56px, 56px, 300),
+		$display-2: mat-typography-level(45px, 48px, 300),
+		$display-1: mat-typography-level(34px, 40px, 300),
+		$headline: mat-typography-level(24px, 32px, 300),
+		$title: mat-typography-level(20px, 32px, 400),
+		$subheading-2: mat-typography-level(16px, 28px, 300),
+		$subheading-1: mat-typography-level(15px, 24px, 300),
+		$body-2: mat-typography-level(14px, 24px, 400),
+		$body-1: mat-typography-level(14px, 20px, 300),
+		$caption: mat-typography-level(12px, 20px, 300),
+		$button: mat-typography-level(14px, 14px, 800),
+			// Line-height must be unit-less fraction of the font-size.
+		$input: mat-typography-level(inherit, 1.125, 300)
 ));
 
 $primary: mat-palette($mat-cyan, 600);
@@ -64,6 +64,12 @@ app-root > *:not(router-outlet) {
 	> mat-card {
 		width: calc(100% - 48px);
 		max-width: 400px;
+
+		@media screen and (min-width: 896px) {
+			& {
+				max-width: 800px;
+			}
+		}
 
 		> mat-divider + * {
 			padding-top: 24px;
