@@ -1,23 +1,24 @@
-import * as express                        from 'express'
-import { NextFunction, Request, Response } from 'express'
-import { Api }                             from './api'
-import { Account, BugReport, Project }     from './types'
-import * as path                           from 'path'
-import { join }                            from 'path'
-import * as https                          from 'https'
-import * as fs                             from 'fs'
-import * as net                            from 'net'
-import * as http                           from 'http'
-import { IncomingMessage, ServerResponse } from 'http'
-import * as Prism                          from 'prismjs'
-import { spawn }                           from 'child_process'
-import * as crypto                         from 'crypto'
-import * as normalizeUrl                   from 'normalize-url'
-import * as URL                            from 'url-parse'
-import { get }                             from 'request-promise-native'
-import { load }                            from 'cheerio'
-import * as beautify                       from 'js-beautify'
-import { markdown }                        from 'markdown'
+import * as express                                                    from 'express'
+import { NextFunction, Request, Response }                             from 'express'
+import { Api }                                                         from './api'
+import { Account, BugReport, DECRYPTION_CONFIRMATION_HEADER, Project } from './types'
+import * as path                                                       from 'path'
+import { join }                                                        from 'path'
+import * as https                                                      from 'https'
+import * as fs                                                         from 'fs'
+import * as net                                                        from 'net'
+import * as http                                                       from 'http'
+import { IncomingMessage, ServerResponse }                             from 'http'
+import * as Prism                                                      from 'prismjs'
+import { spawn }                                                       from 'child_process'
+import * as crypto                                                     from 'crypto'
+import * as normalizeUrl                                               from 'normalize-url'
+import * as URL                                                        from 'url-parse'
+import { get }                                                         from 'request-promise-native'
+import { load }                                                        from 'cheerio'
+import * as beautify                                                   from 'js-beautify'
+import { md2html }                                                     from './md2html'
+import 'prismjs/components/prism-markdown'
 import Signals = NodeJS.Signals
 
 const debug = require ( 'debug' ) (
@@ -78,8 +79,8 @@ interface ApiRequest extends Request {
 
 const app = express ()
 
-const router  = express.Router (),
-      servers = []
+const router = express.Router ()
+const servers = []
 
 const noAuthRoutes = [
 	'/accounts/auth',
@@ -278,7 +279,7 @@ router.post (
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'name' ) && req.body.hasOwnProperty ( 'type' ) ) {
-			if ( +req.body.type && req.body.type % 1 == 0 && req.body.type >= 0 && req.body.type <= 1 ) {
+			if ( +req.body.type && req.body.type % 1 === 0 && req.body.type >= 0 && req.body.type <= 1 ) {
 				try {
 					res.json ( await Api.newProject (
 						req.account.username,
@@ -672,18 +673,27 @@ router.get (
 
 		try {
 			const project : Project = await Api.getPublished ( req.params.publishToken )
+
+			let code
+
+			if ( project.code.startsWith ( DECRYPTION_CONFIRMATION_HEADER ) ) {
+				code = project.code.substr ( DECRYPTION_CONFIRMATION_HEADER.length )
+			} else {
+				code = project.code
+			}
+
 			let html
 
 			switch ( project.type ) {
 				case 0:
-					html = project.code
+					html = code
 					break
 				case 1:
-					html = markdown.toHTML ( project.code )
+					html = md2html ( code )
 			}
 
 			res.end (
-				project.code,
+				html,
 				'utf8'
 			)
 		} catch {
@@ -708,20 +718,31 @@ router.get (
 
 		try {
 			const project : Project = await Api.getPublished ( req.params.publishToken )
+			let code
+
+			if ( project.code.startsWith ( DECRYPTION_CONFIRMATION_HEADER ) ) {
+				code = project.code.substr ( DECRYPTION_CONFIRMATION_HEADER.length )
+			} else {
+				code = project.code
+			}
+
+			let grammar
 			let language
 
 			switch ( project.type ) {
 				case 0:
-					language = Prism.languages.html
+					grammar = Prism.languages.html
+					language = 'html'
 					break
 				case 1:
-					language = Prism.languages.markdown
+					grammar = Prism.languages.markdown
+					language = 'markdown'
 			}
 
 			const highlighted = Prism.highlight (
-				project.code,
-				language,
-				'html'
+				code,
+				grammar,
+				language
 			)
 
 			res.end (
