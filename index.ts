@@ -689,7 +689,10 @@ router.get (
 					html = code
 					break
 				case 1:
-					html = md2html ( code )
+					html = md2html (
+						code,
+						project.name
+					)
 			}
 
 			res.end (
