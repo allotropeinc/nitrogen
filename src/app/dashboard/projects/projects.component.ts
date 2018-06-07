@@ -1,7 +1,7 @@
 import { Component, OnInit }                    from '@angular/core'
 import { ApiService }                           from '../../api.service'
-import { Project }                              from '../../project'
 import { MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
+import { ClientProject }                        from '../../../../backend/types'
 
 @Component ( {
 	selector    : 'app-projects',
@@ -10,7 +10,7 @@ import { MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
 } )
 export class ProjectsComponent implements OnInit {
 	working = true
-	projects : Project[]
+	projects : ClientProject[]
 
 	constructor (
 		private api : ApiService,

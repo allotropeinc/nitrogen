@@ -1,8 +1,8 @@
 import { Component, Inject, Input, OnInit }                      from '@angular/core'
-import { Project }                                               from '../../../project'
-import { ApiService }                               from '../../../api.service'
+import { ApiService }                                            from '../../../api.service'
 import { ProjectsComponent }                                     from '../projects.component'
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
+import { ClientProject }                                         from '../../../../../backend/types'
 
 @Component ( {
 	selector    : 'app-project-item',
@@ -11,7 +11,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar } from '@angular/
 } )
 export class ProjectItemComponent implements OnInit {
 	@Input ()
-	project : Project
+	project : ClientProject
 	apiLocation = this.api.apiLocation
 
 	constructor (

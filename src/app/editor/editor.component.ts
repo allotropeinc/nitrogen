@@ -3,9 +3,10 @@ import { ActivatedRoute, CanDeactivate, Router }                 from '@angular/
 import { ApiService }                                            from '../api.service'
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
 import { CodeEditorComponent }                                   from './code-editor/code-editor.component'
-import { Project }                                               from '../project'
 import { Observable }                                            from 'rxjs'
 import * as beautify                                             from 'js-beautify'
+import { markdown }                                              from 'markdown'
+import { ClientProject }                                         from '../../../backend/types'
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
 
 @Component ( {
@@ -24,7 +25,7 @@ export class EditorComponent implements OnInit {
 	editorOptions : IEditorConstructionOptions
 	@ViewChild ( CodeEditorComponent )
 	editor : CodeEditorComponent
-	project : Project
+	project : ClientProject
 	unsaved = false
 	publishing = false
 	apiLocation = this.api.apiLocation
@@ -95,9 +96,29 @@ export class EditorComponent implements OnInit {
 		this.unsaved = this.code !== this.originalCode
 	}
 
+	getHTML () {
+		if ( this.project.type === 0 ) {
+			return this.code
+		} else if ( this.project.type === 1 ) {
+			console.log ( markdown )
+			const md = markdown.toHTML ( this.code )
+
+			console.log (
+				this.code,
+				md
+			)
+
+			return md
+		}
+	}
+
 	update () {
+		if ( this.url ) {
+			URL.revokeObjectURL ( this.url )
+		}
+
 		this.url = URL.createObjectURL ( new Blob (
-			[ this.code ],
+			[ this.getHTML () ],
 			{ type : 'text/html' }
 		) )
 

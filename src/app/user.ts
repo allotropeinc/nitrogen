@@ -1,9 +1,9 @@
-import { Project } from './project'
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
+import { ClientProject } from '../../backend/types'
 
 export class User {
 	constructor (
-		public projects : Project[],
+		public projects : ClientProject[],
 		public editorOptions : IEditorConstructionOptions
 	) {}
 }

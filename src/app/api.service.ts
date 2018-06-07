@@ -1,10 +1,9 @@
-import { Component, Inject, Injectable, isDevMode }                           from '@angular/core'
-import { Observable, Observer, of }                                           from 'rxjs'
-import { Project }                                                            from './project'
-import { HttpClient }                                                         from '@angular/common/http'
-import { Account, BugReport, DECRYPTION_CONFIRMATION_HEADER, MinimalAccount } from '../../backend/types'
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar }              from '@angular/material'
-import { URL }                                                                from 'url-parse'
+import { Component, Inject, Injectable, isDevMode }                                          from '@angular/core'
+import { Observable, Observer, of }                                                          from 'rxjs'
+import { Account, BugReport, ClientProject, DECRYPTION_CONFIRMATION_HEADER, MinimalAccount } from '../../backend/types'
+import { HttpClient }                                                                        from '@angular/common/http'
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar }                             from '@angular/material'
+import { URL }                                                                               from 'url-parse'
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
 
 declare const CryptoJS : any
@@ -281,12 +280,12 @@ export class ApiService {
 		)
 	}
 
-	getProjectList () : Observable<Project[]> {
+	getProjectList () : Observable<ClientProject[]> {
 		this.log (
 			'getProjectList'
 		)
 
-		return new Observable<Project[]> (
+		return new Observable<ClientProject[]> (
 			observer => {
 				this.http.get (
 					this.apiLocation + '/projects',
@@ -296,7 +295,7 @@ export class ApiService {
 						}
 					}
 				).subscribe (
-					( response : Project[] ) => {
+					( response : ClientProject[] ) => {
 						if ( response ) {
 							observer.next ( response )
 							observer.complete ()
@@ -482,13 +481,13 @@ export class ApiService {
 		)
 	}
 
-	getProject ( id : number ) : Observable<Project> {
+	getProject ( id : number ) : Observable<ClientProject> {
 		this.log (
 			'getProject',
 			id
 		)
 
-		return new Observable<Project> (
+		return new Observable<ClientProject> (
 			observer => {
 				this.http.get (
 					this.apiLocation + '/projects/' + id,
@@ -498,7 +497,7 @@ export class ApiService {
 						}
 					}
 				).subscribe (
-					( response : Project ) => {
+					( response : ClientProject ) => {
 						if ( response ) {
 							this.decrypt ( response.code ).subscribe (
 								( decrypted : string ) => {

@@ -1,10 +1,10 @@
-import { Project } from './project'
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
+import { ClientProject } from '../../backend/types'
 
 export interface Account {
 	username : string
 	password : string
-	projects : Project[],
+	projects : ClientProject[],
 	editorOptions : IEditorConstructionOptions,
 	isAdmin : boolean,
 	activeToken : string
