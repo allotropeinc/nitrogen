@@ -51,7 +51,7 @@ export class CodeEditorComponent implements OnInit, AfterViewInit {
 	}
 
 	ngAfterViewInit () {
-		this.reload ().subscribe ( this.reload ) // HACK
+		this.reload ().subscribe ( this.reload.bind ( this ) ) // HACK
 	}
 
 	reload () {
