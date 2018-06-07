@@ -17,7 +17,8 @@ export function md2html ( code : string ) {
 					'body{' +
 						'font-family:Overpass,sans-serif;' +
 						'max-width:80ch;' +
-						'margin:1em auto' +
+						'padding:1em;' +
+						'margin:0 auto' +
 					'}' +
 
 					'pre{' +
