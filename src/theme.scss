@@ -71,6 +71,12 @@ app-root > *:not(router-outlet) {
 			}
 		}
 
+		@media screen and (min-width: 1296px) {
+			& {
+				max-width: 1200px;
+			}
+		}
+
 		> mat-divider + * {
 			padding-top: 24px;
 		}
@@ -89,7 +95,7 @@ app-root > *:not(router-outlet) {
 	color: #ffb300;
 }
 
-.mat-card a:not([matLine]):not([mat-flat-button]):not([mat-button]):not(.mat-menu-item):not([mat-list-item]), .link {
+.mat-card a:not([matLine]):not([mat-flat-button]):not([mat-button]):not(.mat-menu-item):not([mat-list-item]):not([mat-icon-button]), .link {
 	color: mat-color(mat-palette($mat-blue-grey, 400));
 	cursor: pointer;
 	text-decoration: underline;

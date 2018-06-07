@@ -1,26 +1,29 @@
+<div class="buttons-flex">
+	<h1>My Projects</h1>
+	<ng-container *ngIf="!working && projects">
+		<a mat-icon-button matTooltip="Refresh" (click)="refresh()" class="full">
+			<mat-icon>
+				refresh
+			</mat-icon>
+		</a>
+		<a mat-icon-button matTooltip="Import from JSFiddle" (click)="import()" class="full">
+			<mat-icon>
+				cloud_download
+			</mat-icon>
+		</a>
+		<a mat-icon-button matTooltip="New Project" (click)="newProject()" class="full">
+			<mat-icon>
+				add
+			</mat-icon>
+		</a>
+	</ng-container>
+</div>
 <ng-container *ngIf="!working && projects">
-	<p *ngIf="projects.length == 0">
+	<p *ngIf="projects.length == 0" class="full">
 		You don't seem to have any projects!
 	</p>
-	<mat-nav-list>
-		<ng-container *ngIf="projects.length > 0">
-			<ng-container *ngFor="let project of projects">
-				<app-project-item [project]="project" *ngIf="project"></app-project-item>
-			</ng-container>
-			<mat-divider inset class="full"></mat-divider>
-		</ng-container>
-		<a mat-list-item (click)="newProject()" class="full">
-			<mat-icon mat-list-icon>add</mat-icon>
-			<span matLine>New Project</span>
-		</a>
-		<a mat-list-item (click)="import()" class="full">
-			<mat-icon mat-list-icon>cloud_download</mat-icon>
-			<span matLine>Import from JSFiddle</span>
-		</a>
-		<a mat-list-item (click)="refresh()" class="full">
-			<mat-icon mat-list-icon>refresh</mat-icon>
-			<span matLine>Refresh</span>
-		</a>
+	<mat-nav-list *ngIf="projects.length > 0">
+		<app-project-item *ngFor="let project of projects" [project]="project"></app-project-item>
 	</mat-nav-list>
 </ng-container>
 <p class="error" *ngIf="!working && !projects">
