@@ -35,6 +35,9 @@ export class CodeEditorComponent implements OnInit, AfterViewInit {
 	@Input ()
 	public code : string
 
+	@Input ()
+	public language : string
+
 	@Output ()
 	codeChange : EventEmitter<string>
 
@@ -83,7 +86,7 @@ export class CodeEditorComponent implements OnInit, AfterViewInit {
 
 								( <any> window ).monaco.editor.setModelLanguage (
 									editor.getModel (),
-									options.language
+									this.language
 								)
 							} )
 

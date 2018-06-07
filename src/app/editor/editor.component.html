@@ -20,7 +20,8 @@
 			</ng-container>
 			<ng-container *ngIf="!working">
 				<div class="buttons">
-					<button mat-icon-button matTooltip="Tidy" [disabled]="project.type !== 0 || publishing || saving" (click)="tidy()">
+					<button mat-icon-button matTooltip="Tidy" [disabled]="project.type !== 0 || publishing || saving"
+					        (click)="tidy()">
 						<mat-icon>
 							brush
 						</mat-icon>
@@ -157,7 +158,8 @@
 				                       primary-component-initialratio="0.5"
 				                       [local-storage-key]="id">
 					<app-code-editor [(code)]="code" (codeChange)="onChange()"
-					                 class="split-pane-content-primary"></app-code-editor>
+					                 class="split-pane-content-primary"
+					                 [language]="['html', 'markdown'][project.type]"></app-code-editor>
 					<iframe class="split-pane-content-secondary" [src]="url | safeurl"></iframe>
 				</horizontal-split-pane>
 			</ng-container>

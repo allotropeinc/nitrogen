@@ -62,11 +62,6 @@ export class EditorComponent implements OnInit {
 								this.api.getEditorOptions ().subscribe (
 									editorOptions => {
 										if ( editorOptions ) {
-											editorOptions.language = [
-												'html',
-												'markdown'
-											][ this.project.type ]
-
 											this.editorOptions = editorOptions
 
 											this.working = false
