@@ -1049,7 +1049,7 @@ export class ApiService {
 		)
 
 		if ( code.startsWith ( DECRYPTION_CONFIRMATION_HEADER ) ) {
-			return code.substr ( 40 )
+			return code.substr ( DECRYPTION_CONFIRMATION_HEADER.length )
 		} else if ( code.toLowerCase ().startsWith ( '<!doctype html>' ) ) {
 			return code
 		} else {
@@ -1094,7 +1094,7 @@ export class ApiService {
 					encrypted
 				)
 
-				const decrypted = this._decrypt ( encrypted )
+				const decrypted = this._getDecrypted ( this._decrypt ( encrypted ) )
 
 				if ( decrypted ) {
 					observer.next ( decrypted )
