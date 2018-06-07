@@ -279,7 +279,7 @@ router.post (
 		res : Response
 	) => {
 		if ( req.body.hasOwnProperty ( 'name' ) && req.body.hasOwnProperty ( 'type' ) ) {
-			if ( +req.body.type && req.body.type % 1 === 0 && req.body.type >= 0 && req.body.type <= 1 ) {
+			if ( Number.isInteger ( req.body.type ) && req.body.type >= 0 && req.body.type <= 1 ) {
 				try {
 					res.json ( await Api.newProject (
 						req.account.username,
