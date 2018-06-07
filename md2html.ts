@@ -5,14 +5,28 @@ const converter = new Converter ()
 converter.setFlavor ( 'github' )
 
 export function md2html ( code : string ) {
-	return '<!doctype html>' +
+	return '' +
+		'<!doctype html>' +
 		'<html>' +
-		'<head>' +
-		'<title>Markdown</title>' +
-		'<link rel="stylesheet" type="text/css" href="/assets/md.css">' +
-		'</head>' +
-		'<body>' +
-		converter.makeHtml ( code ) +
-		'</body>' +
+			'<head>' +
+			'<title>Markdown</title>' +
+				'<style type="text/css">' +
+					'@import url(\'https://fonts.googleapis.com/css?family=Overpass\');' +
+					'@import url(\'https://fonts.googleapis.com/css?family=Overpass+Mono&subset=latin-ext\');' +
+
+					'body{' +
+						'font-family:Overpass,sans-serif;' +
+						'max-width:80ch;' +
+						'margin:1em auto' +
+					'}' +
+
+					'pre{' +
+						'font-family:\'Overpass Mono\',monospace' +
+					'}' +
+				'</style>' +
+			'</head>' +
+			'<body>' +
+				converter.makeHtml ( code ) +
+			'</body>' +
 		'</html>'
 }
