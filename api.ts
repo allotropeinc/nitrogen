@@ -771,10 +771,8 @@ export const Api = {
 							const project = account.projects[ id ]
 
 							accept ( <ClientProject> {
-									id           : id,
-									name         : project.name,
-									code         : project.code,
-									publishToken : project.publishToken
+									id : id,
+									... project
 								}
 							)
 						} else {
