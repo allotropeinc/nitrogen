@@ -15,6 +15,7 @@
 				<mat-card-content>{{report.steps}}</mat-card-content>
 				<mat-card-subtitle>Comments:</mat-card-subtitle>
 				<mat-card-content>{{report.comments}}</mat-card-content>
+				<mat-card-subtitle>Reported by {{report.username}}.</mat-card-subtitle>
 				<mat-card-content>
 					<button mat-button (click)="toggleRead(report)">
 						Mark as {{report.read ? 'un' : ''}}read

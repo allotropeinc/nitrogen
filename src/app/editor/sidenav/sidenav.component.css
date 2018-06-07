@@ -23,3 +23,7 @@ label > * {
 mat-progress-spinner {
 	margin: 0 auto;
 }
+
+.buttons-wrapper {
+    height: 36px;
+}

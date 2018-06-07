@@ -4,7 +4,6 @@
 	</mat-icon>
 </button>
 <h1>Menu</h1>
-<p>This is the.. uh.. menu. What else should I say here?</p>
 <p>
 	<a mat-button routerLink="/dashboard" class="fullwidth">Return to Dashboard</a>
 </p>
@@ -446,11 +445,14 @@
 			</mat-option>
 		</mat-select>
 	</mat-form-field>
-	<div class="buttons">
-		<button mat-button [disabled]="saving" (click)="resetSettings()">Reset Settings</button>
-		<button mat-flat-button [disabled]="saving" (click)="saveSettings()">
-			{{saving ? 'Saving Settings' : 'Save Settings'}}
-		</button>
+	<div class="buttons-wrapper">
+		<div class="buttons">
+			<button mat-button [disabled]="saving" (click)="resetSettings()">Reset Settings</button>
+			<button mat-flat-button [disabled]="saving" (click)="saveSettings()">
+				{{saving ? 'Saving Settings' : 'Save Settings'}}
+			</button>
+		</div>
 	</div>
+	<app-global-footer></app-global-footer>
 </ng-container>
 <mat-progress-spinner mode="indeterminate" *ngIf="!optionsReady"></mat-progress-spinner>
