@@ -9,7 +9,7 @@ export function md2html ( code : string ) {
 		'<!doctype html>' +
 		'<html>' +
 			'<head>' +
-			'<title>Markdown</title>' +
+				'<title>Markdown</title>' +
 				'<style type="text/css">' +
 					'@import url(\'https://fonts.googleapis.com/css?family=Overpass\');' +
 					'@import url(\'https://fonts.googleapis.com/css?family=Overpass+Mono&subset=latin-ext\');' +
