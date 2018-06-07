@@ -20,7 +20,7 @@
 			</ng-container>
 			<ng-container *ngIf="!working">
 				<div class="buttons">
-					<button mat-icon-button matTooltip="Tidy" [disabled]="publishing || saving" (click)="tidy()">
+					<button mat-icon-button matTooltip="Tidy" [disabled]="project.type !== 0 || publishing || saving" (click)="tidy()">
 						<mat-icon>
 							brush
 						</mat-icon>
@@ -128,7 +128,7 @@
 								Revert Changes
 							</span>
 						</button>
-						<button mat-menu-item [disabled]="publishing || saving" (click)="tidy()">
+						<button mat-menu-item [disabled]="project.type !== 0 || publishing || saving" (click)="tidy()">
 							<mat-icon>
 								brush
 							</mat-icon>

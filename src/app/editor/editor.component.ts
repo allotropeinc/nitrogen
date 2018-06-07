@@ -5,7 +5,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar } from '@angular/
 import { CodeEditorComponent }                                   from './code-editor/code-editor.component'
 import { Observable }                                            from 'rxjs'
 import * as beautify                                             from 'js-beautify'
-import { markdown }                                              from 'markdown'
+import { md2html }                                               from '../../../backend/md2html'
 import { ClientProject }                                         from '../../../backend/types'
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
 
@@ -62,7 +62,13 @@ export class EditorComponent implements OnInit {
 								this.api.getEditorOptions ().subscribe (
 									editorOptions => {
 										if ( editorOptions ) {
+											editorOptions.language = [
+												'html',
+												'markdown'
+											][ this.project.type ]
+
 											this.editorOptions = editorOptions
+
 											this.working = false
 										} else {
 											this.snackbar.open (
@@ -100,7 +106,7 @@ export class EditorComponent implements OnInit {
 		if ( this.project.type === 0 ) {
 			return this.code
 		} else if ( this.project.type === 1 ) {
-			return markdown.toHTML ( this.code )
+			return md2html ( this.code )
 		}
 	}
 

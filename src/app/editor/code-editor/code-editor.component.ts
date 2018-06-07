@@ -79,7 +79,12 @@ export class CodeEditorComponent implements OnInit, AfterViewInit {
 								( this.editor = editor ).getModel ().updateOptions ( {
 									tabSize      : 4,
 									insertSpaces : false
-								} )
+								} );
+
+								( <any> window ).monaco.editor.setModelLanguage (
+									editor.getModel (),
+									options.language
+								)
 							} )
 
 							observer.next ( true )

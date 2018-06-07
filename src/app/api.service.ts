@@ -539,7 +539,7 @@ export class ApiService {
 
 		return new Observable<boolean> (
 			observer => {
-				( encrypt ? this.encrypt ( code ) : of ( code ) ).subscribe (
+				( encrypt ? this.encrypt ( code ) : of ( DECRYPTION_CONFIRMATION_HEADER + code ) ).subscribe (
 					( newCode : string ) => {
 						this.http.post (
 							this.apiLocation + '/projects/' + id,

@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css?family=Overpass');
+@import url('https://fonts.googleapis.com/css?family=Overpass+Mono&subset=latin-ext');
+
+body {
+    font-family: Overpass, sans-serif;
+    max-width: 80ch;
+    margin: 1em auto;
+}
+
+pre {
+    font-family: 'Overpass Mono', monospace;
+}
