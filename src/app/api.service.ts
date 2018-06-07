@@ -1099,6 +1099,8 @@ export class ApiService {
 				if ( alreadyDecrypted ) {
 					observer.next ( alreadyDecrypted )
 					observer.complete ()
+
+					return
 				}
 
 				const decrypted = this._getDecrypted ( this._decrypt ( encrypted ) )
