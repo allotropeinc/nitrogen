@@ -101,7 +101,10 @@ export class EditorComponent implements OnInit {
 		if ( this.project.type === 0 ) {
 			return this.code
 		} else if ( this.project.type === 1 ) {
-			return md2html ( this.code )
+			return md2html (
+				this.code,
+				this.project.name
+			)
 		}
 	}
 
