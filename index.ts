@@ -17,6 +17,7 @@ import * as URL                            from 'url-parse'
 import { get }                             from 'request-promise-native'
 import { load }                            from 'cheerio'
 import * as beautify                       from 'js-beautify'
+import { markdown }                        from 'markdown'
 import Signals = NodeJS.Signals
 
 const debug = require ( 'debug' ) (
@@ -671,6 +672,15 @@ router.get (
 
 		try {
 			const project : Project = await Api.getPublished ( req.params.publishToken )
+			let html
+
+			switch ( project.type ) {
+				case 0:
+					html = project.code
+					break
+				case 1:
+					html = markdown.toHTML ( project.code )
+			}
 
 			res.end (
 				project.code,
@@ -698,10 +708,19 @@ router.get (
 
 		try {
 			const project : Project = await Api.getPublished ( req.params.publishToken )
+			let language
+
+			switch ( project.type ) {
+				case 0:
+					language = Prism.languages.html
+					break
+				case 1:
+					language = Prism.languages.markdown
+			}
 
 			const highlighted = Prism.highlight (
 				project.code,
-				Prism.languages.html,
+				language,
 				'html'
 			)
 
@@ -1042,18 +1061,18 @@ if ( config[ 'secret' ] ) {
 										)
 
 										debug ( 'bringing down servers for update' )
-
-										await safeShutdown ()
-
-										debug ( 'stopping hexazine' )
-
-										process.exit ( 1 )
 									} else {
 										debug (
 											'exit status was zero (signal: %s)',
 											signal
 										)
 									}
+
+									await safeShutdown ()
+
+									debug ( 'stopping hexazine' )
+
+									process.exit ( 1 )
 								}
 							)
 						} else {
