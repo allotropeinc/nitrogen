@@ -109,6 +109,47 @@ export class ApiService {
 		}
 	}
 
+	protected request (
+		url : string,
+		body? : Object
+	) : Observable<any> {
+		return new Observable<any> (
+			( observer : Observer<any> ) => {
+				const options = {
+					headers : {
+						token : this.token
+					}
+				}
+
+				let request
+
+				if ( !body ) {
+					request = this.http.get (
+						url,
+						options
+					)
+				} else {
+					request = this.http.post (
+						url,
+						body,
+						options
+					)
+				}
+
+				request.subscribe (
+					( response ) => {
+						observer.next ( response )
+						observer.complete ()
+					},
+					() => {
+						observer.next ( undefined )
+						observer.complete ()
+					}
+				)
+			}
+		)
+	}
+
 	authenticate (
 		username : string,
 		password : string
@@ -121,7 +162,7 @@ export class ApiService {
 
 		return new Observable<boolean> (
 			observer => {
-				this.http.post (
+				this.request (
 					this.apiLocation + '/accounts/auth',
 					{
 						username : username,
@@ -142,10 +183,6 @@ export class ApiService {
 							observer.next ( false )
 							observer.complete ()
 						}
-					},
-					() => {
-						observer.next ( false )
-						observer.complete ()
 					}
 				)
 			}
@@ -160,13 +197,8 @@ export class ApiService {
 		if ( this.token ) {
 			return new Observable<boolean> (
 				observer => {
-					this.http.get (
-						this.apiLocation + '/accounts/check',
-						{
-							headers : {
-								token : this.token
-							}
-						}
+					this.request (
+						this.apiLocation + '/accounts/check'
 					).subscribe (
 						( response : string ) => {
 							if ( response !== null ) {
@@ -182,13 +214,6 @@ export class ApiService {
 								observer.next ( false )
 								observer.complete ()
 							}
-						},
-						() => {
-							this.username = null
-							this.token = null
-
-							observer.next ( false )
-							observer.complete ()
 						}
 					)
 				}
@@ -210,7 +235,7 @@ export class ApiService {
 
 		return new Observable<boolean> (
 			observer => {
-				this.http.post (
+				this.request (
 					this.apiLocation + '/accounts/new',
 					{
 						username : username,
@@ -231,10 +256,6 @@ export class ApiService {
 							observer.next ( response )
 							observer.complete ()
 						}
-					},
-					() => {
-						observer.next ( false )
-						observer.complete ()
 					}
 				)
 			} )
@@ -247,14 +268,9 @@ export class ApiService {
 
 		return new Observable<boolean> (
 			observer => {
-				this.http.post (
+				this.request (
 					this.apiLocation + '/accounts/logout',
-					{},
-					{
-						headers : {
-							token : this.token
-						}
-					}
+					{}
 				).subscribe (
 					( response : boolean ) => {
 						if ( response ) {
@@ -270,10 +286,6 @@ export class ApiService {
 							observer.next ( false )
 							observer.complete ()
 						}
-					},
-					() => {
-						observer.next ( false )
-						observer.complete ()
 					}
 				)
 			}
@@ -287,13 +299,8 @@ export class ApiService {
 
 		return new Observable<ClientProject[]> (
 			observer => {
-				this.http.get (
-					this.apiLocation + '/projects',
-					{
-						headers : {
-							token : this.token
-						}
-					}
+				this.request (
+					this.apiLocation + '/projects'
 				).subscribe (
 					( response : ClientProject[] ) => {
 						if ( response ) {
@@ -303,10 +310,6 @@ export class ApiService {
 							observer.next ( null )
 							observer.complete ()
 						}
-					},
-					() => {
-						observer.next ( null )
-						observer.complete ()
 					}
 				)
 			}
@@ -324,24 +327,15 @@ export class ApiService {
 
 		return new Observable<boolean> (
 			observer => {
-				this.http.post (
+				this.request (
 					this.apiLocation + '/projects/new',
 					{
 						name : name,
 						type : type
-					},
-					{
-						headers : {
-							token : this.token
-						}
 					}
 				).subscribe (
 					( response : boolean ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -357,23 +351,14 @@ export class ApiService {
 
 		return new Observable<boolean> (
 			observer => {
-				this.http.post (
+				this.request (
 					this.apiLocation + '/projects/delete/' + id,
 					{
 						name : name
-					},
-					{
-						headers : {
-							token : this.token
-						}
 					}
 				).subscribe (
 					( response : boolean ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -389,23 +374,14 @@ export class ApiService {
 
 		return new Observable<boolean> (
 			observer => {
-				this.http.post (
+				this.request (
 					this.apiLocation + '/projects/move/' + id,
 					{
 						delta : -1
-					},
-					{
-						headers : {
-							token : this.token
-						}
 					}
 				).subscribe (
 					( response : boolean ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -421,23 +397,14 @@ export class ApiService {
 
 		return new Observable<boolean> (
 			observer => {
-				this.http.post (
+				this.request (
 					this.apiLocation + '/projects/move/' + id,
 					{
 						delta : 1
-					},
-					{
-						headers : {
-							token : this.token
-						}
 					}
 				).subscribe (
 					( response : boolean ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -457,23 +424,14 @@ export class ApiService {
 
 		return new Observable<boolean> (
 			observer => {
-				this.http.post (
+				this.request (
 					this.apiLocation + '/projects/rename/' + id,
 					{
 						name : name
-					},
-					{
-						headers : {
-							token : this.token
-						}
 					}
 				).subscribe (
 					( response : boolean ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -489,13 +447,8 @@ export class ApiService {
 
 		return new Observable<ClientProject> (
 			observer => {
-				this.http.get (
-					this.apiLocation + '/projects/' + id,
-					{
-						headers : {
-							token : this.token
-						}
-					}
+				this.request (
+					this.apiLocation + '/projects/' + id
 				).subscribe (
 					( response : ClientProject ) => {
 						if ( response ) {
@@ -516,10 +469,6 @@ export class ApiService {
 							observer.next ( null )
 							observer.complete ()
 						}
-					},
-					() => {
-						observer.next ( null )
-						observer.complete ()
 					}
 				)
 			}
@@ -541,23 +490,14 @@ export class ApiService {
 			observer => {
 				( encrypt ? this.encrypt ( code ) : of ( DECRYPTION_CONFIRMATION_HEADER + code ) ).subscribe (
 					( newCode : string ) => {
-						this.http.post (
+						this.request (
 							this.apiLocation + '/projects/' + id,
 							{
 								code : newCode
-							},
-							{
-								headers : {
-									token : this.token
-								}
 							}
 						).subscribe (
 							( response : boolean ) => {
 								observer.next ( response )
-								observer.complete ()
-							},
-							() => {
-								observer.next ( false )
 								observer.complete ()
 							}
 						)
@@ -572,20 +512,11 @@ export class ApiService {
 
 		return new Observable<IEditorConstructionOptions> (
 			observer => {
-				this.http.get (
-					this.apiLocation + '/editorOptions',
-					{
-						headers : {
-							token : this.token
-						}
-					}
+				this.request (
+					this.apiLocation + '/editorOptions'
 				).subscribe (
 					( response : IEditorConstructionOptions ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( null )
 						observer.complete ()
 					}
 				)
@@ -601,23 +532,14 @@ export class ApiService {
 
 		return new Observable<boolean> (
 			observer => {
-				this.http.post (
+				this.request (
 					this.apiLocation + '/editorOptions',
 					{
 						options : options
-					},
-					{
-						headers : {
-							token : this.token
-						}
 					}
 				).subscribe (
 					( response : boolean ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -628,26 +550,17 @@ export class ApiService {
 	submitBugReport ( data ) : Observable<boolean> {
 		return new Observable<boolean> (
 			observer => {
-				this.http.post (
+				this.request (
 					this.apiLocation + '/bugReport',
 					<{
 						username : string,
 						title : string,
 						summary : string,
 						steps : string
-					}> data,
-					{
-						headers : {
-							token : this.token
-						}
-					}
+					}> data
 				).subscribe (
 					( response : boolean ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -665,23 +578,14 @@ export class ApiService {
 
 		return new Observable<boolean> (
 			observer => {
-				this.http.post (
+				this.request (
 					this.apiLocation + '/accounts/delete',
 					{
 						password : password
-					},
-					{
-						headers : {
-							token : this.token
-						}
 					}
 				).subscribe (
 					( response : boolean ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -698,14 +602,9 @@ export class ApiService {
 		)
 
 		return new Observable<boolean> ( ( observer ) => {
-			this.http.post (
+			this.request (
 				this.apiLocation + '/projects/' + id + '/unpublish',
-				{},
-				{
-					headers : {
-						token : this.token
-					}
-				}
+				{}
 			).subscribe (
 				( response : boolean ) => {
 					observer.next ( response )
@@ -728,14 +627,9 @@ export class ApiService {
 		)
 
 		return new Observable<string> ( ( observer ) => {
-			this.http.post (
+			this.request (
 				this.apiLocation + '/projects/' + id + '/publish',
-				{},
-				{
-					headers : {
-						token : this.token
-					}
-				}
+				{}
 			).subscribe (
 				( response : string ) => {
 					observer.next ( response )
@@ -756,21 +650,12 @@ export class ApiService {
 
 		return new Observable<boolean> (
 			observer => {
-				this.http.post (
+				this.request (
 					this.apiLocation + '/editorOptions/reset',
-					{},
-					{
-						headers : {
-							token : this.token
-						}
-					}
+					{}
 				).subscribe (
 					( response : boolean ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -792,16 +677,11 @@ export class ApiService {
 					newPassword
 				)
 
-				this.http.post (
+				this.request (
 					this.apiLocation + '/accounts/changePassword',
 					{
 						oldPassword : oldPassword,
 						password    : newPassword
-					},
-					{
-						headers : {
-							token : this.token
-						}
 					}
 				).subscribe (
 					( success : boolean ) => {
@@ -810,10 +690,6 @@ export class ApiService {
 						}
 
 						observer.next ( success )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -834,16 +710,11 @@ export class ApiService {
 					newUsername
 				)
 
-				this.http.post (
+				this.request (
 					this.apiLocation + '/accounts/changeUsername',
 					{
 						password : password,
 						username : newUsername
-					},
-					{
-						headers : {
-							token : this.token
-						}
 					}
 				).subscribe (
 					( success : boolean ) => {
@@ -852,10 +723,6 @@ export class ApiService {
 						}
 
 						observer.next ( success )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -869,20 +736,11 @@ export class ApiService {
 					'getAdminStatus'
 				)
 
-				this.http.get (
-					this.apiLocation + '/isAdmin',
-					{
-						headers : {
-							token : this.token
-						}
-					}
+				this.request (
+					this.apiLocation + '/isAdmin'
 				).subscribe (
 					( admin : boolean ) => {
 						observer.next ( admin )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -897,20 +755,11 @@ export class ApiService {
 					'getUsers'
 				)
 
-				this.http.get (
-					this.apiLocation + '/accounts',
-					{
-						headers : {
-							token : this.token
-						}
-					}
+				this.request (
+					this.apiLocation + '/accounts'
 				).subscribe (
 					( response : MinimalAccount[] ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( null )
 						observer.complete ()
 					}
 				)
@@ -930,20 +779,11 @@ export class ApiService {
 					username
 				)
 
-				this.http.get (
-					this.apiLocation + '/accounts/admin/' + encodeURIComponent ( username ),
-					{
-						headers : {
-							token : this.token
-						}
-					}
+				this.request (
+					this.apiLocation + '/accounts/admin/' + encodeURIComponent ( username )
 				).subscribe (
 					( response : Account ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( null )
 						observer.complete ()
 					}
 				)
@@ -965,21 +805,12 @@ export class ApiService {
 					account
 				)
 
-				this.http.post (
+				this.request (
 					this.apiLocation + '/accounts/admin/' + encodeURIComponent ( username ),
-					account,
-					{
-						headers : {
-							token : this.token
-						}
-					}
+					account
 				).subscribe (
 					( response : boolean ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -997,23 +828,14 @@ export class ApiService {
 					password
 				)
 
-				this.http.post (
+				this.request (
 					this.apiLocation + '/accounts/checkPassword',
 					{
 						password : password
-					},
-					{
-						headers : {
-							token : this.token
-						}
 					}
 				).subscribe (
 					( response : boolean ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -1162,20 +984,11 @@ export class ApiService {
 					'getBugReports'
 				)
 
-				this.http.get (
-					this.apiLocation + '/bugReports',
-					{
-						headers : {
-							token : this.token
-						}
-					}
+				this.request (
+					this.apiLocation + '/bugReports'
 				).subscribe (
 					( response : BugReport[] ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( null )
 						observer.complete ()
 					}
 				)
@@ -1195,21 +1008,12 @@ export class ApiService {
 					bugReport
 				)
 
-				this.http.post (
+				this.request (
 					this.apiLocation + '/bugReports/' + id,
-					bugReport,
-					{
-						headers : {
-							token : this.token
-						}
-					}
+					bugReport
 				).subscribe (
 					( response : boolean ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -1227,21 +1031,12 @@ export class ApiService {
 					username
 				)
 
-				this.http.post (
+				this.request (
 					this.apiLocation + '/accounts/delete/' + encodeURIComponent ( username ),
-					{},
-					{
-						headers : {
-							token : this.token
-						}
-					}
+					{}
 				).subscribe (
 					( response : boolean ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -1254,23 +1049,14 @@ export class ApiService {
 	) : Observable<boolean> {
 		return new Observable<boolean> (
 			( observer : Observer<boolean> ) => {
-				this.http.post (
+				this.request (
 					this.apiLocation + '/projects/import',
 					{
 						url : url
-					},
-					{
-						headers : {
-							token : this.token
-						}
 					}
 				).subscribe (
 					( response : boolean ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( false )
 						observer.complete ()
 					}
 				)
@@ -1283,20 +1069,11 @@ export class ApiService {
 	) : Observable<string> {
 		return new Observable<string> (
 			( observer : Observer<string> ) => {
-				this.http.get (
-					this.apiLocation + '/starterCode/' + type,
-					{
-						headers : {
-							token : this.token
-						}
-					}
+				this.request (
+					this.apiLocation + '/starterCode/' + type
 				).subscribe (
 					( response : string ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( null )
 						observer.complete ()
 					}
 				)
@@ -1310,23 +1087,14 @@ export class ApiService {
 	) : Observable<string> {
 		return new Observable<string> (
 			( observer : Observer<string> ) => {
-				this.http.post (
+				this.request (
 					this.apiLocation + '/starterCode/' + type,
 					{
 						code : code
-					},
-					{
-						headers : {
-							token : this.token
-						}
 					}
 				).subscribe (
 					( response : string ) => {
 						observer.next ( response )
-						observer.complete ()
-					},
-					() => {
-						observer.next ( null )
 						observer.complete ()
 					}
 				)
