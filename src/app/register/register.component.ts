@@ -82,7 +82,7 @@ export class RegisterComponent implements OnInit {
 			}
 		} else {
 			this.snackbar.open (
-				'Please agree to our privacy policy and ToS',
+				'Please review our Privacy Policy, ToS, and Content Policy',
 				'Close'
 			)
 		}
