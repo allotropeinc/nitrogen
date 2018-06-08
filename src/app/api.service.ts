@@ -117,11 +117,11 @@ export class ApiService {
 			( observer : Observer<any> ) => {
 				const options = {
 					headers : {
-						token : this.token
+						token : this.token || ''
 					}
 				}
 
-				let request
+				let request : Observable<Object>
 
 				if ( !body ) {
 					request = this.http.get (
@@ -141,7 +141,12 @@ export class ApiService {
 						observer.next ( response )
 						observer.complete ()
 					},
-					() => {
+					( err ) => {
+						console.error (
+							'HTTP error: %s',
+							err
+						)
+
 						observer.next ( undefined )
 						observer.complete ()
 					}
@@ -170,7 +175,7 @@ export class ApiService {
 					}
 				).subscribe (
 					( response : string ) => {
-						if ( response !== null ) {
+						if ( response ) {
 							this.username = username
 							this.password = password
 							this.token = response
@@ -201,7 +206,7 @@ export class ApiService {
 						this.apiLocation + '/accounts/check'
 					).subscribe (
 						( response : string ) => {
-							if ( response !== null ) {
+							if ( response ) {
 								observer.next ( true )
 								observer.complete ()
 							} else {
