@@ -4,7 +4,16 @@ const converter = new Converter ()
 
 converter.setFlavor ( 'github' )
 
-export function md2html ( code : string, title : string ) {
+export function _md2html ( code : string ) {
+	return converter.makeHtml ( code )
+}
+
+export function md2html (
+	code : string,
+	title : string
+) {
+	// Preserve indentation
+	// @formatter:off
 	return '' +
 		'<!doctype html>' +
 		'<html>' +
@@ -29,7 +38,8 @@ export function md2html ( code : string, title : string ) {
 				'</style>' +
 			'</head>' +
 			'<body>' +
-				converter.makeHtml ( code ) +
+				_md2html ( code ) +
 			'</body>' +
 		'</html>'
+	// @formatter:on
 }
