@@ -51,13 +51,14 @@ import {
 	AccountOptionsComponent
 }                                                   from './dashboard/account-options/account-options.component'
 import { AdminButtonComponent }                     from './dashboard/admin-button/admin-button.component'
-import { AdminDashboardComponent }                  from './admin-dashboard/admin-dashboard.component'
-import { AdminDashboardUsersComponent }             from './admin-dashboard/admin-dashboard-users/admin-dashboard-users.component'
-import { AdminDashboardReportsComponent }           from './admin-dashboard/admin-dashboard-reports/admin-dashboard-reports.component'
+import { AdminDashboardComponent }            from './admin-dashboard/admin-dashboard.component'
+import { AdminDashboardUsersComponent }       from './admin-dashboard/admin-dashboard-users/admin-dashboard-users.component'
+import { AdminDashboardReportsComponent }     from './admin-dashboard/admin-dashboard-reports/admin-dashboard-reports.component'
 import {
 	AdminDashboardUserComponent,
 	UserDeleteAccountDialogComponent
-}                                                   from './admin-dashboard/admin-dashboard-users/admin-dashboard-user/admin-dashboard-user.component'
+}                                             from './admin-dashboard/admin-dashboard-users/admin-dashboard-user/admin-dashboard-user.component'
+import { AdminDashboardStarterCodeComponent } from './admin-dashboard/admin-dashboard-starterCode/admin-dashboard-starterCode.component'
 
 @NgModule ( {
 	declarations    : [
@@ -92,6 +93,7 @@ import {
 		AdminDashboardUsersComponent,
 		AdminDashboardReportsComponent,
 		AdminDashboardUserComponent,
+		AdminDashboardStarterCodeComponent,
 		ApiProvidePasswordDialogComponent,
 		ApiDecryptionDialogComponent,
 		ShareProjectDialogComponent,

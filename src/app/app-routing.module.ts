@@ -4,10 +4,11 @@ import { DashboardComponent }                   from './dashboard/dashboard.comp
 import { SigninComponent }                      from './signin/signin.component'
 import { CanDeactivateEditor, EditorComponent } from './editor/editor.component'
 import { RegisterComponent }                    from './register/register.component'
-import { AdminDashboardComponent }              from './admin-dashboard/admin-dashboard.component'
-import { AdminDashboardUsersComponent }         from './admin-dashboard/admin-dashboard-users/admin-dashboard-users.component'
-import { AdminDashboardReportsComponent }       from './admin-dashboard/admin-dashboard-reports/admin-dashboard-reports.component'
-import { AdminDashboardUserComponent }          from './admin-dashboard/admin-dashboard-users/admin-dashboard-user/admin-dashboard-user.component'
+import { AdminDashboardComponent }            from './admin-dashboard/admin-dashboard.component'
+import { AdminDashboardUsersComponent }       from './admin-dashboard/admin-dashboard-users/admin-dashboard-users.component'
+import { AdminDashboardReportsComponent }     from './admin-dashboard/admin-dashboard-reports/admin-dashboard-reports.component'
+import { AdminDashboardUserComponent }        from './admin-dashboard/admin-dashboard-users/admin-dashboard-user/admin-dashboard-user.component'
+import { AdminDashboardStarterCodeComponent } from './admin-dashboard/admin-dashboard-starterCode/admin-dashboard-starterCode.component'
 
 const routes : Routes = [
 	{
@@ -52,6 +53,10 @@ const routes : Routes = [
 			{
 				path      : 'reports',
 				component : AdminDashboardReportsComponent
+			},
+			{
+				path      : 'starterCode',
+				component : AdminDashboardStarterCodeComponent
 			}
 		]
 	}

@@ -1277,6 +1277,62 @@ export class ApiService {
 			}
 		)
 	}
+
+	getStarterCode (
+		type : number
+	) : Observable<string> {
+		return new Observable<string> (
+			( observer : Observer<string> ) => {
+				this.http.get (
+					this.apiLocation + '/starterCode/' + type,
+					{
+						headers : {
+							token : this.token
+						}
+					}
+				).subscribe (
+					( response : string ) => {
+						observer.next ( response )
+						observer.complete ()
+					},
+					() => {
+						observer.next ( null )
+						observer.complete ()
+					}
+				)
+			}
+		)
+	}
+
+	setStarterCode (
+		type : number,
+		code : string
+	) : Observable<string> {
+		return new Observable<string> (
+			( observer : Observer<string> ) => {
+				this.http.post (
+					this.apiLocation + '/starterCode/' + type,
+					{
+						code : code
+					},
+					{
+						headers : {
+							token : this.token
+						}
+					}
+				).subscribe (
+					( response : string ) => {
+						observer.next ( response )
+						observer.complete ()
+					},
+					() => {
+						observer.next ( null )
+						observer.complete ()
+					}
+				)
+			}
+		)
+	}
 }
 
 @Component ( {

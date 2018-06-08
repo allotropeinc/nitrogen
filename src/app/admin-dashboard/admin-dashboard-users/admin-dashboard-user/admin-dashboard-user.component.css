@@ -51,17 +51,6 @@ mat-form-field {
 	margin-right: 24px;
 }
 
-.mat-expansion-panel-header-title, .mat-expansion-panel-header-description {
-	flex-basis: 0;
-}
-
-.mat-expansion-panel-header-title {
-	width: 50%;
-	text-overflow: ellipsis;
-	overflow: hidden;
-	white-space: pre;
-}
-
 pre {
 	overflow-x: auto;
 }
