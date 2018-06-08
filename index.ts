@@ -163,15 +163,11 @@ router.use (
 		} else {
 			const headers = req.headers
 
-			if ( !headers.hasOwnProperty ( 'token' ) ) {
-				if ( noAuthRoutes.indexOf ( req.url ) !== -1 ) {
-					next ()
-				} else if ( req.url.startsWith ( '/projects/published/' ) && req.url.length > 20 ) {
-					next ()
-				} else {
-					res.json ( null )
-				}
-			} else {
+			if ( noAuthRoutes.indexOf ( req.url ) !== -1 ) {
+				next ()
+			} else if ( req.url.startsWith ( '/projects/published/' ) && req.url.length > 20 ) {
+				next ()
+			} else if ( headers.hasOwnProperty ( 'token' ) ) {
 				const token = <string> headers.token
 
 				try {
@@ -183,6 +179,8 @@ router.use (
 				} catch {
 					res.json ( null )
 				}
+			} else {
+				res.json ( null )
 			}
 		}
 	}
