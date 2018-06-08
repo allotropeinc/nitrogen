@@ -135,6 +135,10 @@ router.use (
 			censored.password = '[censored]'
 		}
 
+		if ( censored.hasOwnProperty ( 'code' ) ) {
+			censored.password = '[censored]'
+		}
+
 		debug (
 			'%s: %s /api%s: %O',
 			req.ip,
