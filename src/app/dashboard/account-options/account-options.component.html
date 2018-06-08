@@ -1,4 +1,4 @@
-<mat-menu #actions="matMenu" yPosition="above">
+<mat-menu #actions="matMenu" xPosition="before">
 	<button mat-menu-item class="account">
 		<mat-icon>{{admin ? 'supervisor_account' : 'account_circle'}}</mat-icon>
 		<span>{{this.api.username}}</span>
@@ -17,6 +17,6 @@
 		<span>Delete Account</span>
 	</button>
 </mat-menu>
-<button mat-icon-button [matMenuTriggerFor]="actions">
+<button mat-icon-button matTooltip="Account Options" [matMenuTriggerFor]="actions">
 	<mat-icon>more_vert</mat-icon>
 </button>

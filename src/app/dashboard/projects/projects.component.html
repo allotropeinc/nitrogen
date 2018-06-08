@@ -1,6 +1,7 @@
 <div class="buttons-flex">
 	<h1>My Projects</h1>
 	<ng-container *ngIf="!working && projects">
+		<ng-content></ng-content>
 		<a mat-icon-button matTooltip="Refresh" (click)="refresh()" class="full">
 			<mat-icon>
 				refresh

@@ -92,7 +92,7 @@ app-root > *:not(router-outlet) {
 }
 
 .error {
-	color: #ffb300;
+	color: #ffb300 !important;
 }
 
 .mat-card a:not([matLine]):not([mat-flat-button]):not([mat-button]):not(.mat-menu-item):not([mat-list-item]):not([mat-icon-button]), .link {
