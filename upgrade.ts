@@ -19,6 +19,29 @@ const allUpgrades : Upgrades = [
 				proj.type = 0
 			}
 		}
+	},
+	async ( data ) => {
+		data.starterCodes = [
+			'<!doctype html>\n' +
+			'<html>\n' +
+			'\t<head>\n' +
+			'\t\t<meta charset="utf-8">\n' +
+			'\t\t<title>Welcome to Nitrogen</title>\n' +
+			'\t\t<style type="text/css">\n' +
+			'\t\t\t/* put CSS styles here */\n' +
+			'\t\t</style>\n' +
+			'\t\t<script type="text/javascript">\n' +
+			'\t\t\t/* put JavaScript here */\n' +
+			'\t\t</script>\n' +
+			'\t</head>\n' +
+			'\t<body>\n' +
+			'\t\t<h1>New HTML Project</h1>\n' +
+			'\t\t<p>Welcome to Nitrogen!</p>\n' +
+			'\t</body>\n' +
+			'</html>',
+			'# New Markdown project\n' +
+			'Welcome to Nitrogen!'
+		]
 	}
 ]
 

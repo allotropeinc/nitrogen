@@ -57,6 +57,8 @@ export interface ApiData {
 		[ token : string ] : PublishToken
 	}
 
+	starterCodes : string[]
+
 	bugReports : BugReport[]
 	version : number
 }

@@ -1139,6 +1139,51 @@ router.get (
 	}
 )
 
+router.get (
+	'/starterCode/:type',
+	async (
+		req : ApiRequest,
+		res : Response
+	) => {
+		if ( req.account.isAdmin ) {
+			const type = +req.params.type
+
+			if ( Number.isInteger ( type ) && type >= 0 && type <= 1 ) {
+				res.json ( await Api.getStarterCode ( type ) )
+			} else {
+				res.json ( null )
+			}
+		} else {
+			res.json ( null )
+		}
+	}
+)
+
+router.post (
+	'/starterCode/:type',
+	async (
+		req : ApiRequest,
+		res : Response
+	) => {
+		if ( req.account.isAdmin ) {
+			if ( req.body.hasOwnProperty ( 'code' ) ) {
+				const type = +req.params.type
+
+				if ( Number.isInteger ( type ) && type >= 0 && type <= 1 ) {
+					res.json ( await Api.setStarterCode (
+						type,
+						req.body.code
+					) )
+				} else {
+					res.json ( null )
+				}
+			}
+		} else {
+			res.json ( null )
+		}
+	}
+)
+
 router.use (
 	(
 		err : Error,

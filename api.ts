@@ -102,28 +102,6 @@ const starterEditorOptions : IEditorConstructionOptions = {
 	accessibilityHelpUrl : ''
 }
 
-const starterCodes = [
-	'<!doctype html>\n' +
-	'<html>\n' +
-	'\t<head>\n' +
-	'\t\t<meta charset="utf-8">\n' +
-	'\t\t<title>Welcome to Nitrogen</title>\n' +
-	'\t\t<style type="text/css">\n' +
-	'\t\t\t/* put CSS styles here */\n' +
-	'\t\t</style>\n' +
-	'\t\t<script type="text/javascript">\n' +
-	'\t\t\t/* put JavaScript here */\n' +
-	'\t\t</script>\n' +
-	'\t</head>\n' +
-	'\t<body>\n' +
-	'\t\t<h1>New HTML Project</h1>\n' +
-	'\t\t<p>Welcome to Nitrogen!</p>\n' +
-	'\t</body>\n' +
-	'</html>',
-	'# New Markdown project\n' +
-	'Welcome to Nitrogen!'
-]
-
 function getData () : Promise<ApiData> {
 	return new Promise ( (
 		accept,
@@ -588,7 +566,7 @@ export const Api = {
 						account.projects.push ( <Project> {
 								name : name,
 								type : type,
-								code : DECRYPTION_CONFIRMATION_HEADER + ( code || starterCodes[ type ] )
+								code : DECRYPTION_CONFIRMATION_HEADER + ( code || data.starterCodes[ type ] )
 							}
 						)
 
@@ -1410,6 +1388,28 @@ export const Api = {
 				)
 
 				data.bugReports[ id ] = bugReport
+
+				saveData ().then (
+					accept
+				).catch (
+					reject
+				)
+			}
+		)
+	},
+	getStarterCode ( type : number ) : Promise<string> {
+		return new Promise<string> ( ( accept ) => accept ( data.starterCodes[ type ] ) )
+	},
+	setStarterCode (
+		type : number,
+		code : string
+	) : Promise<boolean> {
+		return new Promise<boolean> (
+			(
+				accept,
+				reject
+			) => {
+				data.starterCodes[ type ] = code
 
 				saveData ().then (
 					accept
