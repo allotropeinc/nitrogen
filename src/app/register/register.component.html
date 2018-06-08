@@ -30,12 +30,15 @@
 			<mat-error>This field is required</mat-error>
 		</mat-form-field>
 	</mat-card-content>
+	<mat-card-content>
+		<mat-checkbox [(ngModel)]="consent">I agree to the Allotrope Labs <a href="https://allotropelabs.com/legal/privacy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://allotropelabs.com/legal/terms/" target="_blank" rel="noopener noreferrer">Terms of Service</a></mat-checkbox>
+	</mat-card-content>
 	<app-global-footer></app-global-footer>
 	<mat-divider></mat-divider>
 	<mat-card-content>
 		<a mat-button routerLink="/signin">Sign In</a>
 		<div class="buttons">
-			<button mat-flat-button (click)="register()" [disabled]="usernameError">Register</button>
+			<button mat-flat-button (click)="register()" [disabled]="usernameError || !consent">Register</button>
 		</div>
 	</mat-card-content>
 </mat-card>

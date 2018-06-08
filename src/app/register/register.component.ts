@@ -24,6 +24,7 @@ export class RegisterComponent implements OnInit {
 	working = false
 	showPassword = false
 	showPasswordConfirm = false
+	consent = false
 
 	constructor (
 		private api : ApiService,
@@ -46,35 +47,42 @@ export class RegisterComponent implements OnInit {
 	}
 
 	register () {
-		if ( !this.username.invalid ) {
-			if ( this.password === this.confirmPassword ) {
-				this.working = true
+		if ( this.consent ) {
+			if ( !this.username.invalid ) {
+				if ( this.password === this.confirmPassword ) {
+					this.working = true
 
-				this.api.register (
-					<string> this.username.value,
-					this.password
-				).subscribe (
-					result => {
-						if ( !result ) {
-							this.working = false
+					this.api.register (
+						<string> this.username.value,
+						this.password
+					).subscribe (
+						result => {
+							if ( !result ) {
+								this.working = false
 
-							this.snackbar.open (
-								'Could not register a new account.',
-								'Close'
-							)
-						} else {
-							this.router.navigate ( [ '/signin' ] )
-						}
-					} )
+								this.snackbar.open (
+									'Could not register a new account.',
+									'Close'
+								)
+							} else {
+								this.router.navigate ( [ '/signin' ] )
+							}
+						} )
+				} else {
+					this.snackbar.open (
+						'Passwords do not match',
+						'Close'
+					)
+				}
 			} else {
 				this.snackbar.open (
-					'Passwords do not match.',
+					'Invalid username.',
 					'Close'
 				)
 			}
 		} else {
 			this.snackbar.open (
-				'Invalid username.',
+				'Please agree to our privacy policy and ToS',
 				'Close'
 			)
 		}
