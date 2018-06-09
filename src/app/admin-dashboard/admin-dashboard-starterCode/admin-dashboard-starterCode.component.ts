@@ -69,7 +69,7 @@ export class AdminDashboardStarterCodeComponent implements OnInit {
 		this.mdWorking = true
 
 		this.api.setStarterCode (
-			0,
+			1,
 			this.mdCode
 		).subscribe (
 			( success ) => {
