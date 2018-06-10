@@ -43,7 +43,8 @@ export function md2html (
 						'display:block;' +
 						'padding:1em;' +
 						`background-color:#${ dark ? '282828' : 'fafafa' };` +
-						'border-radius:0.5em' +
+						'border-radius:0.5em;' +
+						'overflow:auto' +
 					'}' +
 
 					'body.dark{' +
