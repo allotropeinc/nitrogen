@@ -31,6 +31,7 @@ export function md2html (
 						'font-family:Overpass,sans-serif;' +
 						'max-width:80ch;' +
 						'padding:1em;' +
+						'line-height:1.5;' +
 						`margin:0 auto${ dark ? ';' : '' }` +
 					(dark ?
 						'background-color:#212121;' +
@@ -42,8 +43,7 @@ export function md2html (
 						'display:block;' +
 						'padding:1em;' +
 						`background-color:#${ dark ? '282828' : 'fafafa' };` +
-						'border-radius:0.5em;' +
-						'line-height:1.5' +
+						'border-radius:0.5em' +
 					'}' +
 
 					'body.dark{' +
