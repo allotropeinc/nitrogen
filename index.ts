@@ -484,9 +484,7 @@ router.post (
 
 							res.json ( false )
 						}
-					} catch ( e ) {
-						debug ( e )
-
+					} catch {
 						res.json ( false )
 					}
 				} else {
@@ -701,7 +699,7 @@ router.get (
 				html,
 				'utf8'
 			)
-		} catch {
+		} catch ( e ) {
 			res.end (
 				'This project does not exist or has been unpublished. Ask the author for a new link.',
 				'utf8'

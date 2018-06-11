@@ -6,6 +6,6 @@ cd ..
 git add .
 DEFAULTCOMMITMSG="Update backend"
 read -e -p "Enter your commit message (leave blank for '$DEFAULTCOMMITMSG'): " COMMITMSG
-git commit -m "${COMMITMSG:-$DEFAULTCOMMITMSG}"
+GPG_TTY=$(tty) git commit -S -m "${COMMITMSG:-$DEFAULTCOMMITMSG}"
 git push -u origin master
 cd backend
