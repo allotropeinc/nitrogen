@@ -66,7 +66,7 @@ export function _post ( code : string ) {
 			for ( let i = 0, str, applyTag ; ( str = lines[ i ] ) !== undefined ; i++ ) {
 				// make sure tags are proper
 
-				const match = /(<(\w+)(?:\s+\w+="(?:[^"]|\\")*")*>)(?:[^\/]|[^<]\/)+$/.exec ( str )
+				const match = /(<(\w+)(?:\s+\w+="(?:[^"]|\\")*")*>)(?:[^\/]|(?=[^>])\/)+$/.exec ( str )
 
 				if ( match ) {
 					lines[ i ] += '</' + match[ 2 ] + '>'
