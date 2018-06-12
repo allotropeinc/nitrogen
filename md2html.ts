@@ -12,7 +12,7 @@ let cheerio : CheerioAPI
 if ( typeof window !== 'undefined' ) {
 	cheerio = ( <any> window ).cheerio // browser
 } else {
-	cheerio = ( <any> require ) ( 'cheerio' ) // node
+	cheerio = ( <any> global ) [ 'require' ] ( 'cheerio' ) // node
 }
 
 const converter = new Converter ()
