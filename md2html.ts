@@ -63,13 +63,13 @@ export function _post ( code : string ) {
 				language
 			).split ( '\n' )
 
-			for ( let i = 0, str, applyTag ; str = lines[ i ] ; i++ ) {
+			for ( let i = 0, str, applyTag ; ( str = lines[ i ] ) !== undefined ; i++ ) {
 				// make sure tags are proper
 
 				const match = /(<(\w+)(?:\s+\w+="(?:[^"]|\\")*")*>)(?:[^\/]|[^<]\/)+$/.exec ( str )
 
 				if ( match ) {
-					lines[ i ] += match[ 2 ]
+					lines[ i ] += '</' + match[ 2 ] + '>'
 					lines[ i + 1 ] = match[ 1 ] + lines[ i + 1 ]
 				}
 			}
