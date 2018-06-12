@@ -2,6 +2,7 @@ import { Converter }                           from 'showdown'
 import * as Prism                              from 'prismjs'
 import * as loadLanguages                      from 'prismjs/components/index'
 import { Cheerio, CheerioAPI, CheerioElement } from './cheerio'
+import * as splitHtml                          from './splitHtml'
 
 loadLanguages ()
 
@@ -58,10 +59,23 @@ export function _post ( code : string ) {
 				}
 			} catch {}
 
-			const lines = _highlight (
-				elem.text (),
-				language
-			).split ( '\n' )
+			const lines = ( <string[]> splitHtml (
+				_highlight (
+					elem.text (),
+					language
+				).replace (
+					/\n/g,
+					'<div class="split"></div>'
+				),
+				'div.split'
+			) ).filter (
+				(
+					_,
+					i
+				) => {
+					return i % 2 === 0
+				}
+			)
 
 			elem.text ( '' )
 
@@ -85,7 +99,7 @@ export function _post ( code : string ) {
 export function md2html (
 	code : string,
 	title : string,
-	dark : boolean = false
+	dark : boolean = true
 ) {
 	// Preserve indentation
 	// @formatter:off
