@@ -1,3 +1,5 @@
+set -e
+
 mkdir backend/app-temp
 ng build --prod --aot --output-path backend/app-temp/
 rm -rf backend/app
