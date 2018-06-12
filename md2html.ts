@@ -99,7 +99,7 @@ export function _post ( code : string ) {
 export function md2html (
 	code : string,
 	title : string,
-	dark : boolean = true
+	dark : boolean = false
 ) {
 	// Preserve indentation
 	// @formatter:off
