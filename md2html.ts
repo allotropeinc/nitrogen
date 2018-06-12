@@ -2,7 +2,6 @@ import { Converter }                           from 'showdown'
 import * as Prism                              from 'prismjs'
 import * as loadLanguages                      from 'prismjs/components/index'
 import { Cheerio, CheerioAPI, CheerioElement } from './cheerio'
-import * as splitHtml                          from './splitHtml'
 
 loadLanguages ()
 
@@ -13,7 +12,7 @@ let cheerio : CheerioAPI
 if ( typeof window !== 'undefined' ) {
 	cheerio = ( <any> window ).cheerio // already browserified
 } else {
-	cheerio = eval('require(\'cheerio\');'); // needed to avoid Webpack trying to convert `cheerio` to a browser module
+	cheerio = eval ( 'require(\'cheerio\');' ) // needed to avoid Webpack trying to convert `cheerio` to a browser module
 }
 
 const converter = new Converter ()
@@ -59,23 +58,21 @@ export function _post ( code : string ) {
 				}
 			} catch {}
 
-			const lines = ( <string[]> splitHtml (
-				_highlight (
-					elem.text (),
-					language
-				).replace (
-					/\n/g,
-					'<div class="split"></div>'
-				),
-				'div.split'
-			) ).filter (
-				(
-					_,
-					i
-				) => {
-					return i % 2 === 0
+			const lines = _highlight (
+				elem.text (),
+				language
+			).split ( '\n' )
+
+			for ( let i = 0, str, applyTag ; str = lines[ i ] ; i++ ) {
+				// make sure tags are proper
+
+				const match = /(<(\w+)(?:\s+\w+="(?:[^"]|\\")*")*>)(?:[^\/]|[^<]\/)+$/.exec ( str )
+
+				if ( match ) {
+					lines[ i ] += match[ 2 ]
+					lines[ i + 1 ] = match[ 1 ] + lines[ i + 1 ]
 				}
-			)
+			}
 
 			elem.text ( '' )
 
