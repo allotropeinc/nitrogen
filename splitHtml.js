@@ -2,9 +2,9 @@
 	var cheerio;
 
 	if ( typeof window !== 'undefined' ) {
-		cheerio = window.cheerio; // browser
+		cheerio = window.cheerio // already browserified
 	} else {
-		cheerio = require('cheerio'); // node
+		cheerio = eval('require(\'cheerio\');'); // needed to avoid Webpack trying to convert `cheerio` to a browser module
 	}
 
 	module.exports = splitHtml

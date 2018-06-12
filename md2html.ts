@@ -11,9 +11,9 @@ declare var require : any
 let cheerio : CheerioAPI
 
 if ( typeof window !== 'undefined' ) {
-	cheerio = ( <any> window ).cheerio // browser
+	cheerio = ( <any> window ).cheerio // already browserified
 } else {
-	cheerio = ( <any> require ) ( 'cheerio' ) // node
+	cheerio = eval('require(\'cheerio\');'); // needed to avoid Webpack trying to convert `cheerio` to a browser module
 }
 
 const converter = new Converter ()
