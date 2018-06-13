@@ -42,6 +42,17 @@ const allUpgrades : Upgrades = [
 			'# New Markdown project\n' +
 			'Welcome to Nitrogen!'
 		]
+	},
+	async ( data ) => {
+		for ( const accKey of Object.keys ( data.accounts ) ) {
+			const acc = data.accounts[ accKey ]
+
+			for ( const proj of acc.projects ) {
+				if ( proj.publishToken ) {
+					data.publishTokens[ proj.publishToken ].projectIndex = acc.projects.indexOf ( proj )
+				}
+			}
+		}
 	}
 ]
 

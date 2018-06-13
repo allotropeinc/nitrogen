@@ -651,6 +651,10 @@ export const Api = {
 								1
 							)
 
+							for ( let i = id ; id < account.projects.length ; i++ ) {
+								data.publishTokens[ account.projects[ i ].publishToken ].projectIndex--
+							}
+
 							saveData ().then (
 								accept
 							).catch (
