@@ -112,8 +112,8 @@ export function md2html (
 				'</title>' +
 				'<link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.0/normalize.css">' +
 				'<style type="text/css">' +
-					'@import url(\'https://fonts.googleapis.com/css?family=Overpass\');' +
-					'@import url(\'https://fonts.googleapis.com/css?family=Overpass+Mono&subset=latin-ext\');' +
+					'@import url(\'https://fonts.googleapis.com/css?family=Overpass:300,300i,600,600i\');' +
+					'@import url(\'https://fonts.googleapis.com/css?family=Overpass+Mono:300,600&subset=latin-ext\');' +
 
 					'body{' +
 						'font-family:Overpass,sans-serif;' +
