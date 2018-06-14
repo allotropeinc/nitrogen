@@ -1,6 +1,6 @@
 {
   "name": "nitrogen",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "license": "MPL2",
   "scripts": {
     "ng": "ng",
