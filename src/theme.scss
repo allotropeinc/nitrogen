@@ -176,3 +176,16 @@ p[color='warn'] {
 	overflow: hidden;
 	white-space: pre;
 }
+
+mat-dialog-content > p:last-child {
+	margin-bottom: 0;
+}
+
+mat-dialog-actions {
+	padding: 24px 0 !important;
+}
+
+mat-dialog-actions > :first-child {
+	// push button to left
+	margin-right: auto;
+}

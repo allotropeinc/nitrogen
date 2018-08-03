@@ -1,5 +1,5 @@
-<form>
-	<h1>Maintenance</h1>
+<h2 mat-dialog-title>Maintenance</h2>
+<mat-dialog-content>
 	<p>
 		<b>Nitrogen's going to go offline for maintenance soon.</b>
 	</p>
@@ -19,13 +19,13 @@
 		keep Nitrogen online for as long as possible before maintenance even
 		starts.
 	</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
 	<button mat-button [mat-dialog-close]="true">
 		Don't show again
 	</button>
-	<div class="buttons">
-		<button mat-flat-button color="primary" [mat-dialog-close]="false"
-		        type="submit" cdkFocusInitial>
-			OK
-		</button>
-	</div>
-</form>
+	<button mat-flat-button color="primary" [mat-dialog-close]="false"
+	        cdkFocusInitial>
+		OK
+	</button>
+</mat-dialog-actions>
