@@ -6,22 +6,22 @@ import { ApiDecryptionDialogComponent, ApiProvidePasswordDialogComponent, ApiSer
 import { FormsModule, ReactiveFormsModule }                                            from '@angular/forms'
 import { MonacoEditorModule }                                                          from 'ngx-monaco-editor'
 
-import { AppComponent }                             from './app.component'
-import { AppRoutingModule }                         from './app-routing.module'
-import { GlobalFooterComponent }                    from './global-footer/global-footer.component'
-import { SigninComponent }                          from './signin/signin.component'
-import { RegisterComponent }                        from './register/register.component'
-import { DashboardComponent }                       from './dashboard/dashboard.component'
+import { AppComponent }                                   from './app.component'
+import { AppRoutingModule }                               from './app-routing.module'
+import { GlobalFooterComponent }                          from './global-footer/global-footer.component'
+import { SigninComponent }                                from './signin/signin.component'
+import { RegisterComponent }                              from './register/register.component'
+import { DashboardComponent, MaintenanceDialogComponent } from './dashboard/dashboard.component'
 import {
 	ImportDialogComponent,
 	NewProjectDialogComponent,
 	ProjectsComponent
-}                                                   from './dashboard/projects/projects.component'
+}                                                         from './dashboard/projects/projects.component'
 import {
 	DeleteProjectDialogComponent,
 	ProjectItemComponent,
 	RenameProjectDialogComponent
-}                                                   from './dashboard/projects/project-item/project-item.component'
+}                                                         from './dashboard/projects/project-item/project-item.component'
 import {
 	CanDeactivateEditor,
 	ConfirmLeaveDialogComponent,
@@ -30,7 +30,7 @@ import {
 	ConfirmUnpublishDialogComponent,
 	EditorComponent,
 	ShareProjectDialogComponent
-}                                                   from './editor/editor.component'
+}                                                         from './editor/editor.component'
 import { SplitPaneModule }                          from 'ng2-split-pane/lib/ng2-split-pane'
 import { SafeUrlPipe }                              from './safe-url.pipe'
 import {
@@ -97,7 +97,8 @@ import { AdminDashboardStarterCodeComponent } from './admin-dashboard/admin-dash
 		ApiProvidePasswordDialogComponent,
 		ApiDecryptionDialogComponent,
 		ShareProjectDialogComponent,
-		UserDeleteAccountDialogComponent
+		UserDeleteAccountDialogComponent,
+		MaintenanceDialogComponent
 	],
 	imports         : [
 		BrowserModule,
@@ -133,7 +134,8 @@ import { AdminDashboardStarterCodeComponent } from './admin-dashboard/admin-dash
 		ApiProvidePasswordDialogComponent,
 		ApiDecryptionDialogComponent,
 		ShareProjectDialogComponent,
-		UserDeleteAccountDialogComponent
+		UserDeleteAccountDialogComponent,
+		MaintenanceDialogComponent
 	]
 } )
 export class AppModule {}

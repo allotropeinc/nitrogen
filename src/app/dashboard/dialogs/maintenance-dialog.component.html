@@ -1,0 +1,31 @@
+<form>
+	<h1>Maintenance</h1>
+	<p>
+		<b>Nitrogen's going to go offline for maintenance soon.</b>
+	</p>
+	<p>
+		We're sorry about this, but at least in the meantime, you have a window
+		to save your data. Currently, there is no dedicated export function, but
+		that will come soon once we're done with maintenance.
+	</p>
+	<p>
+		Don't worry if you don't get there in time, though. Any data you forget
+		to save will still be safe with us, and when Nitrogen goes online again,
+		all your data will be restored and it'll be like nothing ever even
+		happened.
+	</p>
+	<p>
+		We're very sorry for the inconvenience, and we're working our hardest to
+		keep Nitrogen online for as long as possible before maintenance even
+		starts.
+	</p>
+	<button mat-button [mat-dialog-close]="true">
+		Don't show again
+	</button>
+	<div class="buttons">
+		<button mat-flat-button color="primary" [mat-dialog-close]="false"
+		        type="submit" cdkFocusInitial>
+			OK
+		</button>
+	</div>
+</form>

@@ -1,6 +1,18 @@
 import { Component, OnInit } from '@angular/core'
-import { ApiService }        from '../api.service'
+import { MatDialog }         from '@angular/material'
 import { Router }            from '@angular/router'
+import { ApiService }        from '../api.service'
+
+/**
+ * This variable prevents the maintenance dialog from showing up every time you
+ * load the dashboard, as opposed to only when you first load the page.
+ *
+ * You can always choose not to show the dialog by clicking the "Don't show
+ * again" button.
+ *
+ * @type {boolean}
+ */
+let hasLoaded = false
 
 @Component ( {
 	selector    : 'app-dashboard',
@@ -13,7 +25,8 @@ export class DashboardComponent implements OnInit {
 
 	constructor (
 		public api : ApiService,
-		private router : Router
+		private router : Router,
+		private dialog : MatDialog
 	) {}
 
 	ngOnInit () {
@@ -25,6 +38,17 @@ export class DashboardComponent implements OnInit {
 							this.admin = admin
 
 							this.working = false
+
+							if ( localStorage.hasShownMaintenanceDialog !== 'true' && !hasLoaded ) {
+								hasLoaded = true
+
+								this.dialog.open (
+									MaintenanceDialogComponent,
+									{ width : '400px' }
+								).afterClosed ().subscribe ( ( dontShowAgain ) => {
+									localStorage.hasShownMaintenanceDialog = dontShowAgain
+								} )
+							}
 						}
 					)
 				} else {
@@ -45,5 +69,12 @@ export class DashboardComponent implements OnInit {
 				}
 			} )
 	}
+}
 
+@Component ( {
+	selector    : 'app-maintenance-dialog',
+	templateUrl : './dialogs/maintenance-dialog.component.html'
+} )
+export class MaintenanceDialogComponent {
+	constructor () {}
 }
