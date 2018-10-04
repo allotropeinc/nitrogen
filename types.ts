@@ -1,6 +1,6 @@
 import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
 
-export interface Project {
+export interface TJSONProject {
 	name : string
 	code : string
 	publishToken? : string
@@ -11,30 +11,30 @@ export interface Project {
 	type : number
 }
 
-export interface ClientProject extends Project {
+export interface TClientProject extends TJSONProject {
 	id : number
 }
 
-export interface Account {
+export interface TJSONAccount {
 	activeToken? : string
 	username : string
 	password : string
-	projects : Project[]
+	projects : TJSONProject[]
 	editorOptions : IEditorConstructionOptions
 	isAdmin : boolean
 }
 
-export interface MinimalAccount {
+export interface TMinimalAccount {
 	username : string
 	isAdmin : boolean
 }
 
-export interface PublishToken {
+export interface TJSONPublishToken {
 	username : string
 	projectIndex : number
 }
 
-export interface BugReport {
+export interface TJSONBugReport {
 	username : string
 	title : string
 	summary : string
@@ -44,9 +44,9 @@ export interface BugReport {
 	id? : number
 }
 
-export interface ApiData {
+export interface TJSONApiData {
 	accounts : {
-		[ username : string ] : Account
+		[ username : string ] : TJSONAccount
 	}
 
 	activeTokens : {
@@ -54,16 +54,75 @@ export interface ApiData {
 	}
 
 	publishTokens : {
-		[ token : string ] : PublishToken
+		[ token : string ] : TJSONPublishToken
 	}
 
 	starterCodes : string[]
 
-	bugReports : BugReport[]
+	bugReports : TJSONBugReport[]
 	version : number
 }
 
-export type Upgrades = ( ( data : ApiData ) => Promise<void> )[]
+export interface TProject {
+	name : string
+	code : string
+	publishToken? : string
+	/**
+	 * 0: HTML
+	 * 1: Markdown
+	 */
+	type : number
+	owner : TAccount
+}
+
+export interface TAccount {
+	activeToken? : string
+	username : string
+	password : string
+	projects : TProject[]
+	editorOptions : IEditorConstructionOptions
+	isAdmin : boolean
+}
+
+export interface TBugReport {
+	user : TAccount
+	title : string
+	summary : string
+	steps : string
+	comments : string
+	read : boolean
+}
+
+export interface TClientBugReport extends TBugReport {
+	username : string
+	user : undefined
+	id : number
+}
+
+/**
+ * This is the format of the Carbyne database. Should you use toObject on the
+ * whole thing, this is the data structure it would reveal. Hopefully you never
+ * toObject the whole database because that would have huge memory requirements
+ * and would be incredibly inefficient.
+ */
+export interface TApiData {
+	accounts : {
+		[ username : string ] : TAccount
+	}
+
+	activeTokens : {
+		[ token : string ] : TAccount
+	}
+
+	publishTokens : {
+		[ token : string ] : TProject
+	}
+
+	starterCodes : string[]
+	bugReports : TBugReport[]
+}
+
+export type TUpgrades = ( ( data : TJSONApiData ) => Promise<void> )[]
 
 export const usernamePattern = /^[\w\d]{1,16}$/
 export const DECRYPTION_CONFIRMATION_HEADER = '!!!!!DECRYPTION_CONFIRMATION_HEADER!!!!!'

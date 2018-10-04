@@ -1,24 +1,25 @@
-import * as express                                                    from 'express'
-import { NextFunction, Request, Response }                             from 'express'
-import { Api }                                                         from './api'
-import { Account, BugReport, DECRYPTION_CONFIRMATION_HEADER, Project } from './types'
-import * as path                                                       from 'path'
-import { join }                                                        from 'path'
-import * as https                                                      from 'https'
-import * as fs                                                         from 'fs'
-import * as net                                                        from 'net'
-import * as http                                                       from 'http'
-import { IncomingMessage, ServerResponse }                             from 'http'
-import * as Prism                                                      from 'prismjs'
-import { spawn }                                                       from 'child_process'
-import * as crypto                                                     from 'crypto'
-import * as normalizeUrl                                               from 'normalize-url'
-import * as URL                                                        from 'url-parse'
-import { get }                                                         from 'request-promise-native'
-import { load }                                                        from 'cheerio'
-import * as beautify                                                   from 'js-beautify'
-import { md2html }                                                     from './md2html'
+import { Carbyne, CarbyneDirectoryStore }                                          from 'carbyne-db'
+import { load }                                                                    from 'cheerio'
+import { spawn }                                                                   from 'child_process'
+import * as crypto                                                                 from 'crypto'
+import * as express                                                                from 'express'
+import { NextFunction, Request, Response }                                         from 'express'
+import * as fs                                                                     from 'fs'
+import * as http                                                                   from 'http'
+import { IncomingMessage, ServerResponse }                                         from 'http'
+import * as https                                                                  from 'https'
+import * as beautify                                                               from 'js-beautify'
+import * as net                                                                    from 'net'
+import * as normalizeUrl                                                           from 'normalize-url'
+import * as path                                                                   from 'path'
+import { join }                                                                    from 'path'
+import * as Prism                                                                    from 'prismjs'
 import 'prismjs/components/prism-markdown'
+import { get }                                                                        from 'request-promise-native'
+import * as URL                                                                       from 'url-parse'
+import { Api }                                                                        from './api'
+import { md2html }                                                                    from './md2html'
+import { DECRYPTION_CONFIRMATION_HEADER, TJSONAccount, TJSONBugReport, TJSONProject } from './types'
 import Signals = NodeJS.Signals
 
 const debug = require ( 'debug' ) (
@@ -73,9 +74,14 @@ const config = JSON.parse (
 debug ( 'Loaded config' )
 
 interface ApiRequest extends Request {
-	account? : Account,
+	account? : TJSONAccount,
 	rawBody? : string
 }
+
+export const db = new Carbyne ( new CarbyneDirectoryStore ( path.join (
+	__dirname,
+	'db'
+) ) )
 
 const app = express ()
 
@@ -672,7 +678,7 @@ router.get (
 		)
 
 		try {
-			const project : Project = await Api.getPublished ( req.params.publishToken )
+			const project : TJSONProject = await Api.getPublished ( req.params.publishToken )
 
 			let code
 
@@ -720,7 +726,7 @@ router.get (
 		)
 
 		try {
-			const project : Project = await Api.getPublished ( req.params.publishToken )
+			const project : TJSONProject = await Api.getPublished ( req.params.publishToken )
 			let code
 
 			if ( project.code.startsWith ( DECRYPTION_CONFIRMATION_HEADER ) ) {
@@ -810,7 +816,7 @@ router.post (
 			try {
 				res.json ( await Api.submitBugReport (
 					req.account.username,
-					<BugReport> {
+					<TJSONBugReport> {
 						username : req.account.username,
 						title    : req.body.title,
 						summary  : req.body.summary,
