@@ -1,0 +1,13 @@
+:host {
+	display: block;
+}
+
+label {
+	display: block;
+	margin-bottom: 8px;
+	line-height: 24px;
+}
+
+label > * {
+	float: right;
+}

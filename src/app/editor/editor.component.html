@@ -1,6 +1,6 @@
 <mat-sidenav-container (window:keydown)="hotkey($event)">
 	<mat-sidenav mode="push" #sidenav>
-		<app-sidenav [editorOptions]="editorOptions"></app-sidenav>
+		<app-editor-sidenav [settings]="settings"></app-editor-sidenav>
 	</mat-sidenav>
 	<mat-sidenav-content>
 		<mat-toolbar>
@@ -9,7 +9,8 @@
 					home
 				</mat-icon>
 			</a>
-			<button mat-icon-button class="menu-button" (click)="sidenav.toggle()">
+			<button mat-icon-button class="menu-button"
+			        (click)="sidenav.toggle()">
 				<mat-icon>
 					menu
 				</mat-icon>
@@ -20,7 +21,8 @@
 			</ng-container>
 			<ng-container *ngIf="!working">
 				<div class="buttons">
-					<button mat-icon-button matTooltip="Tidy" [disabled]="project.type !== 0 || publishing || saving"
+					<button mat-icon-button matTooltip="Tidy"
+					        [disabled]="project.type !== 0 || publishing || saving"
 					        (click)="tidy()">
 						<mat-icon>
 							brush
@@ -33,14 +35,17 @@
 							reply
 						</mat-icon>
 					</button>
-					<mat-checkbox matTooltip="Auto-update" color="primary" [(ngModel)]="autoUpdate"></mat-checkbox>
-					<button matTooltip="Update preview" mat-icon-button (click)="update()"
+					<mat-checkbox matTooltip="Auto-update" color="primary"
+					              [(ngModel)]="autoUpdate"></mat-checkbox>
+					<button matTooltip="Update preview" mat-icon-button
+					        (click)="update()"
 					        [disabled]="publishing || saving">
 						<mat-icon>
 							refresh
 						</mat-icon>
 					</button>
-					<button matTooltip="Publish project" mat-icon-button [disabled]="publishing || saving || unsaved"
+					<button matTooltip="Publish project" mat-icon-button
+					        [disabled]="publishing || saving || unsaved"
 					        (click)="publish()"
 					        *ngIf="!project.publishToken">
 						<mat-icon>
@@ -48,20 +53,25 @@
 						</mat-icon>
 					</button>
 					<ng-container *ngIf="project.publishToken">
-						<button matTooltip="Unpublish project" mat-icon-button color="warn"
-						        [disabled]="publishing || saving || unsaved" (click)="unpublish()">
+						<button matTooltip="Unpublish project" mat-icon-button
+						        color="warn"
+						        [disabled]="publishing || saving || unsaved"
+						        (click)="unpublish()">
 							<mat-icon>
 								cloud_off
 							</mat-icon>
 						</button>
-						<button matTooltip="Share your published project" mat-icon-button
-						        [disabled]="publishing || saving || unsaved" (click)="share()">
+						<button matTooltip="Share your published project"
+						        mat-icon-button
+						        [disabled]="publishing || saving || unsaved"
+						        (click)="share()">
 							<mat-icon>
 								share
 							</mat-icon>
 						</button>
 					</ng-container>
-					<button matTooltip="Save" mat-icon-button [disabled]="!unsaved || saving" (click)="save()">
+					<button matTooltip="Save" mat-icon-button
+					        [disabled]="!unsaved || saving" (click)="save()">
 						<mat-icon>
 							save
 						</mat-icon>
@@ -69,7 +79,8 @@
 				</div>
 				<div class="mobile-buttons">
 					<mat-menu xPosition="before" #mobile_menu="matMenu">
-						<button mat-menu-item [disabled]="!unsaved || saving" (click)="save()">
+						<button mat-menu-item [disabled]="!unsaved || saving"
+						        (click)="save()">
 							<mat-icon>
 								save
 							</mat-icon>
@@ -78,7 +89,9 @@
 							</span>
 						</button>
 						<ng-container *ngIf="project.publishToken">
-							<button mat-menu-item [disabled]="publishing || saving || unsaved" (click)="unpublish()"
+							<button mat-menu-item
+							        [disabled]="publishing || saving || unsaved"
+							        (click)="unpublish()"
 							        color="warn">
 								<mat-icon>
 									cloud_off
@@ -87,7 +100,9 @@
 								Unpublish
 							</span>
 							</button>
-							<button mat-menu-item [disabled]="publishing || saving || unsaved" (click)="share()">
+							<button mat-menu-item
+							        [disabled]="publishing || saving || unsaved"
+							        (click)="share()">
 								<mat-icon>
 									share
 								</mat-icon>
@@ -96,7 +111,9 @@
 								</span>
 							</button>
 						</ng-container>
-						<button mat-menu-item [disabled]="publishing || saving || unsaved" (click)="publish()"
+						<button mat-menu-item
+						        [disabled]="publishing || saving || unsaved"
+						        (click)="publish()"
 						        *ngIf="!project.publishToken">
 							<mat-icon>
 								cloud_upload
@@ -105,7 +122,8 @@
 								Publish
 							</span>
 						</button>
-						<button mat-menu-item (click)="update()" [disabled]="publishing || saving">
+						<button mat-menu-item (click)="update()"
+						        [disabled]="publishing || saving">
 							<mat-icon>
 								refresh
 							</mat-icon>
@@ -115,13 +133,16 @@
 						</button>
 						<span mat-menu-item (click)="autoUpdate = !autoUpdate">
 							<mat-icon class="fixed-container">
-								<mat-checkbox class="fixed" color="primary" [(ngModel)]="autoUpdate"></mat-checkbox>
+								<mat-checkbox class="fixed" color="primary"
+								              [(ngModel)]="autoUpdate"></mat-checkbox>
 							</mat-icon>
 							<span>
 								Auto-refresh
 							</span>
 						</span>
-						<button mat-menu-item [disabled]="!unsaved || publishing || saving" (click)="revert()">
+						<button mat-menu-item
+						        [disabled]="!unsaved || publishing || saving"
+						        (click)="revert()">
 							<mat-icon>
 								reply
 							</mat-icon>
@@ -129,7 +150,9 @@
 								Revert Changes
 							</span>
 						</button>
-						<button mat-menu-item [disabled]="project.type !== 0 || publishing || saving" (click)="tidy()">
+						<button mat-menu-item
+						        [disabled]="project.type !== 0 || publishing || saving"
+						        (click)="tidy()">
 							<mat-icon>
 								brush
 							</mat-icon>
@@ -148,7 +171,8 @@
 		</mat-toolbar>
 		<div>
 			<ng-container *ngIf="!working">
-				<horizontal-split-pane class="split" [class.dragging]="dragging" (on-begin-resizing)="dragging = true"
+				<horizontal-split-pane class="split" [class.dragging]="dragging"
+				                       (on-begin-resizing)="dragging = true"
 				                       (on-ended-resizing)="dragging = false"
 				                       primary-component-minsize="0"
 				                       secondary-component-minsize="0"
@@ -160,10 +184,12 @@
 					<app-code-editor [(code)]="code" (codeChange)="onChange()"
 					                 class="split-pane-content-primary"
 					                 [language]="['html', 'markdown'][project.type]"></app-code-editor>
-					<iframe class="split-pane-content-secondary" [src]="url | safeurl"></iframe>
+					<iframe class="split-pane-content-secondary"
+					        [src]="url | safeurl"></iframe>
 				</horizontal-split-pane>
 			</ng-container>
-			<mat-progress-spinner mode="indeterminate" *ngIf="working"></mat-progress-spinner>
+			<mat-progress-spinner mode="indeterminate"
+			                      *ngIf="working"></mat-progress-spinner>
 		</div>
 	</mat-sidenav-content>
 </mat-sidenav-container>

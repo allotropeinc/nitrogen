@@ -40,9 +40,9 @@ export class AdminDashboardUserComponent implements OnInit {
 		)
 	}
 
-	getEditorSettings () {
+	getSettings () {
 		return JSON.stringify (
-			this.account.editorOptions,
+			this.account.settings,
 			undefined,
 			'\t'
 		)

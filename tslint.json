@@ -15,16 +15,13 @@
 			"severity" : "warn"
 		},
 		"eofline" : true,
-		"forin" : true,
+		"forin" : false,
 		"import-blacklist" : [
 			true,
 			"rxjs/Rx"
 		],
 		"import-spacing" : false,
-		"indent" : [
-			true,
-			"tabs"
-		],
+		"indent" : false,
 		"interface-over-type-literal" : true,
 		"label-position" : true,
 		"max-line-length" : [
@@ -99,11 +96,7 @@
 		"typedef-whitespace" : [
 			true,
 			{
-				"call-signature" : "space",
-				"index-signature" : "space",
-				"parameter" : "space",
-				"property-declaration" : "space",
-				"variable-declaration" : "space"
+				"index-signature" : "space"
 			}
 		],
 		"unified-signatures" : true,

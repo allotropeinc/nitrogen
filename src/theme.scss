@@ -95,7 +95,20 @@ app-root > *:not(router-outlet) {
 	color: #ffb300 !important;
 }
 
-.mat-card a:not([matLine]):not([mat-flat-button]):not([mat-button]):not(.mat-menu-item):not([mat-list-item]):not([mat-icon-button]), .link {
+.link {
+	cursor: pointer;
+	text-decoration: underline;
+
+	&:hover {
+		text-decoration: none;
+	}
+}
+
+.link:not(.color-primary):not(.color-accent):not(.color-warn) {
+	color: mat-color(mat-palette($mat-blue-grey, 400));
+}
+
+.mat-card a:not([matLine]):not([mat-flat-button]):not([mat-button]):not(.mat-menu-item):not([mat-list-item]):not([mat-icon-button]) {
 	color: mat-color(mat-palette($mat-blue-grey, 400));
 	cursor: pointer;
 	text-decoration: underline;
@@ -136,11 +149,23 @@ app-project-item > .mat-list-item > .mat-list-item-content > .mat-list-text > * 
 	font-weight: 300;
 }
 
-p[color='warn'] {
+p.warn {
 	color: mat-color($warn);
 	padding: 1em;
 	background-color: transparentize(mat-color($warn), 0.9);
 	border-radius: 0.5em;
+}
+
+.color-primary {
+	color: mat-color($primary)
+}
+
+.color-accent {
+	color: mat-color($accent)
+}
+
+.color-warn {
+	color: mat-color($warn)
 }
 
 .mat-menu-item[color='warn'] {
@@ -188,4 +213,16 @@ mat-dialog-actions {
 mat-dialog-actions > :first-child {
 	// push button to left
 	margin-right: auto;
+}
+
+.mat-menu-item > .mat-icon {
+	&, & + span {
+		height: 48px;
+		line-height: 48px;
+		vertical-align: top;
+	}
+
+	& + span {
+		display: inline-block;
+	}
 }

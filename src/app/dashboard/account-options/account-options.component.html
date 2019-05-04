@@ -4,6 +4,10 @@
 		<span>{{this.api.username}}</span>
 	</button>
 	<mat-divider></mat-divider>
+	<button mat-menu-item (click)="accountSettings()">
+		<mat-icon>settings</mat-icon>
+		<span>Account Settings</span>
+	</button>
 	<button mat-menu-item (click)="changeAccountUsername()">
 		<mat-icon>visibility</mat-icon>
 		<span>Change Username</span>

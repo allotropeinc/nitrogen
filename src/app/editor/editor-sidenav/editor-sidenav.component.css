@@ -10,20 +10,20 @@
 	right: 24px;
 }
 
-label {
-	display: block;
-	margin-bottom: 8px;
-	line-height: 24px;
-}
-
-label > * {
-	float: right;
-}
-
 mat-progress-spinner {
 	margin: 0 auto;
 }
 
 .buttons-wrapper {
     height: 36px;
+	margin-top: 24px;
+}
+
+mat-accordion {
+	display: block;
+	margin: 0 -24px;
+}
+
+a.dashboard-button {
+	margin-bottom: 0 !important;
 }

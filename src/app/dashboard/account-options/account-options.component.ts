@@ -1,50 +1,50 @@
-import { Component, Input, OnInit }             from '@angular/core'
-import { MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
-import { ApiService }                           from '../../api.service'
-import { Router }                               from '@angular/router'
+import {Component, Input, OnInit}             from '@angular/core'
+import {MatDialog, MatDialogRef, MatSnackBar} from '@angular/material'
+import {Router}                               from '@angular/router'
+import {ApiService}                           from '../../api.service'
 
-@Component ( {
-	selector    : 'app-account-options',
-	templateUrl : './account-options.component.html',
-	styleUrls   : [ './account-options.component.css' ]
-} )
+@Component({
+	selector   : 'app-account-options',
+	templateUrl: './account-options.component.html',
+	styleUrls  : ['./account-options.component.css']
+})
 export class AccountOptionsComponent implements OnInit {
-	@Input ()
-	admin : boolean
+	@Input()
+	admin: boolean
 
-	constructor (
-		private dialog : MatDialog,
-		public api : ApiService,
-		private snackbar : MatSnackBar,
-		private router : Router
+	constructor(
+		private dialog: MatDialog,
+		public api: ApiService,
+		private snackbar: MatSnackBar,
+		private router: Router
 	) { }
 
-	ngOnInit () {}
+	ngOnInit() {}
 
-	changeAccountUsername () {
-		const dialogRef = this.dialog.open (
+	changeAccountUsername() {
+		const dialogRef = this.dialog.open(
 			AccountChangeUsernameComponent,
 			{
-				width : '300px'
+				width: '300px'
 			}
 		)
 
-		dialogRef.afterClosed ().subscribe (
+		dialogRef.afterClosed().subscribe(
 			data => {
-				if ( data ) {
-					this.api.changeUsername (
+				if (data) {
+					this.api.changeUsername(
 						this.api.username,
 						data.password,
 						data.username
-					).subscribe (
+					).subscribe(
 						result => {
-							if ( !result ) {
-								this.snackbar.open (
+							if (!result) {
+								this.snackbar.open(
 									'The account username could not be changed.',
 									'Close'
 								)
 							} else {
-								this.snackbar.open (
+								this.snackbar.open(
 									'The account username was successfully changed.',
 									'Close'
 								)
@@ -52,33 +52,33 @@ export class AccountOptionsComponent implements OnInit {
 						}
 					)
 				}
-			} )
+			})
 	}
 
-	changeAccountPassword () {
-		const dialogRef = this.dialog.open (
+	changeAccountPassword() {
+		const dialogRef = this.dialog.open(
 			AccountChangePasswordComponent,
 			{
-				width : '300px'
+				width: '300px'
 			}
 		)
 
-		dialogRef.afterClosed ().subscribe (
+		dialogRef.afterClosed().subscribe(
 			passwords => {
-				if ( passwords ) {
-					this.api.changePassword (
+				if (passwords) {
+					this.api.changePassword(
 						this.api.username,
 						passwords.old,
 						passwords.new
-					).subscribe (
+					).subscribe(
 						result => {
-							if ( !result ) {
-								this.snackbar.open (
+							if (!result) {
+								this.snackbar.open(
 									'The account password could not be changed.',
 									'Close'
 								)
 							} else {
-								this.snackbar.open (
+								this.snackbar.open(
 									'The account password was successfully changed.',
 									'Close'
 								)
@@ -86,84 +86,87 @@ export class AccountOptionsComponent implements OnInit {
 						}
 					)
 				}
-			} )
+			})
 	}
 
-	deleteAccount () {
-		const dialogRef = this.dialog.open (
+	deleteAccount() {
+		const dialogRef = this.dialog.open(
 			AccountDeleteDialogComponent,
 			{
-				width : '300px'
+				width: '300px'
 			}
 		)
 
-		dialogRef.afterClosed ().subscribe (
+		dialogRef.afterClosed().subscribe(
 			password => {
-				if ( password ) {
-					this.api.deleteAccount (
+				if (password) {
+					this.api.deleteAccount(
 						password
-					).subscribe (
+					).subscribe(
 						result => {
-							if ( !result ) {
-								this.snackbar.open (
+							if (!result) {
+								this.snackbar.open(
 									'The account could not be deleted.',
 									'Close'
 								)
 							} else {
-								this.snackbar.open (
+								this.snackbar.open(
 									'The account was successfully deleted.',
 									'Close'
 								)
 
-								this.router.navigate ( [ '/signin' ] )
+								this.router.navigate(['/signin'])
 							}
 						}
 					)
 				}
-			} )
+			})
 	}
 
+	accountSettings() {
+		this.snackbar.open('Working!', 'Close')
+	}
 }
 
-@Component ( {
-	selector    : 'app-account-change-username-dialog',
-	templateUrl : './dialogs/account-change-username-dialog.component.html'
-} )
+@Component({
+	selector   : 'app-account-change-username-dialog',
+	templateUrl: './dialogs/account-change-username-dialog.component.html'
+})
 export class AccountChangeUsernameComponent {
-	password : string
+	password: string
 	showPassword = false
-	username : string
+	username: string
 
-	constructor (
-		public dialogRef : MatDialogRef<AccountChangeUsernameComponent>
+	constructor(
+		public dialogRef: MatDialogRef<AccountChangeUsernameComponent>
 	) {}
 }
 
-@Component ( {
-	selector    : 'app-account-change-password-dialog',
-	templateUrl : './dialogs/account-change-password-dialog.component.html'
-} )
+@Component({
+	selector   : 'app-account-change-password-dialog',
+	templateUrl: './dialogs/account-change-password-dialog.component.html'
+})
 export class AccountChangePasswordComponent {
-	oldPassword : string
-	newPassword : string
-	newPasswordConfirm : string
+	oldPassword: string
+	newPassword: string
+	newPasswordConfirm: string
 	showOldPassword = false
 	showNewPassword = false
 	showNewPasswordConfirm = false
 
-	constructor (
-		public dialogRef : MatDialogRef<AccountChangePasswordComponent>,
-		private snackbar : MatSnackBar
+	constructor(
+		public dialogRef: MatDialogRef<AccountChangePasswordComponent>,
+		private snackbar: MatSnackBar
 	) {}
 
-	onClick () {
-		if ( this.newPasswordConfirm === this.newPassword ) {
-			this.dialogRef.close ( {
-				old : this.oldPassword,
-				new : this.newPassword
-			} )
+	onClick() {
+		if (this.newPasswordConfirm === this.newPassword) {
+			this.dialogRef.close({
+				old: this.oldPassword,
+				new: this.newPassword
+			})
 		} else {
-			this.snackbar.open (
+			this.snackbar.open(
 				'Passwords do not match.',
 				'Close'
 			)
@@ -171,15 +174,15 @@ export class AccountChangePasswordComponent {
 	}
 }
 
-@Component ( {
-	selector    : 'app-account-delete-dialog',
-	templateUrl : './dialogs/account-delete-dialog.component.html'
-} )
+@Component({
+	selector   : 'app-account-delete-dialog',
+	templateUrl: './dialogs/account-delete-dialog.component.html'
+})
 export class AccountDeleteDialogComponent {
-	password : string
+	password: string
 	showPassword = false
 
-	constructor (
-		public dialogRef : MatDialogRef<AccountDeleteDialogComponent>
+	constructor(
+		public dialogRef: MatDialogRef<AccountDeleteDialogComponent>
 	) {}
 }

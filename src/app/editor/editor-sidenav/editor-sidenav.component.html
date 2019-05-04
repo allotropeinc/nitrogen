@@ -1,0 +1,41 @@
+<button mat-icon-button class="close-button" (click)="sidenav.close()">
+	<mat-icon>
+		close
+	</mat-icon>
+</button>
+<h1>Menu</h1>
+<p>
+	<a mat-button routerLink="/dashboard" class="fullwidth dashboard-button">
+		Return to Dashboard
+	</a>
+</p>
+<h2>Settings</h2>
+<ng-container *ngIf="settingsReady">
+	<mat-accordion>
+		<mat-expansion-panel class="mat-elevation-z0">
+			<mat-expansion-panel-header>
+				<mat-panel-title>Editor Settings</mat-panel-title>
+				<mat-panel-description>
+					Code editor configuration
+				</mat-panel-description>
+			</mat-expansion-panel-header>
+			<app-editor-sidenav-editor-settings
+				[editorSettings]="settings.editor"
+				[disabled]="saving"></app-editor-sidenav-editor-settings>
+		</mat-expansion-panel>
+	</mat-accordion>
+	<div class="buttons-wrapper">
+		<div class="buttons">
+			<button mat-button [disabled]="saving" (click)="resetSettings()">
+				Reset Settings
+			</button>
+			<button mat-flat-button [disabled]="saving"
+			        (click)="saveSettings()">
+				{{saving ? 'Saving Settings' : 'Save Settings'}}
+			</button>
+		</div>
+	</div>
+	<app-global-footer></app-global-footer>
+</ng-container>
+<mat-progress-spinner mode="indeterminate"
+                      *ngIf="!settingsReady"></mat-progress-spinner>

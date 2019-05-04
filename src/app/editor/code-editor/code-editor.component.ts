@@ -62,14 +62,14 @@ export class CodeEditorComponent implements OnInit, AfterViewInit {
 			observer => {
 				this.working = true
 
-				this.api.getEditorOptions ().subscribe (
-					options => {
-						if ( options ) {
+				this.api.getSettings ().subscribe (
+					settings => {
+						if ( settings ) {
 							this.editorContainer.clear ()
 							this.editor = null
 
 							this.editorComponent = this.editorContainer.createComponent ( this.factory )
-							this.editorComponent.instance.options = options
+							this.editorComponent.instance.options = settings.editor
 							this.editorComponent.instance.writeValue ( this.code )
 
 							this.editorComponent.instance.registerOnChange (

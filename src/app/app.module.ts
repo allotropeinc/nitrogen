@@ -1,6 +1,7 @@
 import { BrowserModule }                                                               from '@angular/platform-browser'
 import { BrowserAnimationsModule }                                                     from '@angular/platform-browser/animations'
 import { NgModule }                                                                    from '@angular/core'
+import {EditorSidenavEditorSettingsComponent}                                          from './editor/editor-sidenav/editor-sidenav-editor-settings/editor-sidenav-editor-settings.component'
 import { MaterialModule }                                                              from './material.module'
 import { ApiDecryptionDialogComponent, ApiProvidePasswordDialogComponent, ApiService } from './api.service'
 import { FormsModule, ReactiveFormsModule }                                            from '@angular/forms'
@@ -30,7 +31,7 @@ import {
 	ConfirmUnpublishDialogComponent,
 	EditorComponent,
 	ShareProjectDialogComponent
-}                                                         from './editor/editor.component'
+}                                                   from './editor/editor.component'
 import { SplitPaneModule }                          from 'ng2-split-pane/lib/ng2-split-pane'
 import { SafeUrlPipe }                              from './safe-url.pipe'
 import {
@@ -39,8 +40,8 @@ import {
 }                                                   from './dashboard/contact/bug-report.component'
 import {
 	ConfirmResetSettingsDialogComponent,
-	SidenavComponent
-}                                                   from './editor/sidenav/sidenav.component'
+	EditorSidenavComponent
+}                                                   from './editor/editor-sidenav/editor-sidenav.component'
 import { HttpClientModule }                         from '@angular/common/http'
 import { CodeEditorComponent }                      from 'app/editor/code-editor/code-editor.component'
 import { EditorComponent as MonacoEditorComponent } from 'ngx-monaco-editor/editor.component'
@@ -58,7 +59,7 @@ import {
 	AdminDashboardUserComponent,
 	UserDeleteAccountDialogComponent
 }                                             from './admin-dashboard/admin-dashboard-users/admin-dashboard-user/admin-dashboard-user.component'
-import { AdminDashboardStarterCodeComponent } from './admin-dashboard/admin-dashboard-starterCode/admin-dashboard-starterCode.component'
+import { AdminDashboardStarterCodeComponent }       from './admin-dashboard/admin-dashboard-starterCode/admin-dashboard-starterCode.component'
 
 @NgModule ( {
 	declarations    : [
@@ -77,7 +78,8 @@ import { AdminDashboardStarterCodeComponent } from './admin-dashboard/admin-dash
 		SafeUrlPipe,
 		BugReportComponent,
 		BugReportDialogComponent,
-		SidenavComponent,
+		EditorSidenavComponent,
+		EditorSidenavEditorSettingsComponent,
 		CodeEditorComponent,
 		AccountDeleteDialogComponent,
 		ConfirmLeaveDialogComponent,
