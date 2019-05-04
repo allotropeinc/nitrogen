@@ -20,8 +20,12 @@ export interface Account {
 	username : string
 	password : string
 	projects : Project[]
-	editorOptions : IEditorConstructionOptions
+	settings : AccountSettings
 	isAdmin : boolean
+}
+
+export interface AccountSettings {
+	editor : IEditorConstructionOptions
 }
 
 export interface MinimalAccount {

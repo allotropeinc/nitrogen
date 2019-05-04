@@ -1,6 +1,9 @@
-import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
+import * as crypto     from 'crypto'
+import * as fs         from 'fs'
+import * as uuid       from 'uuid'
 import {
 	Account,
+	AccountSettings,
 	ApiData,
 	BugReport,
 	ClientProject,
@@ -10,9 +13,6 @@ import {
 	PublishToken,
 	usernamePattern
 }                      from './types'
-import * as crypto     from 'crypto'
-import * as fs         from 'fs'
-import * as uuid       from 'uuid'
 import { upgradeData } from './upgrade'
 
 const debug = require ( 'debug' ) (
@@ -23,83 +23,85 @@ debug.enabled = true
 
 let data : ApiData = null
 
-const starterEditorOptions : IEditorConstructionOptions = {
-	acceptSuggestionOnCommitCharacter : true,
-	acceptSuggestionOnEnter           : 'on',
-	accessibilitySupport              : 'auto',
-	ariaLabel                         : '',
-	autoClosingBrackets               : true,
-	autoIndent                        : true, // false,
-	automaticLayout                   : true,
-	codeLens                          : true,
-	contextmenu                       : true,
-	cursorBlinking                    : 'blink',
-	cursorStyle                       : 'line',
-	disableLayerHinting               : false,
-	disableMonospaceOptimizations     : false,
-	dragAndDrop                       : false,
-	emptySelectionClipboard           : false,
-	extraEditorClassName              : '',
-	fixedOverflowWidgets              : false,
-	folding                           : true,
-	fontFamily                        : 'Inconsolata',
-	fontLigatures                     : true, // false,
-	fontSize                          : 14,
-	fontWeight                        : '100', // 'normal',
-	formatOnPaste                     : false,
-	formatOnType                      : false,
-	glyphMargin                       : false,
-	hideCursorInOverviewRuler         : false,
-	hover                             : true,
-	iconsInSuggestions                : true,
-	letterSpacing                     : 0,
-	lineDecorationsWidth              : 10,
-	lineHeight                        : 16,
-	lineNumbers                       : 'on',
-	lineNumbersMinChars               : 5,
-	links                             : false, // true,
-	matchBrackets                     : true,
-	mouseWheelScrollSensitivity       : 1,
-	mouseWheelZoom                    : false,
-	multiCursorModifier               : 'ctrlCmd', // 'alt',
-	occurrencesHighlight              : true,
-	overviewRulerBorder               : true,
-	overviewRulerLanes                : 2,
-	parameterHints                    : true,
-	quickSuggestions                  : true,
-	quickSuggestionsDelay             : 500,
-	readOnly                          : false,
-	renderControlCharacters           : true, // false,
-	renderIndentGuides                : true, // false,
-	renderLineHighlight               : 'none', // 'all',
-	renderWhitespace                  : 'all', // 'none',
-	revealHorizontalRightPadding      : 30,
-	roundedSelection                  : true,
-	rulers                            : [],
-	scrollBeyondLastLine              : false, // true,
-	selectOnLineNumbers               : true,
-	selectionClipboard                : true,
-	selectionHighlight                : true,
-	showFoldingControls               : 'always', // 'mouseover',
-	snippetSuggestions                : 'bottom',
-	stopRenderingLineAfter            : -1,
-	suggestFontSize                   : 14,
-	suggestLineHeight                 : 16, // 14,
-	suggestOnTriggerCharacters        : true,
-	useTabStops                       : true, // false,
-	wordBasedSuggestions              : true,
-	wordSeparators                    : '`~!@#$%^&*()-=+[{]}\\|;:\\\'",.<>/?',
-	wordWrap                          : 'on', // 'off',
-	wordWrapBreakAfterCharacters      : ' \t})]?|&,;',
-	wordWrapBreakBeforeCharacters     : '{([+',
-	wordWrapBreakObtrusiveCharacters  : '.',
-	wordWrapColumn                    : 80,
-	wordWrapMinified                  : true,
-	wrappingIndent                    : 'same', // 'none',
+const starterSettings : AccountSettings = {
+	editor : {
+		acceptSuggestionOnCommitCharacter : true,
+		acceptSuggestionOnEnter           : 'on',
+		accessibilitySupport              : 'auto',
+		ariaLabel                         : '',
+		autoClosingBrackets               : true,
+		autoIndent                        : true, // false,
+		automaticLayout                   : true,
+		codeLens                          : true,
+		contextmenu                       : true,
+		cursorBlinking                    : 'blink',
+		cursorStyle                       : 'line',
+		disableLayerHinting               : false,
+		disableMonospaceOptimizations     : false,
+		dragAndDrop                       : false,
+		emptySelectionClipboard           : false,
+		extraEditorClassName              : '',
+		fixedOverflowWidgets              : false,
+		folding                           : true,
+		fontFamily                        : 'Inconsolata',
+		fontLigatures                     : true, // false,
+		fontSize                          : 14,
+		fontWeight                        : '100', // 'normal',
+		formatOnPaste                     : false,
+		formatOnType                      : false,
+		glyphMargin                       : false,
+		hideCursorInOverviewRuler         : false,
+		hover                             : true,
+		iconsInSuggestions                : true,
+		letterSpacing                     : 0,
+		lineDecorationsWidth              : 10,
+		lineHeight                        : 16,
+		lineNumbers                       : 'on',
+		lineNumbersMinChars               : 5,
+		links                             : false, // true,
+		matchBrackets                     : true,
+		mouseWheelScrollSensitivity       : 1,
+		mouseWheelZoom                    : false,
+		multiCursorModifier               : 'ctrlCmd', // 'alt',
+		occurrencesHighlight              : true,
+		overviewRulerBorder               : true,
+		overviewRulerLanes                : 2,
+		parameterHints                    : true,
+		quickSuggestions                  : true,
+		quickSuggestionsDelay             : 500,
+		readOnly                          : false,
+		renderControlCharacters           : true, // false,
+		renderIndentGuides                : true, // false,
+		renderLineHighlight               : 'none', // 'all',
+		renderWhitespace                  : 'all', // 'none',
+		revealHorizontalRightPadding      : 30,
+		roundedSelection                  : true,
+		rulers                            : [],
+		scrollBeyondLastLine              : false, // true,
+		selectOnLineNumbers               : true,
+		selectionClipboard                : true,
+		selectionHighlight                : true,
+		showFoldingControls               : 'always', // 'mouseover',
+		snippetSuggestions                : 'bottom',
+		stopRenderingLineAfter            : -1,
+		suggestFontSize                   : 14,
+		suggestLineHeight                 : 16, // 14,
+		suggestOnTriggerCharacters        : true,
+		useTabStops                       : true, // false,
+		wordBasedSuggestions              : true,
+		wordSeparators                    : '`~!@#$%^&*()-=+[{]}\\|;:\\\'",.<>/?',
+		wordWrap                          : 'on', // 'off',
+		wordWrapBreakAfterCharacters      : ' \t})]?|&,;',
+		wordWrapBreakBeforeCharacters     : '{([+',
+		wordWrapBreakObtrusiveCharacters  : '.',
+		wordWrapColumn                    : 80,
+		wordWrapMinified                  : true,
+		wrappingIndent                    : 'same', // 'none',
 
-	// language             : 'html',
-	theme                : 'vs-dark',
-	accessibilityHelpUrl : ''
+		// language             : 'html',
+		theme                : 'vs-dark',
+		accessibilityHelpUrl : ''
+	}
 }
 
 function getData () : Promise<ApiData> {
@@ -288,14 +290,15 @@ export const Api = {
 					() => {
 						if ( usernamePattern.test ( username ) ) {
 							data.accounts[ username ] = {
-								username      : username,
-								password      : currentHashVersion + '!' + hashFunctions[ currentHashVersion ] (
-									username,
-									password
-								),
-								projects      : [],
-								editorOptions : starterEditorOptions,
-								isAdmin       : false
+								username : username,
+								password : currentHashVersion + '!' +
+								           hashFunctions[ currentHashVersion ] (
+									           username,
+									           password
+								           ),
+								projects : [],
+								settings : starterSettings,
+								isAdmin  : false
 							}
 
 							saveData ().then (
@@ -566,7 +569,8 @@ export const Api = {
 						account.projects.push ( <Project> {
 								name : name,
 								type : type,
-								code : DECRYPTION_CONFIRMATION_HEADER + ( code || data.starterCodes[ type ] )
+								code : DECRYPTION_CONFIRMATION_HEADER +
+								       ( code || data.starterCodes[ type ] )
 							}
 						)
 
@@ -600,7 +604,8 @@ export const Api = {
 
 				getAccount ( username ).then (
 					( account : Account ) => {
-						if ( id >= 0 && id < account.projects.length && id % 1 === 0 ) {
+						if ( id >= 0 && id < account.projects.length &&
+						     id % 1 === 0 ) {
 							account.projects[ id ].name = name
 
 							saveData ().then (
@@ -639,7 +644,8 @@ export const Api = {
 
 				getAccount ( username ).then (
 					( account : Account ) => {
-						if ( id >= 0 && id < account.projects.length && id % 1 === 0 ) {
+						if ( id >= 0 && id < account.projects.length &&
+						     id % 1 === 0 ) {
 							const project = account.projects[ id ]
 
 							if ( project.hasOwnProperty ( 'publishToken' ) ) {
@@ -651,7 +657,9 @@ export const Api = {
 								1
 							)
 
-							for ( let i = id ; id < account.projects.length ; i++ ) {
+							for ( let i = id ;
+							      id < account.projects.length ;
+							      i++ ) {
 								data.publishTokens[ account.projects[ i ].publishToken ].projectIndex--
 							}
 
@@ -692,8 +700,11 @@ export const Api = {
 
 				getAccount ( username ).then (
 					( account : Account ) => {
-						if ( id >= 0 && id < account.projects.length && id % 1 === 0 ) {
-							if ( id + delta >= 0 && id + delta < account.projects.length && ( id + delta ) % 1 === 0 ) {
+						if ( id >= 0 && id < account.projects.length &&
+						     id % 1 === 0 ) {
+							if ( id + delta >= 0 &&
+							     id + delta < account.projects.length &&
+							     ( id + delta ) % 1 === 0 ) {
 								const src = account.projects[ id ]
 								const dest = account.projects[ id + delta ]
 
@@ -701,11 +712,13 @@ export const Api = {
 								account.projects[ id ] = dest
 
 								if ( src.hasOwnProperty ( 'publishToken' ) ) {
-									data.publishTokens[ src.publishToken ].projectIndex += delta
+									data.publishTokens[ src.publishToken ]
+										.projectIndex += delta
 								}
 
 								if ( dest.hasOwnProperty ( 'publishToken' ) ) {
-									data.publishTokens[ dest.publishToken ].projectIndex -= delta
+									data.publishTokens[ dest.publishToken ]
+										.projectIndex -= delta
 								}
 
 								saveData ().then (
@@ -714,7 +727,10 @@ export const Api = {
 									reject
 								)
 							} else {
-								debug ( 'moving to an invalid project id %d', id + delta )
+								debug (
+									'moving to an invalid project id %d',
+									id + delta
+								)
 
 								reject ( false )
 							}
@@ -749,7 +765,8 @@ export const Api = {
 
 				getAccount ( username ).then (
 					( account : Account ) => {
-						if ( id >= 0 && id < account.projects.length && id % 1 === 0 ) {
+						if ( id >= 0 && id < account.projects.length &&
+						     id % 1 === 0 ) {
 							const project = account.projects[ id ]
 
 							accept ( <ClientProject> {
@@ -789,7 +806,8 @@ export const Api = {
 
 				getAccount ( username ).then (
 					( account : Account ) => {
-						if ( id >= 0 && id < account.projects.length && id % 1 === 0 ) {
+						if ( id >= 0 && id < account.projects.length &&
+						     id % 1 === 0 ) {
 							account.projects[ id ].code = code
 
 							saveData ().then (
@@ -812,21 +830,21 @@ export const Api = {
 			}
 		)
 	},
-	getEditorOptions (
+	getSettings (
 		username : string
-	) : Promise<IEditorConstructionOptions> {
+	) : Promise<AccountSettings> {
 		return new Promise ( (
 			accept,
 			reject
 			) => {
 				debug (
-					'getting editor options for %o',
+					'getting settings for %o',
 					username
 				)
 
 				getAccount ( username ).then (
 					( account : Account ) => {
-						accept ( account.editorOptions )
+						accept ( account.settings )
 					}
 				).catch (
 					() => reject ( null )
@@ -834,9 +852,9 @@ export const Api = {
 			}
 		)
 	},
-	setEditorOptions (
+	setSettings (
 		username : string,
-		options : IEditorConstructionOptions
+		options : AccountSettings
 	) : Promise<boolean> {
 		return new Promise ( (
 			accept,
@@ -849,7 +867,7 @@ export const Api = {
 
 				getAccount ( username ).then (
 					( account : Account ) => {
-						account.editorOptions = options
+						account.settings = options
 
 						saveData ().then (
 							accept
@@ -950,7 +968,8 @@ export const Api = {
 
 					const token : PublishToken = data.publishTokens[ publishToken ]
 
-					accept ( data.accounts[ token.username ].projects[ token.projectIndex ] )
+					accept (
+						data.accounts[ token.username ].projects[ token.projectIndex ] )
 				} else {
 					debug (
 						'project at %o does not exist',
@@ -980,7 +999,8 @@ export const Api = {
 					(
 						account : Account
 					) => {
-						if ( id >= 0 && id < account.projects.length && id % 1 === 0 ) {
+						if ( id >= 0 && id < account.projects.length &&
+						     id % 1 === 0 ) {
 							const project = account.projects[ id ]
 
 							if ( !project.publishToken ) {
@@ -989,10 +1009,11 @@ export const Api = {
 
 								debug ( 'activating publish token' )
 								project.publishToken = publishToken
-								data.publishTokens[ publishToken ] = <PublishToken> {
-									username     : username,
-									projectIndex : id
-								}
+								data.publishTokens[ publishToken ] =
+									<PublishToken> {
+										username     : username,
+										projectIndex : id
+									}
 
 								saveData ().then (
 									() => accept ( publishToken )
@@ -1037,7 +1058,8 @@ export const Api = {
 					(
 						account : Account
 					) => {
-						if ( id >= 0 && id < account.projects.length && id % 1 === 0 ) {
+						if ( id >= 0 && id < account.projects.length &&
+						     id % 1 === 0 ) {
 							debug ( 'getting project' )
 
 							const project = account.projects[ id ]
@@ -1073,7 +1095,7 @@ export const Api = {
 			}
 		)
 	},
-	resetEditorOptions (
+	resetSettings (
 		username : string
 	) : Promise<boolean> {
 		return new Promise ( (
@@ -1087,7 +1109,7 @@ export const Api = {
 
 				getAccount ( username ).then (
 					( account : Account ) => {
-						account.editorOptions = starterEditorOptions
+						account.settings = starterSettings
 
 						saveData ().then (
 							accept
@@ -1117,10 +1139,12 @@ export const Api = {
 
 				getAccount ( username ).then (
 					( account : Account ) => {
-						account.password = currentHashVersion + '!' + hashFunctions[ currentHashVersion ] (
-							username,
-							password
-						)
+						account.password =
+							currentHashVersion + '!' +
+							hashFunctions[ currentHashVersion ] (
+								username,
+								password
+							)
 
 						saveData ().then (
 							accept
@@ -1160,10 +1184,12 @@ export const Api = {
 							(
 								account : Account
 							) => {
-								account.password = currentHashVersion + '!' + hashFunctions[ currentHashVersion ] (
-									username,
-									newPassword
-								)
+								account.password =
+									currentHashVersion + '!' +
+									hashFunctions[ currentHashVersion ] (
+										username,
+										newPassword
+									)
 
 								saveData ().then (
 									accept
@@ -1197,7 +1223,8 @@ export const Api = {
 					newUsername
 				)
 
-				if ( !data.accounts.hasOwnProperty ( newUsername ) && usernamePattern.test ( newUsername ) ) {
+				if ( !data.accounts.hasOwnProperty ( newUsername ) &&
+				     usernamePattern.test ( newUsername ) ) {
 					Api.validateCredentials (
 						oldUsername,
 						password
@@ -1211,28 +1238,35 @@ export const Api = {
 								) => {
 									debug ( 'setting username' )
 									account.username = newUsername
-									account.password = currentHashVersion + '!' + hashFunctions[ currentHashVersion ] (
-										newUsername,
-										password
-									)
+									account.password =
+										currentHashVersion + '!' +
+										hashFunctions[ currentHashVersion ] (
+											newUsername,
+											password
+										)
 
-									debug ( 'migrating published projects to new username' )
+									debug ( 'migrating published projects to' +
+									        ' new username' )
 									account.projects.forEach (
 										(
 											project : Project
 										) => {
 											if ( project.publishToken ) {
-												data.publishTokens[ project.publishToken ].username = newUsername
+												data.publishTokens[ project.publishToken ]
+													.username = newUsername
 											}
 										}
 									)
 
-									debug ( 'migrating active token to new username' )
+									debug ( 'migrating active token to new' +
+									        ' username' )
 									if ( account.activeToken ) {
-										data.activeTokens[ account.activeToken ] = newUsername
+										data.activeTokens[ account.activeToken ] =
+											newUsername
 									}
 
-									debug ( 'migrating account to new username' )
+									debug ( 'migrating account to new' +
+									        ' username' )
 									delete data.accounts[ oldUsername ]
 									data.accounts[ newUsername ] = account
 
@@ -1280,10 +1314,7 @@ export const Api = {
 	},
 	getAccounts () : Promise<MinimalAccount[]> {
 		return new Promise<MinimalAccount[]> (
-			(
-				accept,
-				reject
-			) => {
+			accept => {
 				debug ( 'getting accounts' )
 
 				accept ( Object.keys ( data.accounts ).map (
@@ -1357,10 +1388,7 @@ export const Api = {
 	},
 	getBugReports () : Promise<BugReport[]> {
 		return new Promise<BugReport[]> (
-			(
-				accept,
-				reject
-			) => {
+			accept => {
 				debug ( 'getting bug reports' )
 
 				accept ( data.bugReports.map (
@@ -1402,7 +1430,9 @@ export const Api = {
 		)
 	},
 	getStarterCode ( type : number ) : Promise<string> {
-		return new Promise<string> ( ( accept ) => accept ( data.starterCodes[ type ] ) )
+		return new Promise<string> (
+			( accept ) => accept ( data.starterCodes[ type ] )
+		)
 	},
 	setStarterCode (
 		type : number,

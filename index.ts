@@ -1,27 +1,28 @@
-import * as express                                                    from 'express'
-import { NextFunction, Request, Response }                             from 'express'
-import { Api }                                                         from './api'
-import { Account, BugReport, DECRYPTION_CONFIRMATION_HEADER, Project } from './types'
-import * as path                                                       from 'path'
-import { join }                                                        from 'path'
-import * as https                                                      from 'https'
-import * as fs                                                         from 'fs'
-import * as net                                                        from 'net'
-import * as http                                                       from 'http'
-import { IncomingMessage, ServerResponse }                             from 'http'
-import * as Prism                                                      from 'prismjs'
-import { spawn }                                                       from 'child_process'
-import * as crypto                                                     from 'crypto'
-import * as normalizeUrl                                               from 'normalize-url'
-import * as URL                                                        from 'url-parse'
-import { get }                                                         from 'request-promise-native'
-import { load }                                                        from 'cheerio'
-import * as beautify                                                   from 'js-beautify'
-import { md2html }                                                     from './md2html'
+import {load}                                                        from 'cheerio'
+import {spawn}                                                       from 'child_process'
+import * as crypto                                                   from 'crypto'
+import * as express                                                  from 'express'
+import {NextFunction, Request, Response}                             from 'express'
+import * as fs                                                       from 'fs'
+import * as http                                                     from 'http'
+import {IncomingMessage, ServerResponse}                             from 'http'
+import * as https                                                    from 'https'
+import * as beautify                                                 from 'js-beautify'
+import * as net                                                      from 'net'
+import * as normalizeUrl                                             from 'normalize-url'
+import * as path                                                     from 'path'
+import {join}                                                        from 'path'
+import * as Prism                                                    from 'prismjs'
 import 'prismjs/components/prism-markdown'
+import {get}                                                         from 'request-promise-native'
+import * as URL                                                      from 'url-parse'
+import {Api}                                                         from './api'
+import {md2html}                                                     from './md2html'
+import {Account, BugReport, DECRYPTION_CONFIRMATION_HEADER, Project} from './types'
+// @ts-ignore
 import Signals = NodeJS.Signals
 
-const debug = require ( 'debug' ) (
+const debug = require('debug')(
 	'hexazine'
 )
 
@@ -29,57 +30,59 @@ debug.enabled = true
 
 let shuttingDown = false
 
-export async function safeShutdown () {
-	if ( shuttingDown ) {
-		debug ( 'already shutting down' )
+export async function safeShutdown() {
+	if (shuttingDown) {
+		debug('already shutting down')
 		return
 	} else {
 		shuttingDown = true
 	}
 
-	debug ( 'shutting down hexazine safely' )
-	debug (
+	debug('shutting down hexazine safely')
+	debug(
 		'we have %d server(s) to shutdown',
 		servers.length
 	)
 
-	for ( let i = 0 ; i < servers.length ; i++ ) {
-		await new Promise (
+	for (let i = 0; i < servers.length; i++) {
+		await new Promise(
 			(
 				accept
 			) => {
-				const server = servers[ i ]
+				const server = servers[i]
 
-				server.destroy ( accept )
+				server.destroy(accept)
 			}
 		)
 	}
 
-	debug ( 'successfully shut down servers' )
+	debug('successfully shut down servers')
 }
 
-const configLocation = fs.existsSync ( 'config.json' ) ? 'config.json' : 'config.default.json'
+const configLocation = fs.existsSync('config.json')
+                       ? 'config.json'
+                       : 'config.default.json'
 
-const config = JSON.parse (
-	fs.readFileSync (
+const config = JSON.parse(
+	fs.readFileSync(
 		configLocation,
 		'utf8'
-	).replace (
+	).replace(
 		/\s+\/\/.*$/gm,
 		''
-	).trim ()
+	).trim()
 )
 
-debug ( 'Loaded config' )
+debug('Loaded config')
 
 interface ApiRequest extends Request {
-	account? : Account,
-	rawBody? : string
+	account?: Account,
+	rawBody?: string
 }
 
-const app = express ()
+const app = express()
 
-const router = express.Router ()
+const router = express.Router()
 const servers = []
 
 const noAuthRoutes = [
@@ -88,305 +91,323 @@ const noAuthRoutes = [
 	'/health'
 ]
 
-if ( config[ 'secret' ] ) {
-	noAuthRoutes.push ( '/github' )
+if (config['secret']) {
+	noAuthRoutes.push('/github')
 }
 
-app.use (
+app.use(
 	async (
-		req : ApiRequest,
-		res : Response,
-		next : NextFunction
+		req: ApiRequest,
+		res: Response,
+		next: NextFunction
 	) => {
 		req.rawBody = ''
-		req.setEncoding ( 'utf8' )
+		req.setEncoding('utf8')
 
-		req.on (
+		req.on(
 			'data',
-			( chunk : string ) => {
+			(chunk: string) => {
 				req.rawBody += chunk
 			}
 		)
 
-		req.on (
+		req.on(
 			'end',
 			() => {
 				try {
-					req.body = req.rawBody.length === 0 ? {} : JSON.parse ( req.rawBody )
+					req.body =
+						req.rawBody.length === 0
+						? {}
+						: JSON.parse(req.rawBody)
 				} catch {
 					req.body = {}
 				}
 
-				next ()
+				next()
 			}
 		)
 	}
 )
 
-router.use (
+router.use(
 	async (
-		req : ApiRequest,
-		res : Response,
-		next : NextFunction
+		req: ApiRequest,
+		res: Response,
+		next: NextFunction
 	) => {
-		const censored = JSON.parse ( JSON.stringify ( req.body ) )
+		const toRestore: {password?: string, code?: string} = {}
 
-		if ( censored.hasOwnProperty ( 'password' ) ) {
-			censored.password = '[censored]'
+		if (req.body.hasOwnProperty('password')) {
+			toRestore.password = req.body.password
+
+			req.body.password = '[censored]'
 		}
 
-		if ( censored.hasOwnProperty ( 'code' ) ) {
-			censored.password = '[censored]'
+		if (req.body.hasOwnProperty('code')) {
+			toRestore.code = req.body.code
+
+			req.body.code = '[censored]'
 		}
 
-		debug (
+		debug(
 			'%s: %s /api%s: %O',
 			req.ip,
 			req.method,
 			req.url,
-			censored
+			req.body
 		)
 
-		res.header (
+		for (const key in toRestore) {
+			req.body[key] = toRestore[key]
+		}
+
+		res.header(
 			'Access-Control-Allow-Origin',
 			'*'
 		)
 
-		res.header (
+		res.header(
 			'Access-Control-Allow-Headers',
 			'*'
 		)
 
-		if ( req.method === 'OPTIONS' ) {
-			res.status ( 200 )
-			res.end ()
+		if (req.method === 'OPTIONS') {
+			res.status(200)
+			res.end()
 		} else {
 			const headers = req.headers
 
-			if ( noAuthRoutes.indexOf ( req.url ) !== -1 ) {
-				next ()
-			} else if ( req.url.startsWith ( '/projects/published/' ) && req.url.length > 20 ) {
-				next ()
-			} else if ( headers.hasOwnProperty ( 'token' ) ) {
+			if (noAuthRoutes.indexOf(req.url) !== -1) {
+				next()
+			} else if (req.url.startsWith('/projects/published/') &&
+			           req.url.length > 20) {
+				next()
+			} else if (headers.hasOwnProperty('token')) {
 				const token = <string> headers.token
 
 				try {
-					await Api.validateToken ( token )
+					await Api.validateToken(token)
 
-					req.account = await Api.getAccount ( await Api.getOwner ( token ) )
+					req.account =
+						await Api.getAccount(await Api.getOwner(token))
 
-					next ()
+					next()
 				} catch {
-					res.json ( null )
+					res.json(null)
 				}
 			} else {
-				res.json ( null )
+				res.json(null)
 			}
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/accounts/auth',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
 		const body = req.body
 
-		if ( body.hasOwnProperty ( 'username' ) && body.hasOwnProperty ( 'password' ) ) {
+		if (body.hasOwnProperty('username') &&
+		    body.hasOwnProperty('password')) {
 			try {
-				res.json ( await Api.authenticate (
+				res.json(await Api.authenticate(
 					body.username,
 					body.password
-				) )
+				))
 			} catch {
-				res.json ( null )
+				res.json(null)
 			}
 		} else {
-			res.json ( null )
+			res.json(null)
 		}
 	}
 )
 
-router.get (
+router.get(
 	'/accounts/check',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		// this is not in the noAuthRoutes list, so the authorization check will automatically return null for us if the token's invalid
+		// this is not in the noAuthRoutes list, so the authorization check
+		// will automatically return null for us if the token's invalid
 
-		res.json ( true )
+		res.json(true)
 	}
 )
 
-router.post (
+router.post(
 	'/accounts/new',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
 		const body = req.body
 
-		if ( body.hasOwnProperty ( 'username' ) && body.hasOwnProperty ( 'password' ) ) {
+		if (body.hasOwnProperty('username') &&
+		    body.hasOwnProperty('password')) {
 			try {
-				await Api.createAccount (
+				await Api.createAccount(
 					body.username,
 					body.password
 				)
 
-				res.json ( await Api.token ( body.username ) )
+				res.json(await Api.token(body.username))
 			} catch {
-				res.json ( null )
+				res.json(null)
 			}
 		} else {
-			res.json ( null )
+			res.json(null)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/accounts/logout',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
 		try {
-			res.json ( await Api.logoutAccount ( req.account.username ) )
+			res.json(await Api.logoutAccount(req.account.username))
 		} catch {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.get (
+router.get(
 	'/projects',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
 		try {
-			res.json ( await Api.getProjects ( req.account.username ) )
+			res.json(await Api.getProjects(req.account.username))
 		} catch {
-			res.json ( null )
+			res.json(null)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/projects/new',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.body.hasOwnProperty ( 'name' ) && req.body.hasOwnProperty ( 'type' ) ) {
-			if ( Number.isInteger ( req.body.type ) && req.body.type >= 0 && req.body.type <= 1 ) {
+		if (req.body.hasOwnProperty('name') &&
+		    req.body.hasOwnProperty('type')) {
+			if (Number.isInteger(req.body.type) && req.body.type >= 0 &&
+			    req.body.type <= 1) {
 				try {
-					res.json ( await Api.newProject (
+					res.json(await Api.newProject(
 						req.account.username,
 						<string> req.body.name,
 						req.body.type
-					) )
+					))
 				} catch {
-					res.json ( false )
+					res.json(false)
 				}
 			} else {
-				res.json ( false )
+				res.json(false)
 			}
 		} else {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/projects/rename/:id',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.body.hasOwnProperty ( 'name' ) ) {
+		if (req.body.hasOwnProperty('name')) {
 			try {
-				res.json ( await Api.renameProject (
+				res.json(await Api.renameProject(
 					req.account.username,
 					+req.params.id,
 					<string> req.body.name
-				) )
+				))
 			} catch {
-				res.json ( false )
+				res.json(false)
 			}
 		} else {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/projects/delete/:id',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.body.hasOwnProperty ( 'name' ) ) {
+		if (req.body.hasOwnProperty('name')) {
 			try {
-				res.json ( await Api.deleteProject (
+				res.json(await Api.deleteProject(
 					req.account.username,
 					+req.params.id
-				) )
+				))
 			} catch {
-				res.json ( null )
+				res.json(null)
 			}
 		} else {
-			res.json ( null )
+			res.json(null)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/projects/import',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.body.hasOwnProperty ( 'url' ) ) {
-			const url = URL ( normalizeUrl ( req.body.url ) )
+		if (req.body.hasOwnProperty('url')) {
+			const url = URL(normalizeUrl(req.body.url))
 
-			if ( url.hostname === 'jsfiddle.net' ) {
-				debug ( 'project is JSFiddle' )
+			if (url.hostname === 'jsfiddle.net') {
+				debug('project is JSFiddle')
 
-				const segments = url.pathname.slice ( 1 ).split ( path.sep )
+				const segments = url.pathname.slice(1).split(path.sep)
 
 				let fiddleId = ''
-				let currentPop = segments.pop ()
+				let currentPop = segments.pop()
 
-				if ( +currentPop ) {
-					debug (
+				if (+currentPop) {
+					debug(
 						'fiddle has ID %s',
 						currentPop
 					)
 
 					fiddleId = '/' + currentPop
 
-					if ( segments.length < 1 ) { // can't have version without id
-						res.json ( false )
+					if (segments.length < 1) { // can't have version without id
+						res.json(false)
 
 						return
 					}
 
-					currentPop = segments.pop ()
+					currentPop = segments.pop()
 				}
 
-				if ( currentPop ) {
+				if (currentPop) {
 					fiddleId = currentPop + fiddleId
 				} else {
-					res.json ( false )
+					res.json(false)
 
 					return
 				}
 
-				if ( fiddleId ) {
-					debug (
+				if (fiddleId) {
+					debug(
 						'getting fiddle with ID %s',
 						fiddleId
 					)
@@ -394,58 +415,62 @@ router.post (
 					const jshellUrl = `https://fiddle.jshell.net/${fiddleId}/show/light`
 
 					try {
-						const result = await get (
+						const result = await get(
 							jshellUrl,
 							{
-								headers : {
-									Referer : jshellUrl
+								headers: {
+									Referer: jshellUrl
 								}
 							}
 						)
 
-						if ( result ) {
-							const $ = load (
+						if (result) {
+							const $ = load(
 								result,
 								{
-									normalizeWhitespace : true
+									normalizeWhitespace: true
 								}
 							)
 
-							$ ( 'body > script:last-child' ).remove ()
+							$('body > script:last-child').remove()
 
-							for ( const i of [
+							for (const i of [
 								'href',
 								'src'
-							] ) {
-								$ ( `[${i}^="/"]` ).each (
+							]) {
+								$(`[${i}^="/"]`).each(
 									(
 										_,
 										elem
 									) => {
-										const element = $ ( elem )
-										const attr = element.attr ( i )
+										const element = $(elem)
+										const attr = element.attr(i)
 
-										element.attr (
+										element.attr(
 											i,
-											( attr.startsWith ( '//' ) ? 'https:' : 'https://fiddle.jshell.net' ) + attr
+											(attr.startsWith('//')
+											 ? 'https:'
+											 : 'https://fiddle.jshell.net') +
+											attr
 										)
 
-										if ( attr === '/css/result-light.css' ) {
-											element.remove ()
+										if (attr ===
+										    '/css/result-light.css') {
+											element.remove()
 										}
 									}
 								)
 							}
 
-							$ ( 'style, script' ).each (
+							$('style, script').each(
 								(
 									_,
 									elem
 								) => {
-									if ( elem.children.length > 0 ) {
-										const text = elem.children[ 0 ]
+									if (elem.children.length > 0) {
+										const text = elem.children[0]
 
-										text.data = text.data.replace (
+										text.data = text.data.replace(
 											/(["'`])\/\//g,
 											'$1https://'
 										)
@@ -454,253 +479,253 @@ router.post (
 							)
 
 							try {
-								await Api.newProject (
+								await Api.newProject(
 									req.account.username,
 									`Imported: JSFiddle ${fiddleId}`,
 									0,
-									beautify.html_beautify (
-										$.html (),
+									beautify.html_beautify(
+										$.html(),
 										{
-											indent_inner_html : true,
-											indent_with_tabs  : true,
-											wrap_line_length  : 0,
-											brace_style       : 'end-expand',
-											preserve_newlines : false,
-											extra_liners      : [ 'style' ]
+											indent_inner_html: true,
+											indent_with_tabs : true,
+											wrap_line_length : 0,
+											brace_style      : 'end-expand',
+											preserve_newlines: false,
+											extra_liners     : ['style']
 										}
 									)
 								)
 
-								debug ( 'success' )
+								debug('success')
 
-								res.json ( true )
+								res.json(true)
 							} catch {
-								debug ( 'failed to create new project' )
+								debug('failed to create new project')
 
-								res.json ( false )
+								res.json(false)
 							}
 						} else {
-							debug ( 'fiddle does not exist' )
+							debug('fiddle does not exist')
 
-							res.json ( false )
+							res.json(false)
 						}
 					} catch {
-						res.json ( false )
+						res.json(false)
 					}
 				} else {
-					debug ( 'invalid URL (?)' )
+					debug('invalid URL (?)')
 
-					res.json ( false )
+					res.json(false)
 				}
 			} else {
-				debug ( 'can\'t import' )
+				debug('can\'t import')
 
-				res.json ( false )
+				res.json(false)
 			}
 		} else {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.get (
+router.get(
 	'/projects/:id',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
 		try {
-			res.json ( await Api.getProject (
+			res.json(await Api.getProject(
 				req.account.username,
 				+req.params.id
-			) )
+			))
 		} catch {
-			res.json ( null )
+			res.json(null)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/projects/:id',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.body.hasOwnProperty ( 'code' ) ) {
+		if (req.body.hasOwnProperty('code')) {
 			try {
-				res.json ( await Api.setProjectCode (
+				res.json(await Api.setProjectCode(
 					req.account.username,
 					+req.params.id,
 					req.body.code
-				) )
+				))
 			} catch {
-				res.json ( false )
+				res.json(false)
 			}
 		} else {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/projects/move/:id',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.body.hasOwnProperty ( 'delta' ) ) {
+		if (req.body.hasOwnProperty('delta')) {
 			try {
-				res.json ( await Api.moveProject (
+				res.json(await Api.moveProject(
 					req.account.username,
 					+req.params.id,
 					+req.body.delta
-				) )
+				))
 			} catch {
-				res.json ( false )
+				res.json(false)
 			}
 		} else {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.get (
-	'/editorOptions',
+router.get(
+	'/settings',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
 		try {
-			res.json ( await Api.getEditorOptions ( req.account.username ) )
+			res.json(await Api.getSettings(req.account.username))
 		} catch {
-			res.json ( null )
+			res.json(null)
 		}
 	}
 )
 
-router.post (
-	'/editorOptions',
+router.post(
+	'/settings',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.body.hasOwnProperty ( 'options' ) ) {
+		if (req.body.hasOwnProperty('settings')) {
 			try {
-				res.json ( await Api.setEditorOptions (
+				res.json(await Api.setSettings(
 					req.account.username,
-					req.body.options
-				) )
+					req.body.settings
+				))
 			} catch {
-				res.json ( false )
+				res.json(false)
 			}
 		} else {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.post (
-	'/editorOptions/reset',
+router.post(
+	'/settings/reset',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
 		try {
-			res.json ( await Api.resetEditorOptions (
-				req.account.username
-			) )
+			res.json(await Api.resetSettings(req.account.username))
 		} catch {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/accounts/delete',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
 		const body = req.body
 
-		if ( body.hasOwnProperty ( 'password' ) ) {
+		if (body.hasOwnProperty('password')) {
 			try {
-				await Api.validateCredentials (
+				await Api.validateCredentials(
 					req.account.username,
 					body.password
 				)
 
-				res.json ( await Api.deleteAccount (
+				res.json(await Api.deleteAccount(
 					req.account.username
-				) )
+				))
 			} catch {
-				res.json ( false )
+				res.json(false)
 			}
 		} else {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/accounts/delete/:username',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.account.isAdmin ) {
+		if (req.account.isAdmin) {
 			try {
-				res.json ( await Api.deleteAccount ( req.params.username ) )
+				res.json(await Api.deleteAccount(req.params.username))
 			} catch {
-				res.json ( false )
+				res.json(false)
 			}
 		} else {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.get (
+router.get(
 	'/projects/published/:publishToken',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		res.header (
+		res.header(
 			'Content-Type',
 			'text/html'
 		)
 
 		try {
-			const project : Project = await Api.getPublished ( req.params.publishToken )
+			const project: Project = await Api.getPublished(
+				req.params.publishToken)
 
 			let code
 
-			if ( project.code.startsWith ( DECRYPTION_CONFIRMATION_HEADER ) ) {
-				code = project.code.substr ( DECRYPTION_CONFIRMATION_HEADER.length )
+			if (project.code.startsWith(DECRYPTION_CONFIRMATION_HEADER)) {
+				code =
+					project.code.substr(DECRYPTION_CONFIRMATION_HEADER.length)
 			} else {
 				code = project.code
 			}
 
 			let html
 
-			switch ( project.type ) {
+			switch (project.type) {
 				case 0:
 					html = code
 					break
 				case 1:
-					html = md2html (
+					html = md2html(
 						code,
 						project.name
 					)
 			}
 
-			res.end (
+			res.end(
 				html,
 				'utf8'
 			)
-		} catch ( e ) {
-			res.end (
+		} catch (e) {
+			res.end(
 				'This project does not exist or has been unpublished. Ask the author for a new link.',
 				'utf8'
 			)
@@ -708,23 +733,25 @@ router.get (
 	}
 )
 
-router.get (
+router.get(
 	'/projects/published/:publishToken/source',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		res.header (
+		res.header(
 			'Content-Type',
 			'text/html'
 		)
 
 		try {
-			const project : Project = await Api.getPublished ( req.params.publishToken )
+			const project: Project = await Api.getPublished(
+				req.params.publishToken)
 			let code
 
-			if ( project.code.startsWith ( DECRYPTION_CONFIRMATION_HEADER ) ) {
-				code = project.code.substr ( DECRYPTION_CONFIRMATION_HEADER.length )
+			if (project.code.startsWith(DECRYPTION_CONFIRMATION_HEADER)) {
+				code =
+					project.code.substr(DECRYPTION_CONFIRMATION_HEADER.length)
 			} else {
 				code = project.code
 			}
@@ -732,7 +759,7 @@ router.get (
 			let grammar
 			let language
 
-			switch ( project.type ) {
+			switch (project.type) {
 				case 0:
 					grammar = Prism.languages.html
 					language = 'html'
@@ -742,18 +769,19 @@ router.get (
 					language = 'markdown'
 			}
 
-			const highlighted = Prism.highlight (
+			const highlighted = Prism.highlight(
 				code,
 				grammar,
 				language
 			)
 
-			res.end (
-				'<link rel="stylesheet" type="text/css" href="/assets/prism.css">' + highlighted,
+			res.end(
+				'<link rel="stylesheet" type="text/css" href="/assets/prism.css">' +
+				highlighted,
 				'utf8'
 			)
 		} catch {
-			res.end (
+			res.end(
 				'This project does not exist or has been unpublished. Ask the author for a new link.',
 				'utf8'
 			)
@@ -761,570 +789,584 @@ router.get (
 	}
 )
 
-router.post (
+router.post(
 	'/projects/:id/unpublish',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
 		try {
-			res.json ( await Api.unpublish (
+			res.json(await Api.unpublish(
 				req.account.username,
 				+req.params.id
-			) )
+			))
 		} catch {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/projects/:id/publish',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
 		try {
-			res.json ( await Api.publish (
+			res.json(await Api.publish(
 				req.account.username,
 				+req.params.id
-			) )
+			))
 		} catch {
-			res.json ( null )
+			res.json(null)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/bugReport',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
 		if (
-			req.body.hasOwnProperty ( 'title' ) &&
-			req.body.hasOwnProperty ( 'summary' ) &&
-			req.body.hasOwnProperty ( 'steps' ) &&
-			req.body.hasOwnProperty ( 'comments' )
+			req.body.hasOwnProperty('title') &&
+			req.body.hasOwnProperty('summary') &&
+			req.body.hasOwnProperty('steps') &&
+			req.body.hasOwnProperty('comments')
 		) {
 			try {
-				res.json ( await Api.submitBugReport (
+				res.json(await Api.submitBugReport(
 					req.account.username,
 					<BugReport> {
-						username : req.account.username,
-						title    : req.body.title,
-						summary  : req.body.summary,
-						steps    : req.body.steps,
-						comments : req.body.comments,
-						read     : false
+						username: req.account.username,
+						title   : req.body.title,
+						summary : req.body.summary,
+						steps   : req.body.steps,
+						comments: req.body.comments,
+						read    : false
 					}
-				) )
+				))
 			} catch {
-				res.json ( false )
+				res.json(false)
 			}
 		} else {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/accounts/changePassword',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.body.hasOwnProperty ( 'oldPassword' ) && req.body.hasOwnProperty ( 'password' ) ) {
-			Api.getOwner ( <string> req.headers.token ).then (
+		if (req.body.hasOwnProperty('oldPassword') &&
+		    req.body.hasOwnProperty('password')) {
+			Api.getOwner(<string> req.headers.token).then(
 				(
-					username : string
+					username: string
 				) => {
-					Api.changePassword (
+					Api.changePassword(
 						username,
 						req.body.oldPassword,
 						req.body.password
-					).then (
-						res.json.bind ( res )
-					).catch (
-						res.json.bind ( res )
 					)
+						.then(res.json.bind(res))
+						.catch(res.json.bind(res))
 				}
-			).catch (
-				() => res.json ( false )
+			).catch(
+				() => res.json(false)
 			)
 		} else {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/accounts/changeUsername',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.body.hasOwnProperty ( 'username' ) && req.body.hasOwnProperty ( 'password' ) ) {
+		if (req.body.hasOwnProperty('username') &&
+		    req.body.hasOwnProperty('password')) {
 			try {
-				res.json ( await Api.changeUsername (
+				res.json(await Api.changeUsername(
 					req.account.username,
 					req.body.username,
 					req.body.password
-				) )
+				))
 			} catch {
-				res.json ( false )
+				res.json(false)
 			}
 		} else {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.get (
+router.get(
 	'/isAdmin',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		res.json ( req.account.isAdmin )
+		res.json(req.account.isAdmin)
 	}
 )
 
-router.get (
+router.get(
 	'/accounts',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.account.isAdmin ) {
+		if (req.account.isAdmin) {
 			try {
-				res.json ( await Api.getAccounts () )
+				res.json(await Api.getAccounts())
 			} catch {
-				res.json ( null )
+				res.json(null)
 			}
 		} else {
-			res.json ( null )
+			res.json(null)
 		}
 	}
 )
 
-router.get (
+router.get(
 	'/accounts/admin/:username',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.account.isAdmin ) {
+		if (req.account.isAdmin) {
 			try {
-				res.json ( await Api.getAccount ( req.params.username ) )
+				res.json(await Api.getAccount(req.params.username))
 			} catch {
-				res.json ( null )
+				res.json(null)
 			}
 		} else {
-			res.json ( null )
+			res.json(null)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/accounts/admin/:username',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.account.isAdmin ) {
+		if (req.account.isAdmin) {
 			try {
-				res.json ( await Api.setAccount (
+				res.json(await Api.setAccount(
 					req.params.username,
-					req.body // holy fuck I hope the client knows what it's doing
-				) )
+					req.body
+					// holy fuck I hope the client knows what it's doing
+				))
 			} catch {
-				res.json ( false )
+				res.json(false)
 			}
 		} else {
-			res.json ( false )
+			res.json(false)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/accounts/checkPassword',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.body.hasOwnProperty ( 'password' ) ) {
+		if (req.body.hasOwnProperty('password')) {
 			try {
-				res.json ( await Api.validateCredentials (
+				res.json(await Api.validateCredentials(
 					req.account.username,
 					req.body.password
-				) )
+				))
 			} catch {
-				res.json ( null )
+				res.json(null)
 			}
 		} else {
-			res.json ( null )
+			res.json(null)
 		}
 	}
 )
 
-router.get (
+router.get(
 	'/bugReports',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.account.isAdmin ) {
+		if (req.account.isAdmin) {
 			try {
-				res.json ( await Api.getBugReports () )
+				res.json(await Api.getBugReports())
 			} catch {
-				res.json ( null )
+				res.json(null)
 			}
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/bugReports/:id',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.account.isAdmin ) {
+		if (req.account.isAdmin) {
 			try {
-				res.json ( await Api.setBugReport (
+				res.json(await Api.setBugReport(
 					req.params.id,
 					req.body
-				) )
+				))
 			} catch {
-				res.json ( false )
+				res.json(false)
 			}
 		}
 	}
 )
 
-function signature ( body ) {
-	return crypto.createHmac (
+function signature(body) {
+	return crypto.createHmac(
 		'sha1',
 		config.secret
-	).update ( body ).digest ( 'hex' )
+	).update(body).digest('hex')
 }
 
-if ( config[ 'secret' ] ) {
-	router.post (
+if (config['secret']) {
+	router.post(
 		'/github',
 		async (
-			req : ApiRequest,
-			res : Response
+			req: ApiRequest,
+			res: Response
 		) => {
 			if (
-				req.headers.hasOwnProperty ( 'x-github-event' ) &&
-				req.headers.hasOwnProperty ( 'x-github-delivery' ) &&
-				req.headers.hasOwnProperty ( 'x-hub-signature' ) &&
-				req.headers.hasOwnProperty ( 'user-agent' ) &&
-				( <string> req.headers[ 'user-agent' ] ).startsWith ( 'GitHub-Hookshot/' )
+				req.headers.hasOwnProperty('x-github-event') &&
+				req.headers.hasOwnProperty('x-github-delivery') &&
+				req.headers.hasOwnProperty('x-hub-signature') &&
+				req.headers.hasOwnProperty('user-agent') &&
+				(<string> req.headers['user-agent']).startsWith(
+					'GitHub-Hookshot/')
 			) {
-				debug ( 'got webhook ping from "GitHub" (need to validate first)' )
-				debug ( 'calculating signature of request body' )
-				const sig = signature ( req.rawBody )
+				debug(
+					'got webhook ping from "GitHub" (need to validate first)')
+				debug('calculating signature of request body')
+				const sig = signature(req.rawBody)
 
-				debug (
+				debug(
 					'signature is %o',
 					sig
 				)
 
-				if ( ( <string> req.headers[ 'x-hub-signature' ] ) === 'sha1=' + sig ) {
-					const event = <string> req.headers[ 'x-github-event' ]
+				if ((<string> req.headers['x-hub-signature']) === 'sha1=' +
+				    sig) {
+					const event = <string> req.headers['x-github-event']
 
-					debug (
+					debug(
 						'signature matches, event is %s',
 						event
 					)
 
-					if ( ( event ) === 'push' ) { // guaranteed to be committed after backend
-						res.status ( 200 )
-						res.json ( true )
+					if ((event) === 'push') { // guaranteed to be committed after backend
+						res.status(200)
+						res.json(true)
 
-						if ( req.body.ref === 'refs/heads/' + config.branch ) {
+						if (req.body.ref === 'refs/heads/' + config.branch) {
 
-							debug ( 'executing update script' )
+							debug('executing update script')
 
-							const child = spawn (
+							const child = spawn(
 								'bash',
 								[
-									join (
+									join(
 										__dirname,
 										'update.sh'
 									)
 								]
 							)
 
-							child.stdout.on (
+							child.stdout.on(
 								'data',
-								( data ) => process.stdout.write ( data.toString () )
+								(data) => process.stdout.write(
+									data.toString())
 							)
 
-							child.stderr.on (
+							child.stderr.on(
 								'data',
-								( data ) => process.stderr.write ( data.toString () )
+								(data) => process.stderr.write(
+									data.toString())
 							)
 
-							child.on (
+							child.on(
 								'close',
 								async (
-									code : number,
-									signal : string
+									code: number,
+									signal: string
 								) => {
-									debug ( 'execution completed' )
+									debug('execution completed')
 
-									if ( code !== 0 ) {
-										debug (
-											'exit status was non-zero: %d (signal: %s)',
+									if (code !== 0) {
+										debug(
+											'exit status was non-zero: %d' +
+											' (signal: %s)',
 											code,
 											signal
 										)
 
-										debug ( 'bringing down servers for update' )
+										debug('bringing down servers for' +
+										      ' update')
 									} else {
-										debug (
+										debug(
 											'exit status was zero (signal: %s)',
 											signal
 										)
 									}
 
-									await safeShutdown ()
+									await safeShutdown()
 
-									debug ( 'stopping hexazine' )
+									debug('stopping hexazine')
 
-									process.exit ( 1 )
+									process.exit(1)
 								}
 							)
 						} else {
-							debug ( 'assuming backend has been pushed and master will follow' )
+							debug('assuming backend has been pushed and' +
+							      ' master will follow')
 						}
-					} else if ( event === 'ping' ) {
-						debug ( 'ping event successfully received' )
+					} else if (event === 'ping') {
+						debug('ping event successfully received')
 
-						res.status ( 200 )
-						res.json ( true )
+						res.status(200)
+						res.json(true)
 					} else {
-						debug ( 'unsupported event' )
+						debug('unsupported event')
 
-						res.status ( 400 )
-						res.json ( false )
+						res.status(400)
+						res.json(false)
 					}
 				} else {
-					debug ( 'signature doesn\'t match' )
+					debug('signature doesn\'t match')
 
-					res.status ( 403 )
-					res.json ( false )
+					res.status(403)
+					res.json(false)
 				}
 			} else {
-				debug ( 'not a valid GitHub event' )
+				debug('not a valid GitHub event')
 
-				res.status ( 400 )
-				res.json ( false )
+				res.status(400)
+				res.json(false)
 			}
 		}
 	)
 }
 
-router.get (
+router.get(
 	'/health',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		res.json ( true )
+		res.json(true)
 	}
 )
 
-router.get (
+router.get(
 	'/starterCode/:type',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.account.isAdmin ) {
+		if (req.account.isAdmin) {
 			const type = +req.params.type
 
-			if ( Number.isInteger ( type ) && type >= 0 && type <= 1 ) {
-				res.json ( await Api.getStarterCode ( type ) )
+			if (Number.isInteger(type) && type >= 0 && type <= 1) {
+				res.json(await Api.getStarterCode(type))
 			} else {
-				res.json ( null )
+				res.json(null)
 			}
 		} else {
-			res.json ( null )
+			res.json(null)
 		}
 	}
 )
 
-router.post (
+router.post(
 	'/starterCode/:type',
 	async (
-		req : ApiRequest,
-		res : Response
+		req: ApiRequest,
+		res: Response
 	) => {
-		if ( req.account.isAdmin ) {
-			if ( req.body.hasOwnProperty ( 'code' ) ) {
+		if (req.account.isAdmin) {
+			if (req.body.hasOwnProperty('code')) {
 				const type = +req.params.type
 
-				if ( Number.isInteger ( type ) && type >= 0 && type <= 1 ) {
-					res.json ( await Api.setStarterCode (
+				if (Number.isInteger(type) && type >= 0 && type <= 1) {
+					res.json(await Api.setStarterCode(
 						type,
 						req.body.code
-					) )
+					))
 				} else {
-					res.json ( null )
+					res.json(null)
 				}
 			}
 		} else {
-			res.json ( null )
+			res.json(null)
 		}
 	}
 )
 
-router.use (
+router.use(
 	(
-		err : Error,
-		req : Request,
-		res : Response,
-		next : NextFunction
+		err: Error,
+		req: Request,
+		res: Response,
+		next: NextFunction
 	) => {
-		res.json ( err )
+		res.json(err)
 	}
 )
 
-app.use (
+app.use(
 	'/api',
 	router
 )
 
-process.on (
+process.on(
 	'unhandledRejection',
-	e => console.log ( e )
+	e => console.log(e)
 )
 
-for ( const name of <Signals[]> [
+for (const name of <Signals[]> [
 	'SIGINT', // CTRL+C
 	'SIGTERM', // `kill` command
 	'SIGUSR1', // `kill` command
 	'SIGUSR2' // `kill` command
-] ) {
-	process.on (
+]) {
+	process.on(
 		name,
 		async () => {
-			debug (
+			debug(
 				'recieved %s',
 				name
 			)
 
-			await safeShutdown ()
+			await safeShutdown()
 		}
 	)
 }
 
-app.use ( express.static ( 'app' ) )
+app.use(express.static('app'))
 
-app.get (
+app.get(
 	'*',
 	(
-		req : Request,
-		res : Response
+		req: Request,
+		res: Response
 	) => {
-		res.sendFile ( path.resolve (
+		res.sendFile(path.resolve(
 			__dirname,
 			'./app/index.html'
-		) )
+		))
 	}
 )
 
-const port = config.port > 0 ? config.port : undefined
+const port = config.port > 0
+             ? config.port
+             : undefined
 
-if ( fs.existsSync ( './privatekey.pem' ) && fs.existsSync ( './certificate.crt' ) ) {
-	if ( port ) {
-		debug (
+if (fs.existsSync('./privatekey.pem') &&
+    fs.existsSync('./certificate.crt')) {
+	if (port) {
+		debug(
 			'using HTTPS on port %d',
 			port
 		)
 
-		servers.push (
-			net.createServer (
-				( con ) => {
-					con.once (
+		servers.push(
+			net.createServer(
+				(con) => {
+					con.once(
 						'data',
-						( buffer ) => {
+						(buffer) => {
 							// If `buffer` starts with 22, it's a TLS handshake
-							const proxyPort = port + ( buffer[ 0 ] === 22 ? 1 : 2 )
-							const proxy = net.createConnection (
+							const proxyPort = port + (buffer[0] === 22 ? 1 : 2)
+							const proxy = net.createConnection(
 								proxyPort,
 								'localhost',
 								() => {
-									proxy.write ( buffer )
-									con.pipe ( proxy ).pipe ( con )
+									proxy.write(buffer)
+									con.pipe(proxy).pipe(con)
 								}
 							)
 						}
 					)
 				}
-			).listen (
+			).listen(
 				port,
 				'0.0.0.0',
-				() => debug ( 'proxy server has started' )
+				() => debug('proxy server has started')
 			)
 		)
 	} else {
-		debug ( 'using HTTPS on default ports' )
+		debug('using HTTPS on default ports')
 	}
 
-	servers.push (
-		https.createServer (
+	servers.push(
+		https.createServer(
 			{
-				key  : fs.readFileSync ( './privatekey.pem' ),
-				cert : fs.readFileSync ( './certificate.crt' )
+				key : fs.readFileSync('./privatekey.pem'),
+				cert: fs.readFileSync('./certificate.crt')
 			},
 			app
-		).listen (
-			( port || 442 ) + 1, // fancy way of saying port + 1 or 443
-			port ? 'localhost' : '0.0.0.0',
-			() => debug ( 'https server has started' )
+		).listen(
+			(port || 442) + 1, // fancy way of saying port + 1 or 443
+			port
+			? 'localhost'
+			: '0.0.0.0',
+			() => debug('https server has started')
 		)
 	)
 
-	servers.push (
-		http.createServer (
+	servers.push(
+		http.createServer(
 			(
-				req : IncomingMessage,
-				res : ServerResponse
+				req: IncomingMessage,
+				res: ServerResponse
 			) => {
-				res.writeHead (
+				res.writeHead(
 					301,
 					{
-						Location : 'https://' + req.headers.host + req.url
+						Location: 'https://' + req.headers.host + req.url
 					}
 				)
 
-				res.end ()
+				res.end()
 			}
-		).listen (
-			( port || 78 ) + 2, // fancy way of saying port + 2 or 80
+		).listen(
+			(port || 78) + 2, // fancy way of saying port + 2 or 80
 			port ? 'localhost' : '0.0.0.0',
-			() => debug ( 'http server has started' )
+			() => debug('http server has started')
 		)
 	)
 } else {
-	debug (
+	debug(
 		'using insecure HTTP on port %d',
 		port || 80
 	)
 
-	servers.push (
-		app.listen (
+	servers.push(
+		app.listen(
 			port || 80,
 			'0.0.0.0',
-			() => debug ( 'server has started' )
+			() => debug('server has started')
 		)
 	)
 }
 
-servers.forEach ( require ( 'server-destroy' ) )
+servers.forEach(require('server-destroy'))

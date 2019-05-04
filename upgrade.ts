@@ -1,26 +1,27 @@
-// A script used by `api.ts` to update the structure of `data.json` to support adding new features or changing existing ones.
-// Uses the `version` property to determine what upgrades to apply.
+// A script used by `api.ts` to update the structure of `data.json` to support
+// adding new features or changing existing ones. Uses the `version` property
+// to determine what upgrades to apply.
 
-import { ApiData, Upgrades } from './types'
-import { safeShutdown }      from './index'
+import {safeShutdown}      from './index'
+import {ApiData, Upgrades} from './types'
 
-const debug = require ( 'debug' ) (
+const debug = require('debug')(
 	'hexazine:upgrade'
 )
 
 debug.enabled = true
 
-const allUpgrades : Upgrades = [
-	async ( data ) => {
-		for ( const accKey of Object.keys ( data.accounts ) ) {
-			const acc = data.accounts[ accKey ]
+const allUpgrades: Upgrades = [
+	async (data) => {
+		for (const accKey of Object.keys(data.accounts)) {
+			const acc = data.accounts[accKey]
 
-			for ( const proj of acc.projects ) {
+			for (const proj of acc.projects) {
 				proj.type = 0
 			}
 		}
 	},
-	async ( data ) => {
+	async (data) => {
 		data.starterCodes = [
 			'<!doctype html>\n' +
 			'<html>\n' +
@@ -43,60 +44,73 @@ const allUpgrades : Upgrades = [
 			'Welcome to Nitrogen!'
 		]
 	},
-	async ( data ) => {
-		for ( const accKey of Object.keys ( data.accounts ) ) {
-			const acc = data.accounts[ accKey ]
+	async (data) => {
+		for (const accKey of Object.keys(data.accounts)) {
+			const acc = data.accounts[accKey]
 
-			for ( const proj of acc.projects ) {
-				if ( proj.publishToken ) {
-					data.publishTokens[ proj.publishToken ].projectIndex = acc.projects.indexOf ( proj )
+			for (const proj of acc.projects) {
+				if (proj.publishToken) {
+					data.publishTokens[proj.publishToken].projectIndex =
+						acc.projects.indexOf(proj)
 				}
 			}
+		}
+	},
+	async (data) => {
+		for (const accKey of Object.keys(data.accounts)) {
+			const acc = data.accounts[accKey]
+
+			acc.settings = {
+				editor: acc['editorOptions']
+			}
+
+			delete acc['editorOptions']
 		}
 	}
 ]
 
-export async function upgradeData ( data : ApiData ) {
-	debug ( 'upgrading data' )
+export async function upgradeData(data: ApiData) {
+	debug('upgrading data')
 
-	if ( !data.version ) {
+	if (!data.version) {
 		data.version = 0
 	}
 
-	if ( data.version === allUpgrades.length ) {
-		debug (
+	if (data.version === allUpgrades.length) {
+		debug(
 			'version is %d (latest, not upgrading)',
 			data.version
 		)
 
 		return false
-	} else if ( data.version > allUpgrades.length ) {
-		debug (
+	} else if (data.version > allUpgrades.length) {
+		debug(
 			'version is %d (NEWER THAN THIS HEXAZINE)',
 			data.version
 		)
-		debug ( 'this is a fatal error, hexazine will be shut down to prevent corruption of data' )
+		debug('this is a fatal error, hexazine will be shut down to prevent' +
+		      ' corruption of data')
 
-		await safeShutdown ()
+		await safeShutdown()
 
 		return false
 	}
 
-	debug (
+	debug(
 		'version is %d, will be upgraded to %d',
 		data.version,
 		allUpgrades.length
 	)
 
-	const upgrades = allUpgrades.slice ( data.version )
+	const upgrades = allUpgrades.slice(data.version)
 
-	for ( const upgrade of upgrades ) {
-		await upgrade ( data )
+	for (const upgrade of upgrades) {
+		await upgrade(data)
 	}
 
 	data.version = allUpgrades.length
 
-	debug (
+	debug(
 		'data has been upgraded to version %d',
 		data.version
 	)

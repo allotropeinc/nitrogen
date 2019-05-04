@@ -1,36 +1,38 @@
-import { Converter }                           from 'showdown'
-import * as Prism                              from 'prismjs'
-import * as loadLanguages                      from 'prismjs/components/index'
-import { Cheerio, CheerioAPI, CheerioElement } from './cheerio'
+import * as Prism                            from 'prismjs'
+import * as loadLanguages                    from 'prismjs/components/index'
+import {Converter}                           from 'showdown'
+import {Cheerio, CheerioAPI, CheerioElement} from './cheerio'
 
-loadLanguages ()
+loadLanguages()
 
-declare var require : any
+declare var require: any
 
-let cheerio : CheerioAPI
+let cheerio: CheerioAPI
 
-if ( typeof window !== 'undefined' ) {
-	cheerio = ( <any> window ).cheerio // already browserified
+if (typeof window !== 'undefined') {
+	cheerio = (<any> window).cheerio // already browserified
 } else {
-	cheerio = eval ( 'require(\'cheerio\');' ) // needed to avoid Webpack trying to convert `cheerio` to a browser module
+	cheerio = eval('require(\'cheerio\');') // needed to avoid Webpack
+                                            // trying to convert `cheerio`
+                                            // to a browser module
 }
 
-const converter = new Converter ()
+const converter = new Converter()
 
-converter.setFlavor ( 'github' )
+converter.setFlavor('github')
 
-export function _md2html ( code : string ) {
-	return converter.makeHtml ( code )
+export function _md2html(code: string) {
+	return converter.makeHtml(code)
 }
 
-export function _highlight (
-	code : string,
-	language : string
+export function _highlight(
+	code: string,
+	language: string
 ) {
-	if ( Prism.languages.hasOwnProperty ( language ) ) {
-		return Prism.highlight (
+	if (Prism.languages.hasOwnProperty(language)) {
+		return Prism.highlight(
 			code,
-			Prism.languages[ language ],
+			Prism.languages[language],
 			language
 		)
 	} else {
@@ -38,68 +40,70 @@ export function _highlight (
 	}
 }
 
-export function _post ( code : string ) {
-	const $ = cheerio.load ( code )
+export function _post(code: string) {
+	const $ = cheerio.load(code)
 
-	$ ( 'pre > code' ).each (
+	$('pre > code').each(
 		(
-			index : number,
-			elem : CheerioElement | Cheerio
+			index: number,
+			elem: CheerioElement | Cheerio
 		) => {
-			elem = $ ( elem )
+			elem = $(elem)
 
 			let language
 
 			try {
-				language = elem.attr ( 'class' ).split ( ' ' )[ 0 ]
+				language = elem.attr('class').split(' ')[0]
 
-				if ( language === 'html' ) {
+				if (language === 'html') {
 					language = 'markup'
 				}
 			} catch {}
 
-			const lines = _highlight (
-				elem.text (),
+			const lines = _highlight(
+				elem.text(),
 				language
-			).split ( '\n' )
+			).split('\n')
 
-			for ( let i = 0, str ; ( str = lines[ i ] ) !== undefined ; i++ ) {
+			for (let i = 0, str; (str = lines[i]) !== undefined; i++) {
 				// make sure tags are proper
 
-				const match = /(<(\w+)(?:\s+\w+="(?:[^"]|\\")*")*>)[^<]*$/.exec ( str )
+				const match = /(<(\w+)(?:\s+\w+="(?:[^"]|\\")*")*>)[^<]*$/.exec(
+					str)
 
-				if ( match ) {
-					lines[ i ] += '</' + match[ 2 ] + '>'
+				if (match) {
+					lines[i] += '</' + match[2] + '>'
 
-					if ( lines[ i + 1 ] !== undefined ) {
-						lines[ i + 1 ] = match[ 1 ] + lines[ i + 1 ]
+					if (lines[i + 1] !== undefined) {
+						lines[i + 1] = match[1] + lines[i + 1]
 					}
 				}
 			}
 
-			elem.text ( '' )
+			elem.text('')
 
-			const table = $ ( '<table>' ).appendTo ( elem )
+			const table = $('<table>').appendTo(elem)
 
-			for ( let i = 0 ; i < lines.length ; i++ ) {
-				table.append (
-					$ ( '<tr>' ).append (
-						$ ( '<td class="line-num">' ).text ( ( i + 1 ).toString () )
-					).append (
-						$ ( '<td class="line">' ).html ( lines[ i ] )
+			for (let i = 0; i < lines.length; i++) {
+				table
+					.append($('<tr>')
+						.append(
+							$('<td class="line-num">').text((i + 1).toString())
+						).append(
+							$('<td class="line">').html(lines[i])
+						)
 					)
-				)
 			}
 		}
 	)
 
-	return $.html ()
+	return $.html()
 }
 
-export function md2html (
-	code : string,
-	title : string,
-	dark : boolean = false
+export function md2html(
+	code: string,
+	title: string,
+	dark: boolean = false
 ) {
 	// Preserve indentation
 	// @formatter:off
