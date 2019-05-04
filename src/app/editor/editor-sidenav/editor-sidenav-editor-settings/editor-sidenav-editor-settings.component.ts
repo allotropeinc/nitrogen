@@ -8,8 +8,8 @@ import IEditorConstructionOptions = monaco.editor.IEditorConstructionOptions
 })
 export class EditorSidenavEditorSettingsComponent {
 	@Input()
-	protected editorSettings: IEditorConstructionOptions
+	public editorSettings: IEditorConstructionOptions
 
 	@Input()
-	protected disabled: boolean
+	public disabled: boolean
 }
