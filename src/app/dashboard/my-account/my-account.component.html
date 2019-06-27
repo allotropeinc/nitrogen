@@ -1,0 +1,39 @@
+<mat-nav-list>
+	<h3 mat-subheader>Credentials</h3>
+	<mat-accordion displayMode="flat" class="mat-elevation-z2"
+	               style="display: block; border-radius: 4px">
+		<mat-expansion-panel class="mat-elevation-z0">
+			<mat-expansion-panel-header>
+				<mat-panel-title>Username</mat-panel-title>
+				<mat-panel-description><span class="dim">Username:</span>&nbsp;{{api.username}}
+				</mat-panel-description>
+			</mat-expansion-panel-header>
+			<ng-template matExpansionPanelContent>
+				<p>Nothing</p>
+			</ng-template>
+		</mat-expansion-panel>
+		<mat-divider></mat-divider>
+		<mat-expansion-panel class="mat-elevation-z0">
+			<mat-expansion-panel-header>
+				<mat-panel-title>Password</mat-panel-title>
+				<mat-panel-description><span class="dim">Password:</span>&nbsp;••••••••
+				</mat-panel-description>
+			</mat-expansion-panel-header>
+			<ng-template matExpansionPanelContent>
+				<p>Nothing</p>
+			</ng-template>
+		</mat-expansion-panel>
+		<mat-divider></mat-divider>
+		<mat-expansion-panel class="mat-elevation-z0">
+			<mat-expansion-panel-header>
+				<mat-panel-title>Email</mat-panel-title>
+				<mat-panel-description><span
+					class="dim">Email:</span>&nbsp;allotrope@allotrope.xyz
+				</mat-panel-description>
+			</mat-expansion-panel-header>
+			<ng-template matExpansionPanelContent>
+				<p>Nothing</p>
+			</ng-template>
+		</mat-expansion-panel>
+	</mat-accordion>
+</mat-nav-list>

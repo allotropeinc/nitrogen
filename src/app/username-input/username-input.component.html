@@ -1,0 +1,11 @@
+<mat-form-field>
+	<input matInput [placeholder]="placeholder" [formControl]="formControl"
+	       required [name]="name" autocomplete="username">
+	<mat-hint *ngIf="isNewUsername && hint">
+		Letters and numbers only, no spaces
+	</mat-hint>
+	<mat-hint *ngIf="isNewUsername" align="end">
+		{{formControl.value.length}}/16
+	</mat-hint>
+	<mat-error>{{getErrorMessage()}}</mat-error>
+</mat-form-field>

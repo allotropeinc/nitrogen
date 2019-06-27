@@ -4,32 +4,33 @@
 @import '~@angular/material/theming';
 
 @include mat-core(mat-typography-config(
-		$font-family: 'Overpass',
-		$display-4: mat-typography-level(112px, 112px, 300),
-		$display-3: mat-typography-level(56px, 56px, 300),
-		$display-2: mat-typography-level(45px, 48px, 300),
-		$display-1: mat-typography-level(34px, 40px, 300),
-		$headline: mat-typography-level(24px, 32px, 300),
-		$title: mat-typography-level(20px, 32px, 400),
-		$subheading-2: mat-typography-level(16px, 28px, 300),
-		$subheading-1: mat-typography-level(15px, 24px, 300),
-		$body-2: mat-typography-level(14px, 24px, 400),
-		$body-1: mat-typography-level(14px, 20px, 300),
-		$caption: mat-typography-level(12px, 20px, 300),
-		$button: mat-typography-level(14px, 14px, 800),
-			// Line-height must be unit-less fraction of the font-size.
-		$input: mat-typography-level(inherit, 1.125, 300)
+	$font-family: 'Overpass',
+	$display-4: mat-typography-level(112px, 112px, 300),
+	$display-3: mat-typography-level(56px, 56px, 300),
+	$display-2: mat-typography-level(45px, 48px, 300),
+	$display-1: mat-typography-level(34px, 40px, 300),
+	$headline: mat-typography-level(24px, 32px, 300),
+	$title: mat-typography-level(20px, 32px, 400),
+	$subheading-2: mat-typography-level(16px, 28px, 300),
+	$subheading-1: mat-typography-level(15px, 24px, 300),
+	$body-2: mat-typography-level(14px, 24px, 400),
+	$body-1: mat-typography-level(14px, 20px, 300),
+	$caption: mat-typography-level(12px, 20px, 300),
+	$button: mat-typography-level(14px, 14px, 800),
+		// Line-height must be unit-less fraction of the font-size.
+	$input: mat-typography-level(inherit, 1.125, 300)
 ));
 
 $primary: mat-palette($mat-cyan, 600);
 $accent: mat-palette($mat-blue-grey, 400);
-$warn: mat-palette($mat-red, 600);
+$warn: mat-palette($mat-red, 500);
 $theme: mat-dark-theme($primary, $accent, $warn);
 
 @include angular-material-theme($theme);
 
 body {
-	background-color: #303030;
+	background-color: map-get(map-get($theme, background), background);
+	color: map-get(map-get($theme, foreground), text);
 	margin: 0;
 	height: 100vh;
 }
@@ -52,45 +53,6 @@ app-root > mat-toolbar {
 	flex-shrink: 0;
 }
 
-app-root > *:not(router-outlet) {
-	& {
-		padding: 24px;
-		height: 100vh;
-		display: flex;
-		flex-direction: column;
-		overflow: scroll;
-	}
-
-	> mat-card {
-		width: calc(100% - 48px);
-		max-width: 400px;
-
-		@media screen and (min-width: 896px) {
-			& {
-				max-width: 800px;
-			}
-		}
-
-		@media screen and (min-width: 1296px) {
-			& {
-				max-width: 1200px;
-			}
-		}
-
-		> mat-divider + * {
-			padding-top: 24px;
-		}
-
-		mat-spinner {
-			margin: 0 auto;
-		}
-	}
-
-	> * {
-		margin: auto;
-	}
-}
-
 .error {
 	color: #ffb300 !important;
 }
@@ -108,7 +70,7 @@ app-root > *:not(router-outlet) {
 	color: mat-color(mat-palette($mat-blue-grey, 400));
 }
 
-.mat-card a:not([matLine]):not([mat-flat-button]):not([mat-button]):not(.mat-menu-item):not([mat-list-item]):not([mat-icon-button]) {
+.mat-card a:not([matLine]):not([mat-flat-button]):not([mat-button]):not(.mat-menu-item):not([mat-list-item]):not([mat-icon-button]):not(.color-primary):not(.color-accent):not(.color-warn) {
 	color: mat-color(mat-palette($mat-blue-grey, 400));
 	cursor: pointer;
 	text-decoration: underline;
@@ -149,23 +111,35 @@ app-project-item > .mat-list-item > .mat-list-item-content > .mat-list-text > * 
 	font-weight: 300;
 }
 
-p.warn {
-	color: mat-color($warn);
+@mixin p-box($color) {
+	color: $color;
 	padding: 1em;
-	background-color: transparentize(mat-color($warn), 0.9);
+	background-color: transparentize($color, 0.9);
 	border-radius: 0.5em;
 }
 
+p.box-info {
+	@include p-box(mat-color($primary));
+}
+
+p.box-warn {
+	@include p-box(mat-color($warn));
+}
+
+p.box-success {
+	@include p-box(#59c84b);
+}
+
 .color-primary {
-	color: mat-color($primary)
+	color: mat-color($primary);
 }
 
 .color-accent {
-	color: mat-color($accent)
+	color: mat-color($accent);
 }
 
 .color-warn {
-	color: mat-color($warn)
+	color: mat-color($warn);
 }
 
 .mat-menu-item[color='warn'] {
@@ -208,6 +182,11 @@ mat-dialog-content > p:last-child {
 
 mat-dialog-actions {
 	padding: 24px 0 !important;
+	min-height: 0 !important;
+}
+
+mat-form-field {
+	margin-bottom: 0;
 }
 
 mat-dialog-actions > :first-child {
@@ -215,14 +194,35 @@ mat-dialog-actions > :first-child {
 	margin-right: auto;
 }
 
-.mat-menu-item > .mat-icon {
-	&, & + span {
-		height: 48px;
-		line-height: 48px;
-		vertical-align: top;
-	}
+mat-dialog-actions > :not(:first-child):not(:last-child) {
+	margin-right: 16px;
+}
 
-	& + span {
-		display: inline-block;
-	}
+/*.mat-button, .mat-flat-button, .mat-stroked-button {
+	border-radius: 2px !important;
+}*/
+
+.nomargin {
+	margin: 0 !important;
+}
+
+.label {
+	font-size: 0.75em;
+	display: block;
+}
+
+:root .mat-progress-spinner.mat-progress-spinner-indeterminate-animation[mode=indeterminate] circle {
+	animation-duration: 6s;
+}
+
+.mat-checkbox-layout {
+	white-space: normal !important;
+}
+
+.mat-checkbox-inner-container {
+	margin-top: 4px !important;
+}
+
+.dim {
+	opacity: .75;
 }

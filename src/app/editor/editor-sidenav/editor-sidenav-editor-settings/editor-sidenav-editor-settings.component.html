@@ -3,16 +3,21 @@
 </p>
 <p>
 	For a description of what these settings mean, see
-	<a class="link color-primary" href="https://microsoft.github.io/monaco-editor/api/interfaces/monaco.editor.ieditorconstructionoptions.html" target="_blank">IEditorConstructionOptions</a>
+	<a class="link color-primary"
+	   href="https://microsoft.github.io/monaco-editor/api/interfaces/monaco.editor.ieditorconstructionoptions.html"
+	   target="_blank">IEditorConstructionOptions</a>
 	at Microsoft's documentation site.
 </p>
-<mat-form-field><input matInput placeholder="ariaLabel" [disabled]="disabled"
-                       [(ngModel)]="editorSettings.ariaLabel">
+<mat-form-field>
+	<input matInput placeholder="ariaLabel" [disabled]="disabled"
+	       [(ngModel)]="editorSettings.ariaLabel">
 </mat-form-field>
-<!--mat-form-field><input matInput placeholder="rulers[]" [(ngModel)]="editorSettings.rulers[]"></mat-form-field-->
-<mat-form-field><input matInput placeholder="wordSeparators"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.wordSeparators">
+<!--mat-form-field>
+<input matInput placeholder="rulers[]" [(ngModel)]="editorSettings.rulers[]"></mat-form-field-->
+<mat-form-field>
+	<input matInput placeholder="wordSeparators"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.wordSeparators">
 </mat-form-field>
 <label>selectionClipboard
 	<mat-slide-toggle color="primary" [disabled]="disabled"
@@ -36,29 +41,36 @@
 	<mat-slide-toggle color="primary" [disabled]="disabled"
 	                  [(ngModel)]="editorSettings.selectOnLineNumbers"></mat-slide-toggle>
 </label>
-<mat-form-field><input matInput placeholder="lineNumbersMinChars"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.lineNumbersMinChars">
+<mat-form-field>
+	<input matInput placeholder="lineNumbersMinChars"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.lineNumbersMinChars"
+	       type="number">
 </mat-form-field>
 <label>glyphMargin
 	<mat-slide-toggle color="primary" [disabled]="disabled"
 	                  [(ngModel)]="editorSettings.glyphMargin"></mat-slide-toggle>
 </label>
-<mat-form-field><input matInput placeholder="lineDecorationsWidth"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.lineDecorationsWidth">
+<mat-form-field>
+	<input matInput placeholder="lineDecorationsWidth"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.lineDecorationsWidth"
+	       type="number">
 </mat-form-field>
-<mat-form-field><input matInput placeholder="revealHorizontalRightPadding"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.revealHorizontalRightPadding">
+<mat-form-field>
+	<input matInput placeholder="revealHorizontalRightPadding"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.revealHorizontalRightPadding"
+	       type="number">
 </mat-form-field>
 <label>roundedSelection
 	<mat-slide-toggle color="primary" [disabled]="disabled"
 	                  [(ngModel)]="editorSettings.roundedSelection"></mat-slide-toggle>
 </label>
-<mat-form-field><input matInput placeholder="extraEditorClassName"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.extraEditorClassName">
+<mat-form-field>
+	<input matInput placeholder="extraEditorClassName"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.extraEditorClassName">
 </mat-form-field>
 <label>readOnly
 	<mat-slide-toggle color="primary" [disabled]="disabled"
@@ -71,9 +83,11 @@ find:IEditorFindOptions-->
 	<mat-slide-toggle color="primary" [disabled]="disabled"
 	                  [(ngModel)]="editorSettings.fixedOverflowWidgets"></mat-slide-toggle>
 </label>
-<mat-form-field><input matInput placeholder="overviewRulerLanes"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.overviewRulerLanes">
+<mat-form-field>
+	<input matInput placeholder="overviewRulerLanes"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.overviewRulerLanes"
+	       type="number">
 </mat-form-field>
 <label>overviewRulerBorder
 	<mat-slide-toggle color="primary" [disabled]="disabled"
@@ -156,9 +170,11 @@ find:IEditorFindOptions-->
 		</mat-option>
 	</mat-select>
 </mat-form-field>
-<mat-form-field><input matInput placeholder="wordWrapColumn"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.wordWrapColumn">
+<mat-form-field>
+	<input matInput placeholder="wordWrapColumn"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.wordWrapColumn"
+	       type="number">
 </mat-form-field>
 <label>wordWrapMinified
 	<mat-slide-toggle color="primary" [disabled]="disabled"
@@ -179,25 +195,40 @@ find:IEditorFindOptions-->
 		</mat-option>
 	</mat-select>
 </mat-form-field>
-<mat-form-field><input matInput placeholder="wordWrapBreakBeforeCharacters"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.wordWrapBreakBeforeCharacters">
+<mat-form-field>
+	<input matInput placeholder="wordWrapBreakBeforeCharacters"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.wordWrapBreakBeforeCharacters">
 </mat-form-field>
-<mat-form-field><input matInput placeholder="wordWrapBreakAfterCharacters"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.wordWrapBreakAfterCharacters">
+<mat-form-field>
+	<input matInput placeholder="wordWrapBreakAfterCharacters"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.wordWrapBreakAfterCharacters">
 </mat-form-field>
-<mat-form-field><input matInput placeholder="wordWrapBreakObtrusiveCharacters"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.wordWrapBreakObtrusiveCharacters">
+<mat-form-field>
+	<input matInput placeholder="wordWrapBreakObtrusiveCharacters"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.wordWrapBreakObtrusiveCharacters">
 </mat-form-field>
-<mat-form-field><input matInput placeholder="stopRenderingLineAfter"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.stopRenderingLineAfter">
+<mat-form-field>
+	<input matInput placeholder="stopRenderingLineAfter"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.stopRenderingLineAfter"
+	       type="number">
 </mat-form-field>
-<label>hover
+<label>hover.enabled
 	<mat-slide-toggle color="primary" [disabled]="disabled"
-	                  [(ngModel)]="editorSettings.hover"></mat-slide-toggle>
+	                  [(ngModel)]="editorSettings.hover.enabled"></mat-slide-toggle>
+	<mat-form-field>
+		<input matInput placeholder="hover.delay"
+		       [disabled]="disabled"
+		       [(ngModel)]="editorSettings.hover.delay"
+		       type="number">
+	</mat-form-field>
+</label>
+<label>hover.sticky
+	<mat-slide-toggle color="primary" [disabled]="disabled"
+	                  [(ngModel)]="editorSettings.hover.sticky"></mat-slide-toggle>
 </label>
 <label>links
 	<mat-slide-toggle color="primary" [disabled]="disabled"
@@ -207,9 +238,11 @@ find:IEditorFindOptions-->
 	<mat-slide-toggle color="primary" [disabled]="disabled"
 	                  [(ngModel)]="editorSettings.contextmenu"></mat-slide-toggle>
 </label>
-<mat-form-field><input matInput placeholder="mouseWheelScrollSensitivity"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.mouseWheelScrollSensitivity">
+<mat-form-field>
+	<input matInput placeholder="mouseWheelScrollSensitivity"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.mouseWheelScrollSensitivity"
+	       type="number">
 </mat-form-field>
 <mat-form-field>
 	<mat-select [disabled]="disabled"
@@ -242,22 +275,42 @@ find:IEditorFindOptions-->
 	<mat-slide-toggle color="primary" [disabled]="disabled"
 	                  [(ngModel)]="editorSettings.quickSuggestions"></mat-slide-toggle>
 </label>
-<mat-form-field><input matInput placeholder="quickSuggestionsDelay"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.quickSuggestionsDelay">
+<mat-form-field>
+	<input matInput placeholder="quickSuggestionsDelay"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.quickSuggestionsDelay"
+	       type="number">
 </mat-form-field>
-<label>parameterHints
+<label>parameterHints.enabled
 	<mat-slide-toggle color="primary" [disabled]="disabled"
-	                  [(ngModel)]="editorSettings.parameterHints"></mat-slide-toggle>
+	                  [(ngModel)]="editorSettings.parameterHints.enabled"></mat-slide-toggle>
+</label>
+<label>parameterHints.cycle
+	<mat-slide-toggle color="primary" [disabled]="disabled"
+	                  [(ngModel)]="editorSettings.parameterHints.cycle"></mat-slide-toggle>
 </label>
 <label>iconsInSuggestions
 	<mat-slide-toggle color="primary" [disabled]="disabled"
 	                  [(ngModel)]="editorSettings.iconsInSuggestions"></mat-slide-toggle>
 </label>
-<label>autoClosingBrackets
-	<mat-slide-toggle color="primary" [disabled]="disabled"
-	                  [(ngModel)]="editorSettings.autoClosingBrackets"></mat-slide-toggle>
-</label>
+<mat-form-field>
+	<mat-select [disabled]="disabled"
+	            [(ngModel)]="editorSettings.autoClosingBrackets"
+	            placeholder="autoClosingBrackets">
+		<mat-option value="always">
+			always
+		</mat-option>
+		<mat-option value="languageDefined">
+			languageDefined
+		</mat-option>
+		<mat-option value="beforeWhitespace">
+			beforeWhitespace
+		</mat-option>
+		<mat-option value="never">
+			never
+		</mat-option>
+	</mat-select>
+</mat-form-field>
 <label>autoIndent
 	<mat-slide-toggle color="primary" [disabled]="disabled"
 	                  [(ngModel)]="editorSettings.autoIndent"></mat-slide-toggle>
@@ -323,13 +376,17 @@ find:IEditorFindOptions-->
 	<mat-slide-toggle color="primary" [disabled]="disabled"
 	                  [(ngModel)]="editorSettings.wordBasedSuggestions"></mat-slide-toggle>
 </label>
-<mat-form-field><input matInput placeholder="suggestFontSize"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.suggestFontSize">
+<mat-form-field>
+	<input matInput placeholder="suggestFontSize"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.suggestFontSize"
+	       type="number">
 </mat-form-field>
-<mat-form-field><input matInput placeholder="suggestLineHeight"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.suggestLineHeight">
+<mat-form-field>
+	<input matInput placeholder="suggestLineHeight"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.suggestLineHeight"
+	       type="number">
 </mat-form-field>
 <label>selectionHighlight
 	<mat-slide-toggle color="primary" [disabled]="disabled"
@@ -400,8 +457,9 @@ find:IEditorFindOptions-->
 	<mat-slide-toggle color="primary" [disabled]="disabled"
 	                  [(ngModel)]="editorSettings.useTabStops"></mat-slide-toggle>
 </label>
-<mat-form-field><input matInput placeholder="fontFamily" [disabled]="disabled"
-                       [(ngModel)]="editorSettings.fontFamily">
+<mat-form-field>
+	<input matInput placeholder="fontFamily" [disabled]="disabled"
+	       [(ngModel)]="editorSettings.fontFamily">
 </mat-form-field>
 <mat-form-field>
 	<mat-select [disabled]="disabled" [(ngModel)]="editorSettings.fontWeight"
@@ -423,15 +481,18 @@ find:IEditorFindOptions-->
 		<mat-option value="900">900</mat-option>
 	</mat-select>
 </mat-form-field>
-<mat-form-field><input matInput placeholder="fontSize" [disabled]="disabled"
-                       [(ngModel)]="editorSettings.fontSize">
+<mat-form-field>
+	<input matInput placeholder="fontSize" [disabled]="disabled"
+	       [(ngModel)]="editorSettings.fontSize" type="number">
 </mat-form-field>
-<mat-form-field><input matInput placeholder="lineHeight" [disabled]="disabled"
-                       [(ngModel)]="editorSettings.lineHeight">
+<mat-form-field>
+	<input matInput placeholder="lineHeight" [disabled]="disabled"
+	       [(ngModel)]="editorSettings.lineHeight" type="number">
 </mat-form-field>
-<mat-form-field><input matInput placeholder="letterSpacing"
-                       [disabled]="disabled"
-                       [(ngModel)]="editorSettings.letterSpacing">
+<mat-form-field>
+	<input matInput placeholder="letterSpacing"
+	       [disabled]="disabled"
+	       [(ngModel)]="editorSettings.letterSpacing" type="number">
 </mat-form-field>
 <!--mat-form-field>
 	<mat-select [disabled]="disabled" [(ngModel)]="editorSettings.language" placeholder="language">

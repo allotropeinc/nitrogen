@@ -1,0 +1,36 @@
+<div class="buttons-flex">
+	<h1>My Projects</h1>
+	<ng-container *ngIf="!working && projects">
+		<ng-content></ng-content>
+		<a mat-icon-button matTooltip="Refresh" (click)="refresh()">
+			<mat-icon>
+				refresh
+			</mat-icon>
+		</a>
+		<a mat-icon-button matTooltip="Import from JSFiddle" (click)="import()">
+			<mat-icon>
+				cloud_download
+			</mat-icon>
+		</a>
+		<a mat-icon-button matTooltip="New Project" (click)="newProject()">
+			<mat-icon>
+				add
+			</mat-icon>
+		</a>
+	</ng-container>
+</div>
+<ng-container *ngIf="!working && projects">
+	<p *ngIf="projects.length == 0" class="full">
+		You don't seem to have any projects!
+	</p>
+	<mat-nav-list *ngIf="projects.length > 0">
+		<app-project-item *ngFor="let project of projects"
+		                  [project]="project"
+		                  [index]="projects.indexOf(project)"></app-project-item>
+	</mat-nav-list>
+</ng-container>
+<p class="error" *ngIf="!working && !projects">
+	Sorry, we couldn't list your projects. <a (click)="refresh()">Try Again</a>
+</p>
+<mat-progress-spinner mode="indeterminate"
+                      *ngIf="working"></mat-progress-spinner>

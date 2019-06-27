@@ -2,20 +2,27 @@
 	<h1>Starter Code</h1>
 	<h2>HTML</h2>
 	<div class="code-editor-container">
-		<app-code-editor [(code)]="htmlCode" *ngIf="!htmlWorking && htmlCode" language="html"></app-code-editor>
+		<app-code-editor [(code)]="htmlCode" *ngIf="!htmlWorking && htmlCode"
+		                 language="html"></app-code-editor>
 		<p *ngIf="!htmlWorking && !htmlCode">
-			Sorry, this editor couldn't load. <a (click)="htmlRefresh()">Retry</a>?
+			Sorry, this editor couldn't load. <a
+			(click)="htmlRefresh()">Retry</a>?
 		</p>
-		<mat-progress-spinner mode="indeterminate" *ngIf="htmlWorking"></mat-progress-spinner>
+		<mat-progress-spinner mode="indeterminate"
+		                      *ngIf="htmlWorking"></mat-progress-spinner>
 	</div>
-	<button mat-flat-button (click)="htmlSave()" [disabled]="htmlWorking">Save</button>
+	<button mat-flat-button color="primary" (click)="htmlSave()" [disabled]="htmlWorking">Save
+	</button>
 	<h2>Markdown</h2>
 	<div class="code-editor-container">
-		<app-code-editor [(code)]="mdCode" *ngIf="!mdWorking && mdCode" language="markdown"></app-code-editor>
+		<app-code-editor [(code)]="mdCode" *ngIf="!mdWorking && mdCode"
+		                 language="markdown"></app-code-editor>
 		<p *ngIf="!mdWorking && !mdCode">
 			Sorry, this editor couldn't load. <a (click)="mdRefresh()">Retry</a>?
 		</p>
-		<mat-progress-spinner mode="indeterminate" *ngIf="mdWorking"></mat-progress-spinner>
+		<mat-progress-spinner mode="indeterminate"
+		                      *ngIf="mdWorking"></mat-progress-spinner>
 	</div>
-	<button mat-flat-button (click)="mdSave()" [disabled]="mdWorking">Save</button>
+	<button mat-flat-button color="primary" (click)="mdSave()" [disabled]="mdWorking">Save
+	</button>
 </div>

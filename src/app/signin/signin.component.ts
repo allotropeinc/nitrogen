@@ -1,56 +1,63 @@
-import { Component, OnInit }                    from '@angular/core'
-import { ApiService }                           from '../api.service'
-import { Router }                               from '@angular/router'
-import { MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
-import { DeleteProjectDialogComponent }         from '../dashboard/projects/project-item/project-item.component'
+import {Component, OnInit}      from '@angular/core'
+import {FormControl, FormGroup} from '@angular/forms'
+import {Router}                 from '@angular/router'
+import {ApiService}             from '../api.service'
 
-@Component ( {
-	selector    : 'app-signin',
-	templateUrl : './signin.component.html',
-	styleUrls   : [ './signin.component.css' ]
-} )
+@Component({
+	selector   : 'app-signin',
+	templateUrl: './signin.component.html',
+	styleUrls  : ['./signin.component.css']
+})
 export class SigninComponent implements OnInit {
-	username : string
-	password : string
-	showPassword = false
 	working = false
 	error = false
 
-	constructor (
-		private api : ApiService,
-		private router : Router,
-		private snackbar : MatSnackBar,
-		private dialog : MatDialog
-	) {
-	}
+	username = new FormControl('')
+	password: FormControl
+	formGroup: FormGroup
 
-	ngOnInit () {
+	constructor(
+		private api: ApiService,
+		private router: Router
+	) {}
+
+	ngOnInit() {
 		this.working = true
 
-		this.api.getTokenValidity ().subscribe (
+		this.api.getTokenValidity().subscribe(
 			valid => {
-				if ( valid ) {
-					this.router.navigate ( [ '/dashboard' ] )
+				if (valid) {
+					this.router.navigate(['/my-projects'])
 				} else {
 					this.working = false
+					this.initFormGroup()
 				}
-			} )
+			})
 	}
 
-	signIn () {
+	initFormGroup() {
+		setTimeout(() => {
+			this.formGroup = new FormGroup({
+				username: this.username,
+				password: this.password
+			})
+		}, 0)
+	}
+
+	signIn() {
 		this.working = true
 
-		this.api.authenticate (
-			this.username,
-			this.password
-		).subscribe (
+		this.api.authenticate(
+			this.username.value,
+			this.password.value
+		).subscribe(
 			result => {
-				if ( !result ) {
+				if (!result) {
 					this.working = false
 					this.error = true
 				} else {
-					this.router.navigate ( [ '/dashboard' ] )
+					this.router.navigate(['/my-projects'])
 				}
-			} )
+			})
 	}
 }

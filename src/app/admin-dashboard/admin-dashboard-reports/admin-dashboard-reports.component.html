@@ -3,8 +3,10 @@
 	<mat-accordion *ngIf="reports">
 		<mat-expansion-panel *ngFor="let report of reports">
 			<mat-expansion-panel-header>
-				<mat-panel-title><span [class.bold]="!report.read">{{report.title}}</span></mat-panel-title>
-				<mat-panel-description>{{report.summary}}</mat-panel-description>
+				<mat-panel-title><span [class.bold]="!report.read">{{report.title}}</span>
+				</mat-panel-title>
+				<mat-panel-description>{{report.summary}}
+				</mat-panel-description>
 			</mat-expansion-panel-header>
 			<mat-card>
 				<mat-card-title>{{report.title}}</mat-card-title>
@@ -15,7 +17,8 @@
 				<mat-card-content>{{report.steps}}</mat-card-content>
 				<mat-card-subtitle>Comments:</mat-card-subtitle>
 				<mat-card-content>{{report.comments}}</mat-card-content>
-				<mat-card-subtitle>Reported by {{report.username}}.</mat-card-subtitle>
+				<mat-card-subtitle>Reported by {{report.username}}.
+				</mat-card-subtitle>
 				<mat-card-content>
 					<button mat-button (click)="toggleRead(report)">
 						Mark as {{report.read ? 'un' : ''}}read
@@ -28,7 +31,9 @@
 		Refresh
 	</button>
 	<div class="error" *ngIf="!reports">
-		Sorry, we couldn't load the bug reports. <a class="link" (click)="refresh()">Refresh</a>?
+		Sorry, we couldn't load the bug reports. <a class="link"
+		                                            (click)="refresh()">Refresh</a>?
 	</div>
 </div>
-<mat-progress-spinner mode="indeterminate" *ngIf="working"></mat-progress-spinner>
+<mat-progress-spinner mode="indeterminate"
+                      *ngIf="working"></mat-progress-spinner>

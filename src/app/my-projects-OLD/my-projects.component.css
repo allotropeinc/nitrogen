@@ -1,0 +1,36 @@
+:host {
+	padding: 24px;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	overflow: scroll;
+}
+
+mat-card {
+	width: calc(100% - 48px);
+	max-width: 400px;
+}
+
+@media screen and (min-width: 896px) {
+	mat-card {
+		max-width: 800px;
+	}
+}
+
+@media screen and (min-width: 1296px) {
+	mat-card {
+		max-width: 1200px;
+	}
+}
+
+mat-card > mat-divider + * {
+	padding-top: 24px;
+}
+
+mat-spinner {
+	margin: 0 auto;
+}
+
+:host > * {
+	margin: auto;
+}

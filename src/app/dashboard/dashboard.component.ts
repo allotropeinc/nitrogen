@@ -1,80 +1,87 @@
-import { Component, OnInit } from '@angular/core'
-import { MatDialog }         from '@angular/material'
-import { Router }            from '@angular/router'
-import { ApiService }        from '../api.service'
+import {
+	animate,
+	group,
+	query,
+	style,
+	transition,
+	trigger
+}                                            from '@angular/animations'
+import {BreakpointObserver, BreakpointState} from '@angular/cdk/layout'
+import {Component, OnInit}                   from '@angular/core'
+import {Router}                              from '@angular/router'
+import {ApiService}                          from '../api.service'
+import {DashboardService}                    from './dashboard.service'
 
-/**
- * This variable prevents the maintenance dialog from showing up every time you
- * load the dashboard, as opposed to only when you first load the page.
- *
- * You can always choose not to show the dialog by clicking the "Don't show
- * again" button.
- *
- * @type {boolean}
- */
-let hasLoaded = false
-
-@Component ( {
-	selector    : 'app-dashboard',
-	templateUrl : './dashboard.component.html',
-	styleUrls   : [ './dashboard.component.css' ]
-} )
+@Component({
+	selector   : 'app-account-dashboard',
+	templateUrl: './dashboard.component.html',
+	styleUrls  : ['./dashboard.component.css'],
+	providers  : [DashboardService],
+	animations : [
+		trigger('routerAnimation', [
+			transition(':enter, :leave', []),
+			transition('* <=> *', [
+				group([
+					query(':enter', [
+						style({
+							transform: 'scale(0.95)',
+							opacity  : 0
+						}),
+						animate(
+							'0.2s ease-out',
+							style({
+								transform: 'scale(1)',
+								opacity  : 1
+							})
+						)
+					]),
+					query(':leave', [
+						style({
+							transform: 'scale(1)',
+							opacity  : 1
+						}),
+						animate(
+							'0.2s ease-out',
+							style({
+								transform: 'scale(0.95)',
+								opacity  : 0
+							})
+						)
+					])
+				])
+			])
+		])
+	]
+})
 export class DashboardComponent implements OnInit {
-	working = true
-	admin = false
+	public working = true
+	public sidebarMode = 'side'
 
-	constructor (
-		public api : ApiService,
-		private router : Router,
-		private dialog : MatDialog
-	) {}
-
-	ngOnInit () {
-		this.api.getTokenValidity ().subscribe (
-			valid => {
-				if ( valid ) {
-					this.api.getAdminStatus ().subscribe (
-						admin => {
-							this.admin = admin
-
-							this.working = false
-
-							if ( localStorage.hasShownMaintenanceDialog !== 'true' && !hasLoaded ) {
-								hasLoaded = true
-
-								this.dialog.open (
-									MaintenanceDialogComponent,
-									{ width : '400px' }
-								).afterClosed ().subscribe ( ( dontShowAgain ) => {
-									localStorage.hasShownMaintenanceDialog = dontShowAgain
-								} )
-							}
-						}
-					)
-				} else {
-					this.router.navigate ( [ '/signin' ] )
+	constructor(
+		public service: DashboardService,
+		public breakpointObserver: BreakpointObserver,
+		public api: ApiService,
+		public router: Router
+	) {
+		breakpointObserver
+			.observe('(min-width: 900px)')
+			.subscribe(
+				(breakpointState: BreakpointState) => {
+					this.sidebarMode = breakpointState.matches ? 'side' : 'over'
 				}
-			} )
+			)
 	}
 
-	logout () {
-		this.working = true
-
-		this.api.logout ().subscribe (
-			success => {
-				if ( success ) {
-					this.router.navigate ( [ '/signin' ] )
-				} else {
-					this.working = false
+	ngOnInit() {
+		this.api.getTokenValidity()
+			.subscribe(
+				(valid: boolean) => {
+					if (valid) {
+						this.working = false
+					} else {
+						this.router.navigate([''])
+					}
 				}
-			} )
+			)
 	}
-}
-
-@Component ( {
-	selector    : 'app-maintenance-dialog',
-	templateUrl : './dialogs/maintenance-dialog.component.html'
-} )
-export class MaintenanceDialogComponent {
-	constructor () {}
 }

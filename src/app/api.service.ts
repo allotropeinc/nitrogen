@@ -1,18 +1,41 @@
-import {HttpClient}                                                                                         from '@angular/common/http'
-import {Component, Inject, Injectable, isDevMode}                                                           from '@angular/core'
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar}                                              from '@angular/material'
-import {Observable, Observer, of}                                                                           from 'rxjs'
-import {URL}                                                                                                from 'url-parse'
-import {Account, AccountSettings, BugReport, ClientProject, DECRYPTION_CONFIRMATION_HEADER, MinimalAccount} from '../../backend/types'
+import {HttpClient}                     from '@angular/common/http'
+import {
+	Component,
+	Inject,
+	Injectable,
+	isDevMode
+}                                       from '@angular/core'
+import {FormControl}                    from '@angular/forms'
+import {
+	MAT_DIALOG_DATA,
+	MatDialog,
+	MatDialogRef
+}                                       from '@angular/material/dialog'
+import {MatSnackBar}                    from '@angular/material/snack-bar'
+import {Observable, Observer, of}       from 'rxjs'
+import {URL}                            from 'url-parse'
+import {Bodies}                         from '../../backend/src/types/bodies'
+import {
+	Account,
+	AccountSettings,
+	BugReport,
+	EmailStatus,
+	Project
+}                                       from '../../backend/src/types/database'
+import {
+	MinimalAccount,
+	ProjectData
+}                                       from '../../backend/src/types/datatypes'
+import {DECRYPTION_CONFIRMATION_HEADER} from '../../backend/src/types/shared-vars'
 
 declare const CryptoJS: any
 
 @Injectable()
 export class ApiService {
-	public apiLocation = isDevMode() ? 'http://localhost:5015/api' : '/api'
-	public username = null
-	protected password = null
-	public token = null
+	public apiLocation = '/api'
+	public username: string = null
+	protected password: string = null
+	public token: string = null
 	public ready = false
 
 	constructor(
@@ -53,8 +76,7 @@ export class ApiService {
 		this.dialog.open(
 			ApiProvidePasswordDialogComponent,
 			{
-				width: '300px',
-				data : this.username
+				data: this.username
 			}
 		).afterClosed().subscribe(
 			(data: string) => {
@@ -73,10 +95,7 @@ export class ApiService {
 
 								this.ready = true
 							} else {
-								this.snackbar.open(
-									'Invalid password.',
-									'Close'
-								)
+								this.snackbar.open('Invalid password.')
 
 								this.askForPassword()
 							}
@@ -168,7 +187,7 @@ export class ApiService {
 			observer => {
 				this.request(
 					this.apiLocation + '/accounts/auth',
-					{
+					<Bodies.Accounts.Auth> {
 						username: username,
 						password: password
 					}
@@ -204,7 +223,7 @@ export class ApiService {
 					this.request(
 						this.apiLocation + '/accounts/check'
 					).subscribe(
-						(response: string) => {
+						(response: boolean) => {
 							if (response) {
 								observer.next(true)
 								observer.complete()
@@ -241,7 +260,7 @@ export class ApiService {
 			observer => {
 				this.request(
 					this.apiLocation + '/accounts/new',
-					{
+					<Bodies.Accounts.New> {
 						username: username,
 						password: password
 					}
@@ -296,17 +315,17 @@ export class ApiService {
 		)
 	}
 
-	getProjectList(): Observable<ClientProject[]> {
+	getProjectList(): Observable<Project[]> {
 		this.log(
 			'getProjectList'
 		)
 
-		return new Observable<ClientProject[]>(
+		return new Observable<Project[]>(
 			observer => {
 				this.request(
 					this.apiLocation + '/projects'
 				).subscribe(
-					(response: ClientProject[]) => {
+					(response: Project[]) => {
 						if (response) {
 							observer.next(response)
 							observer.complete()
@@ -333,7 +352,7 @@ export class ApiService {
 			observer => {
 				this.request(
 					this.apiLocation + '/projects/new',
-					{
+					<Bodies.Projects.New> {
 						name: name,
 						type: type
 					}
@@ -347,7 +366,7 @@ export class ApiService {
 		)
 	}
 
-	deleteProject(id: number): Observable<boolean> {
+	deleteProject(id: string): Observable<boolean> {
 		this.log(
 			'deleteProject',
 			id
@@ -357,9 +376,7 @@ export class ApiService {
 			observer => {
 				this.request(
 					this.apiLocation + '/projects/delete/' + id,
-					{
-						name: name
-					}
+					{}
 				).subscribe(
 					(response: boolean) => {
 						observer.next(response)
@@ -370,41 +387,19 @@ export class ApiService {
 		)
 	}
 
-	moveProjectUp(id: number): Observable<boolean> {
+	moveProject(id: string, newPos: number): Observable<boolean> {
 		this.log(
-			'moveProjectUp',
-			id
+			'moveProject',
+			id,
+			newPos
 		)
 
 		return new Observable<boolean>(
 			observer => {
 				this.request(
 					this.apiLocation + '/projects/move/' + id,
-					{
-						delta: -1
-					}
-				).subscribe(
-					(response: boolean) => {
-						observer.next(response)
-						observer.complete()
-					}
-				)
-			}
-		)
-	}
-
-	moveProjectDown(id: number): Observable<boolean> {
-		this.log(
-			'moveProjectDown',
-			id
-		)
-
-		return new Observable<boolean>(
-			observer => {
-				this.request(
-					this.apiLocation + '/projects/move/' + id,
-					{
-						delta: 1
+					<Bodies.Projects.Move> {
+						newPos: newPos
 					}
 				).subscribe(
 					(response: boolean) => {
@@ -417,7 +412,7 @@ export class ApiService {
 	}
 
 	renameProject(
-		id: number,
+		id: string,
 		name: string
 	): Observable<boolean> {
 		this.log(
@@ -430,7 +425,7 @@ export class ApiService {
 			observer => {
 				this.request(
 					this.apiLocation + '/projects/rename/' + id,
-					{
+					<Bodies.Projects.Rename> {
 						name: name
 					}
 				).subscribe(
@@ -443,18 +438,18 @@ export class ApiService {
 		)
 	}
 
-	getProject(id: number): Observable<ClientProject> {
+	getProject(id: string): Observable<Project> {
 		this.log(
 			'getProject',
 			id
 		)
 
-		return new Observable<ClientProject>(
+		return new Observable<Project>(
 			observer => {
 				this.request(
 					this.apiLocation + '/projects/' + id
 				).subscribe(
-					(response: ClientProject) => {
+					(response: Project) => {
 						if (response) {
 							this.decrypt(response.code).subscribe(
 								(decrypted: string) => {
@@ -480,7 +475,7 @@ export class ApiService {
 	}
 
 	setProjectCode(
-		id: number,
+		id: string,
 		code: string,
 		encrypt: boolean
 	): Observable<boolean> {
@@ -498,7 +493,7 @@ export class ApiService {
 					(newCode: string) => {
 						this.request(
 							this.apiLocation + '/projects/' + id,
-							{
+							<Bodies.Projects.UpdateCode> {
 								code: newCode
 							}
 						).subscribe(
@@ -519,7 +514,7 @@ export class ApiService {
 		return new Observable<AccountSettings>(
 			observer => {
 				this.request(
-					this.apiLocation + '/settings'
+					this.apiLocation + '/accounts/settings'
 				).subscribe(
 					(response: AccountSettings) => {
 						observer.next(response)
@@ -539,8 +534,8 @@ export class ApiService {
 		return new Observable<boolean>(
 			observer => {
 				this.request(
-					this.apiLocation + '/settings',
-					{
+					this.apiLocation + '/accounts/settings',
+					<Bodies.Accounts.Settings> {
 						settings: settings
 					}
 				).subscribe(
@@ -553,17 +548,17 @@ export class ApiService {
 		)
 	}
 
-	submitBugReport(data): Observable<boolean> {
+	submitBugReport(data: Bodies.BugReport): Observable<boolean> {
+		this.log(
+			'submitBugReport',
+			data
+		)
+
 		return new Observable<boolean>(
 			observer => {
 				this.request(
 					this.apiLocation + '/bugReport',
-					<{
-						username: string,
-						title: string,
-						summary: string,
-						steps: string
-					}> data
+					data
 				).subscribe(
 					(response: boolean) => {
 						observer.next(response)
@@ -586,7 +581,7 @@ export class ApiService {
 			observer => {
 				this.request(
 					this.apiLocation + '/accounts/delete',
-					{
+					<Bodies.Accounts.Delete> {
 						password: password
 					}
 				).subscribe(
@@ -600,7 +595,7 @@ export class ApiService {
 	}
 
 	unpublishProject(
-		id: number
+		id: string
 	): Observable<boolean> {
 		this.log(
 			'unpublishProject',
@@ -625,7 +620,7 @@ export class ApiService {
 	}
 
 	publishProject(
-		id: number
+		id: string
 	): Observable<string> {
 		this.log(
 			'publishProject',
@@ -657,7 +652,7 @@ export class ApiService {
 		return new Observable<boolean>(
 			observer => {
 				this.request(
-					this.apiLocation + '/settings/reset',
+					this.apiLocation + '/accounts/settings/reset',
 					{}
 				).subscribe(
 					(response: boolean) => {
@@ -674,18 +669,18 @@ export class ApiService {
 		oldPassword: string,
 		newPassword: string
 	): Observable<boolean> {
+		this.log(
+			'changePassword',
+			username,
+			oldPassword,
+			newPassword
+		)
+
 		return new Observable(
 			observer => {
-				this.log(
-					'changePassword',
-					username,
-					oldPassword,
-					newPassword
-				)
-
 				this.request(
 					this.apiLocation + '/accounts/changePassword',
-					{
+					<Bodies.Accounts.ChangePassword> {
 						oldPassword: oldPassword,
 						password   : newPassword
 					}
@@ -707,18 +702,18 @@ export class ApiService {
 		password: string,
 		newUsername: string
 	): Observable<boolean> {
+		this.log(
+			'changeUsername',
+			username,
+			password,
+			newUsername
+		)
+
 		return new Observable(
 			observer => {
-				this.log(
-					'changeUsername',
-					username,
-					password,
-					newUsername
-				)
-
 				this.request(
 					this.apiLocation + '/accounts/changeUsername',
-					{
+					<Bodies.Accounts.ChangeUsername> {
 						password: password,
 						username: newUsername
 					}
@@ -736,14 +731,14 @@ export class ApiService {
 	}
 
 	getAdminStatus(): Observable<boolean> {
+		this.log(
+			'getAdminStatus'
+		)
+
 		return new Observable<boolean>(
 			(observer: Observer<boolean>) => {
-				this.log(
-					'getAdminStatus'
-				)
-
 				this.request(
-					this.apiLocation + '/isAdmin'
+					this.apiLocation + '/accounts/isAdmin'
 				).subscribe(
 					(admin: boolean) => {
 						observer.next(admin)
@@ -755,12 +750,12 @@ export class ApiService {
 	}
 
 	getUsers(): Observable<MinimalAccount[]> {
+		this.log(
+			'getUsers'
+		)
+
 		return new Observable<MinimalAccount[]>(
 			(observer: Observer<MinimalAccount[]>) => {
-				this.log(
-					'getUsers'
-				)
-
 				this.request(
 					this.apiLocation + '/accounts'
 				).subscribe(
@@ -774,50 +769,22 @@ export class ApiService {
 	}
 
 	getAccount(
-		username: string
+		id: string
 	): Observable<Account> {
+		this.log(
+			'getAccount',
+			id
+		)
+
 		return new Observable<Account>(
 			(
 				observer: Observer<Account>
 			) => {
-				this.log(
-					'getAccount',
-					username
-				)
-
 				this.request(
 					this.apiLocation + '/accounts/admin/' +
-					encodeURIComponent(username)
+					encodeURIComponent(id)
 				).subscribe(
 					(response: Account) => {
-						observer.next(response)
-						observer.complete()
-					}
-				)
-			}
-		)
-	}
-
-	changeAccount(
-		username: string,
-		account: Account
-	): Observable<boolean> {
-		return new Observable<boolean>(
-			(
-				observer: Observer<boolean>
-			) => {
-				this.log(
-					'changeAccount',
-					username,
-					account
-				)
-
-				this.request(
-					this.apiLocation + '/accounts/admin/' +
-					encodeURIComponent(username),
-					account
-				).subscribe(
-					(response: boolean) => {
 						observer.next(response)
 						observer.complete()
 					}
@@ -829,16 +796,16 @@ export class ApiService {
 	checkPassword(
 		password: string
 	): Observable<boolean> {
+		this.log(
+			'checkPassword',
+			password
+		)
+
 		return new Observable<boolean>(
 			(observer: Observer<boolean>) => {
-				this.log(
-					'checkPassword',
-					password
-				)
-
 				this.request(
 					this.apiLocation + '/accounts/checkPassword',
-					{
+					<Bodies.Accounts.CheckPassword> {
 						password: password
 					}
 				).subscribe(
@@ -854,13 +821,13 @@ export class ApiService {
 	encrypt(
 		code: string
 	): Observable<string> {
+		this.log(
+			'encrypt',
+			code
+		)
+
 		return new Observable<string>(
 			(observer: Observer<string>) => {
-				this.log(
-					'encrypt',
-					code
-				)
-
 				observer.next(
 					CryptoJS.AES.encrypt(
 						DECRYPTION_CONFIRMATION_HEADER + code,
@@ -917,13 +884,13 @@ export class ApiService {
 	decrypt(
 		encrypted: string
 	): Observable<string> {
+		this.log(
+			'decrypt',
+			encrypted
+		)
+
 		return new Observable<string>(
 			(observer: Observer<string>) => {
-				this.log(
-					'decrypt',
-					encrypted
-				)
-
 				const alreadyDecrypted = this._getDecrypted(encrypted)
 
 				if (alreadyDecrypted) {
@@ -954,18 +921,17 @@ export class ApiService {
 	decryptionDialog(
 		encrypted: string
 	): Observable<string> {
+		this.log(
+			'decryptionDialog',
+			encrypted
+		)
+
 		return new Observable<string>(
 			(observer: Observer<string>) => {
-				this.log(
-					'decryptionDialog',
-					encrypted
-				)
-
 				this.dialog.open(
 					ApiDecryptionDialogComponent,
 					{
-						width: '300px',
-						data : [
+						data: [
 							encrypted,
 							this._decrypt.bind(this),
 							this._getDecrypted.bind(this)
@@ -987,12 +953,12 @@ export class ApiService {
 	}
 
 	getBugReports(): Observable<BugReport[]> {
+		this.log(
+			'getBugReports'
+		)
+
 		return new Observable<BugReport[]>(
 			(observer: Observer<BugReport[]>) => {
-				this.log(
-					'getBugReports'
-				)
-
 				this.request(
 					this.apiLocation + '/bugReports'
 				).subscribe(
@@ -1005,44 +971,19 @@ export class ApiService {
 		)
 	}
 
-	setBugReport(
-		id: number,
-		bugReport: BugReport
-	): Observable<boolean> {
-		return new Observable<boolean>(
-			(observer: Observer<boolean>) => {
-				this.log(
-					'setBugReport',
-					id,
-					bugReport
-				)
-
-				this.request(
-					this.apiLocation + '/bugReports/' + id,
-					bugReport
-				).subscribe(
-					(response: boolean) => {
-						observer.next(response)
-						observer.complete()
-					}
-				)
-			}
-		)
-	}
-
 	deleteOtherAccount(
-		username: string
+		id: string
 	): Observable<boolean> {
+		this.log(
+			'deleteOtherAccount',
+			id
+		)
+
 		return new Observable<boolean>(
 			(observer: Observer<boolean>) => {
-				this.log(
-					'deleteOtherAccount',
-					username
-				)
-
 				this.request(
 					this.apiLocation + '/accounts/delete/' +
-					encodeURIComponent(username),
+					encodeURIComponent(id),
 					{}
 				).subscribe(
 					(response: boolean) => {
@@ -1057,11 +998,16 @@ export class ApiService {
 	import(
 		url: string
 	): Observable<boolean> {
+		this.log(
+			'import',
+			url
+		)
+
 		return new Observable<boolean>(
 			(observer: Observer<boolean>) => {
 				this.request(
 					this.apiLocation + '/projects/import',
-					{
+					<Bodies.Projects.Import> {
 						url: url
 					}
 				).subscribe(
@@ -1077,6 +1023,11 @@ export class ApiService {
 	getStarterCode(
 		type: number
 	): Observable<string> {
+		this.log(
+			'getStarterCode',
+			type
+		)
+
 		return new Observable<string>(
 			(observer: Observer<string>) => {
 				this.request(
@@ -1095,17 +1046,108 @@ export class ApiService {
 		type: number,
 		code: string
 	): Observable<string> {
+		this.log(
+			'setStarterCode',
+			type,
+			code
+		)
+
 		return new Observable<string>(
 			(observer: Observer<string>) => {
 				this.request(
 					this.apiLocation + '/starterCode/' + type,
-					{
+					<Bodies.StarterCode> {
 						code: code
 					}
 				).subscribe(
 					(response: string) => {
 						observer.next(response)
 						observer.complete()
+					}
+				)
+			}
+		)
+	}
+
+	setEmail(email: string): Observable<boolean> {
+		this.log(
+			'setEmail',
+			email
+		)
+
+		return new Observable<boolean>(
+			(observer: Observer<boolean>) => {
+				this.request(
+					this.apiLocation + '/accounts/email',
+					<Bodies.Accounts.Email> {
+						email   : email,
+						password: this.password
+					}
+				).subscribe(
+					(response: boolean) => {
+						observer.next(response)
+						observer.complete()
+					}
+				)
+			}
+		)
+	}
+
+	getEmailStatus(): Observable<EmailStatus> {
+		this.log(
+			'getEmailStatus'
+		)
+
+		return new Observable<EmailStatus>(
+			(observer: Observer<EmailStatus>) => {
+				this.request(this.apiLocation + '/accounts/email').subscribe(
+					(response: EmailStatus) => {
+						observer.next(response)
+						observer.complete()
+					}
+				)
+			}
+		)
+	}
+
+	revokeEmailVerification(): Observable<boolean> {
+		this.log(
+			'revokeEmailVerification'
+		)
+
+		return new Observable<boolean>(
+			(observer: Observer<boolean>) => {
+				this.request(
+					this.apiLocation + '/accounts/email/revokeVerification',
+					{}
+				).subscribe(
+					(response: boolean) => {
+						observer.next(response)
+						observer.complete()
+					}
+				)
+			}
+		)
+	}
+
+	getProjectsData(): Observable<ProjectData[]> {
+		this.log(
+			'getProjectsData'
+		)
+
+		return new Observable<ProjectData[]>(
+			observer => {
+				this.request(
+					this.apiLocation + '/projectData'
+				).subscribe(
+					(response: ProjectData[]) => {
+						if (response) {
+							observer.next(response)
+							observer.complete()
+						} else {
+							observer.next(null)
+							observer.complete()
+						}
 					}
 				)
 			}
@@ -1118,8 +1160,7 @@ export class ApiService {
 	templateUrl: './dialogs/api-provide-password-dialog.component.html'
 })
 export class ApiProvidePasswordDialogComponent {
-	showPassword = false
-	password = ''
+	password: FormControl
 
 	constructor(
 		public dialogRef: MatDialogRef<ApiProvidePasswordDialogComponent>,
@@ -1133,20 +1174,23 @@ export class ApiProvidePasswordDialogComponent {
 	templateUrl: './dialogs/api-decryption-dialog.component.html'
 })
 export class ApiDecryptionDialogComponent {
-	showPassword = false
-	password = ''
+	password: FormControl
 	encrypted: string
 	decrypt: (
 		encrypted: string,
 		password: string
 	) => string
+	getDecrypted: (code: string) => string
 	decrypted = ''
-	getDecrypted = Function
 
 	constructor(
 		public dialogRef: MatDialogRef<ApiDecryptionDialogComponent>,
 		@Inject(MAT_DIALOG_DATA)
-			data: [string, any]
+			data: [
+			string,
+			(encrypted: string, password?: string) => string,
+			(code: string) => string
+			]
 	) {
 		this.encrypted = data[0]
 		this.decrypt = data[1]

@@ -1,95 +1,77 @@
-import { Component, OnInit }                    from '@angular/core'
-import { ActivatedRoute, Router }               from '@angular/router'
-import { ApiService }                           from '../../../api.service'
-import { MatDialog, MatDialogRef, MatSnackBar } from '@angular/material'
-import { Account }                              from '../../../../../backend/types'
+import {Component, OnInit}                    from '@angular/core'
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import {ActivatedRoute, Router}               from '@angular/router'
+import {Account}                              from '../../../../../backend/src/types/database'
+import {ApiService}                           from '../../../api.service'
 
-@Component ( {
-	selector    : 'app-admin-dashboard-user',
-	templateUrl : './admin-dashboard-user.component.html',
-	styleUrls   : [ './admin-dashboard-user.component.css' ]
-} )
+@Component({
+	selector   : 'app-admin-dashboard-user',
+	templateUrl: './admin-dashboard-user.component.html',
+	styleUrls  : ['./admin-dashboard-user.component.css']
+})
 export class AdminDashboardUserComponent implements OnInit {
-	username : string = this.route.snapshot.paramMap.get ( 'username' )
-	account : Account
+	username: string = this.route.snapshot.paramMap.get('username')
+	account: Account
 	working = true
 
-	constructor (
-		private route : ActivatedRoute,
-		private api : ApiService,
-		private snackbar : MatSnackBar,
-		private dialog : MatDialog,
-		private router : Router
+	constructor(
+		private route: ActivatedRoute,
+		private api: ApiService,
+		private snackbar: MatSnackBar,
+		private dialog: MatDialog,
+		private router: Router
 	) {}
 
-	ngOnInit () {
-		this.refresh ()
+	ngOnInit() {
+		this.refresh()
 	}
 
-	refresh () {
+	refresh() {
 		this.working = true
 		this.account = null
 
-		this.api.getAccount (
+		this.api.getAccount(
 			this.username
-		).subscribe (
-			( account : Account ) => {
+		).subscribe(
+			(account: Account) => {
 				this.account = account
 				this.working = false
 			}
 		)
 	}
 
-	getSettings () {
-		return JSON.stringify (
+	getSettings() {
+		return JSON.stringify(
 			this.account.settings,
 			undefined,
 			'\t'
 		)
 	}
 
-	saveChanges () {
-		this.working = true
-
-		this.api.changeAccount (
-			this.username,
-			this.account
-		).subscribe (
-			( success ) => {
-				if ( !success ) {
-					this.snackbar.open (
-						'The account could not be saved.',
-						'Close'
-					)
-				}
-
-				this.working = false
-			}
+	saveChanges() {
+		this.snackbar.open(
+			'Saving is disabled due to security issues. Sorry'
 		)
 	}
 
-	deleteAccount () {
+	deleteAccount() {
 		this.working = true
 
-		this.dialog.open (
-			UserDeleteAccountDialogComponent,
-			{
-				width : '300px'
-			}
-		).afterClosed ().subscribe (
-			( del : boolean ) => {
-				if ( del ) {
-					this.api.deleteOtherAccount ( this.username ).subscribe (
-						( success : boolean ) => {
-							if ( !success ) {
-								this.snackbar.open (
-									'The account could not be deleted.',
-									'Close'
+		this.dialog.open(UserDeleteAccountDialogComponent)
+			.afterClosed().subscribe(
+			(del: boolean) => {
+				if (del) {
+					this.api.deleteOtherAccount(this.username).subscribe(
+						(success: boolean) => {
+							if (!success) {
+								this.snackbar.open(
+									'The account could not be deleted.'
 								)
 
 								this.working = false
 							} else {
-								this.router.navigateByUrl ( '/admin/users' )
+								this.router.navigateByUrl('/admin/users')
 							}
 						}
 					)
@@ -101,12 +83,12 @@ export class AdminDashboardUserComponent implements OnInit {
 	}
 }
 
-@Component ( {
-	selector    : 'app-user-delete-account-dialog',
-	templateUrl : './dialogs/user-delete-account-dialog.component.html'
-} )
+@Component({
+	selector   : 'app-user-delete-account-dialog',
+	templateUrl: './dialogs/user-delete-account-dialog.component.html'
+})
 export class UserDeleteAccountDialogComponent {
-	constructor (
-		public dialogRef : MatDialogRef<UserDeleteAccountDialogComponent>
+	constructor(
+		public dialogRef: MatDialogRef<UserDeleteAccountDialogComponent>
 	) {}
 }

@@ -1,8 +1,14 @@
-<h1>Leave Unsaved Project</h1>
-<p>Are you sure you want to leave this unsaved project?</p>
-<ng-container>
+<h2 mat-dialog-title>Leave Unsaved Project</h2>
+<mat-dialog-content>
+	<mat-hint>
+		<p class="nomargin">
+			Are you sure you want to leave this unsaved project?
+		</p>
+	</mat-hint>
+</mat-dialog-content>
+<mat-dialog-actions>
 	<button mat-button (click)="dialogRef.close()">Cancel</button>
-	<div class="buttons">
-		<button mat-flat-button color="warn" [mat-dialog-close]="true">Leave</button>
-	</div>
-</ng-container>
+	<button mat-flat-button color="warn" [mat-dialog-close]="true">
+		Leave
+	</button>
+</mat-dialog-actions>

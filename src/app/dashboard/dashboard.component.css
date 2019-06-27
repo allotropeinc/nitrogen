@@ -1,0 +1,60 @@
+:host {
+	width: 100vw;
+	height: 100vh;
+}
+
+mat-sidenav-container, .container {
+	width: 100%;
+	height: 100%;
+}
+
+.container {
+	display: flex;
+	flex-direction: column;
+}
+
+.container.hidden {
+	display: none;
+}
+
+mat-toolbar {
+	flex-shrink: 0;
+}
+
+mat-toolbar > [mat-icon-button] {
+	margin-right: 16px;
+}
+
+.content {
+	display: block;
+	flex-grow: 1;
+	flex-basis: 0;
+	height: 0;
+	position: relative;
+	overflow: auto;
+}
+
+.content > ::ng-deep *:not(router-outlet) {
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	max-width: 600px;
+	box-sizing: border-box;
+	margin: 0 auto;
+	padding: 0 16px;
+}
+
+.content > ::ng-deep *:not(router-outlet) > mat-card {
+	margin: 16px 0;
+}
+
+mat-sidenav-content {
+	display: flex;
+	flex-direction: column;
+}
+
+mat-progress-spinner {
+	margin: auto;
+}

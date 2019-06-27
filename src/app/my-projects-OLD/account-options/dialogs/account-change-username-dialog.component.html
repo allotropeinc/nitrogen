@@ -1,0 +1,20 @@
+<h2 mat-dialog-title>Change Account Username</h2>
+<mat-hint>
+	<p>Please enter your current password and new username below.</p>
+</mat-hint>
+<mat-dialog-content>
+	<form id="change-username-form"
+	      (submit)="dialogRef.close({username: username.value, password: password.value})">
+		<app-password-input placeholder="Current password"
+		                    (formControl)="password = $event"></app-password-input>
+		<app-username-input [isNewUsername]="true" placeholder="New username"
+		                    (formControl)="username = $event"></app-username-input>
+	</form>
+</mat-dialog-content>
+<mat-dialog-actions>
+	<button mat-button (click)="dialogRef.close()">Cancel</button>
+	<button mat-flat-button color="primary" type="submit"
+	        form="change-username-form">
+		Change
+	</button>
+</mat-dialog-actions>

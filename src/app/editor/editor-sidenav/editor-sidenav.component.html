@@ -5,8 +5,9 @@
 </button>
 <h1>Menu</h1>
 <p>
-	<a mat-button routerLink="/dashboard" class="fullwidth dashboard-button">
-		Return to Dashboard
+	<a mat-button routerLink="/my-projects"
+	   class="fullwidth my-projects-button">
+		Return to My Projects
 	</a>
 </p>
 <h2>Settings</h2>
@@ -16,12 +17,21 @@
 			<mat-expansion-panel-header>
 				<mat-panel-title>Editor Settings</mat-panel-title>
 				<mat-panel-description>
-					Code editor configuration
+					Code editor settings
 				</mat-panel-description>
 			</mat-expansion-panel-header>
 			<app-editor-sidenav-editor-settings
-				[editorSettings]="settings.editor"
+				[editorSettings]="accountSettings.editor"
 				[disabled]="saving"></app-editor-sidenav-editor-settings>
+		</mat-expansion-panel>
+		<mat-expansion-panel class="mat-elevation-z0">
+			<mat-expansion-panel-header>
+				<mat-panel-title>Project Settings</mat-panel-title>
+				<mat-panel-description>
+					Project configuration
+				</mat-panel-description>
+			</mat-expansion-panel-header>
+			<p>Work in progress</p>
 		</mat-expansion-panel>
 	</mat-accordion>
 	<div class="buttons-wrapper">
@@ -29,7 +39,7 @@
 			<button mat-button [disabled]="saving" (click)="resetSettings()">
 				Reset Settings
 			</button>
-			<button mat-flat-button [disabled]="saving"
+			<button mat-flat-button color="primary" [disabled]="saving"
 			        (click)="saveSettings()">
 				{{saving ? 'Saving Settings' : 'Save Settings'}}
 			</button>

@@ -2,6 +2,7 @@
 	padding: 24px;
 	display: block;
 	overflow: scroll;
+	position: relative;
 }
 
 .close-button {
@@ -15,7 +16,7 @@ mat-progress-spinner {
 }
 
 .buttons-wrapper {
-    height: 36px;
+	height: 36px;
 	margin-top: 24px;
 }
 
@@ -24,6 +25,6 @@ mat-accordion {
 	margin: 0 -24px;
 }
 
-a.dashboard-button {
+a.my-projects-button {
 	margin-bottom: 0 !important;
 }

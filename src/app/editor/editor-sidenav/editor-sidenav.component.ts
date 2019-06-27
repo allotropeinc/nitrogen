@@ -1,8 +1,10 @@
-import {Component, Input, OnInit}                         from '@angular/core'
-import {MatDialog, MatDialogRef, MatSidenav, MatSnackBar} from '@angular/material'
-import {AccountSettings}                                  from '../../../../backend/types'
-import {ApiService}                                       from '../../api.service'
-import {EditorComponent}                                  from '../editor.component'
+import {Component, Input, OnInit} from '@angular/core'
+import {MatDialog, MatDialogRef}  from '@angular/material/dialog'
+import {MatSidenav}               from '@angular/material/sidenav'
+import {MatSnackBar}              from '@angular/material/snack-bar'
+import {AccountSettings}          from '../../../../backend/src/types/database'
+import {ApiService}               from '../../api.service'
+import {EditorComponent}          from '../editor.component'
 
 @Component({
 	selector   : 'app-editor-sidenav',
@@ -12,19 +14,19 @@ import {EditorComponent}                                  from '../editor.compon
 export class EditorSidenavComponent implements OnInit {
 	public settingsReady = false
 	public saving = false
-	private _settings: AccountSettings
+	private _accountSettings: AccountSettings
 
 	@Input()
-	set settings(settings: AccountSettings) {
-		this._settings = settings
+	set accountSettings(settings: AccountSettings) {
+		this._accountSettings = settings
 
 		if (settings) {
 			this.settingsReady = true
 		}
 	}
 
-	get settings() {
-		return this._settings
+	get accountSettings() {
+		return this._accountSettings
 	}
 
 	constructor(
@@ -40,7 +42,7 @@ export class EditorSidenavComponent implements OnInit {
 	saveSettings() {
 		this.saving = true
 
-		this.api.setSettings(this.settings).subscribe(
+		this.api.setSettings(this.accountSettings).subscribe(
 			success => {
 				if (success) {
 					this.editor.reloadCodeEditor().subscribe(
@@ -58,8 +60,7 @@ export class EditorSidenavComponent implements OnInit {
 						})
 				} else {
 					this.snackbar.open(
-						'The editor settings could not be saved.',
-						'Close'
+						'The editor settings could not be saved.'
 					)
 
 					this.saving = false
@@ -71,12 +72,7 @@ export class EditorSidenavComponent implements OnInit {
 	resetSettings() {
 		this.saving = true
 
-		const dialogRef = this.dialog.open(
-			ConfirmResetSettingsDialogComponent,
-			{
-				width: '300px'
-			}
-		)
+		const dialogRef = this.dialog.open(ConfirmResetSettingsDialogComponent)
 
 		dialogRef.afterClosed().subscribe(
 			agreed => {
@@ -87,13 +83,12 @@ export class EditorSidenavComponent implements OnInit {
 								this.api.getSettings().subscribe(
 									settings => {
 										if (settings) {
-											this.settings = settings
+											this.accountSettings = settings
 
 											this.saveSettings()
 										} else {
 											this.snackbar.open(
-												'The editor settings could not be reset.',
-												'Close'
+												'The editor settings could not be reset.'
 											)
 										}
 
@@ -101,8 +96,7 @@ export class EditorSidenavComponent implements OnInit {
 									})
 							} else {
 								this.snackbar.open(
-									'The editor settings could not be reset.',
-									'Close'
+									'The editor settings could not be reset.'
 								)
 
 								this.saving = false

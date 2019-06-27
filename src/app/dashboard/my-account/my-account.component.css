@@ -1,0 +1,24 @@
+mat-card-title > h2 {
+	margin: 0;
+}
+
+.row {
+	display: flex;
+	margin: 16px 0;
+}
+
+.row > * {
+	margin: auto 0;
+	display: block;
+}
+
+.row > :first-child {
+	flex-grow: 1;
+	flex-basis: 0;
+	width: 0;
+}
+
+.row > :not(:first-child) {
+	flex-shrink: 0;
+	margin-left: 16px;
+}

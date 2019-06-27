@@ -1,12 +1,20 @@
-import {Component, Inject, OnInit, ViewChild}                  from '@angular/core'
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatSnackBar} from '@angular/material'
-import {ActivatedRoute, CanDeactivate, Router}                 from '@angular/router'
-import * as beautify                                           from 'js-beautify'
-import {Observable}                                            from 'rxjs'
-import {md2html}                                               from '../../../backend/md2html'
-import {AccountSettings, ClientProject}                        from '../../../backend/types'
-import {ApiService}                                            from '../api.service'
-import {CodeEditorComponent}                                   from './code-editor/code-editor.component'
+import {Component, Inject, OnInit, ViewChild}  from '@angular/core'
+import {
+	MAT_DIALOG_DATA,
+	MatDialog,
+	MatDialogRef
+}                                              from '@angular/material/dialog'
+import {MatSnackBar}                           from '@angular/material/snack-bar'
+import {ActivatedRoute, CanDeactivate, Router} from '@angular/router'
+import * as beautify                           from 'js-beautify'
+import {Observable}                            from 'rxjs'
+import {md2html}                               from '../../../backend/src/lib/md2html'
+import {
+	AccountSettings,
+	Project
+}                                              from '../../../backend/src/types/database'
+import {ApiService}                            from '../api.service'
+import {CodeEditorComponent}                   from './code-editor/code-editor.component'
 
 @Component({
 	selector   : 'app-editor',
@@ -14,17 +22,17 @@ import {CodeEditorComponent}                                   from './code-edit
 	styleUrls  : ['./editor.component.css']
 })
 export class EditorComponent implements OnInit {
-	id = +this.route.snapshot.paramMap.get('id')
+	id = this.route.snapshot.paramMap.get('id')
 	working = true
 	originalCode: string
 	code: string
 	saving = false
 	url = 'about:blank'
 	dragging = false
-	settings: AccountSettings
-	@ViewChild(CodeEditorComponent)
+	accountSettings: AccountSettings
+	@ViewChild(CodeEditorComponent, {static: false})
 	editor: CodeEditorComponent
-	project: ClientProject
+	project: Project
 	unsaved = false
 	publishing = false
 	apiLocation = this.api.apiLocation
@@ -62,7 +70,7 @@ export class EditorComponent implements OnInit {
 								this.api.getSettings().subscribe(
 									settings => {
 										if (settings) {
-											this.settings = settings
+											this.accountSettings = settings
 
 											this.working = false
 										} else {
@@ -77,7 +85,7 @@ export class EditorComponent implements OnInit {
 							} else {
 								this.snackbar.open(
 									'The project could not be opened.',
-									'Return to Dashboard'
+									'Return to My Projects'
 								).onAction().subscribe(() => {
 									this.router.navigate(['/signin'])
 								})
@@ -98,13 +106,14 @@ export class EditorComponent implements OnInit {
 	}
 
 	getHTML() {
-		if (this.project.type === 0) {
-			return this.code
-		} else if (this.project.type === 1) {
-			return md2html(
-				this.code,
-				this.project.name
-			)
+		switch (this.project.type) {
+			case 0:
+				return this.code
+			case 1:
+				return md2html(
+					this.code,
+					this.project.name
+				)
 		}
 	}
 
@@ -136,8 +145,7 @@ export class EditorComponent implements OnInit {
 			success => {
 				if (!success) {
 					this.snackbar.open(
-						'The project could not be saved.',
-						'Close'
+						'The project could not be saved.'
 					)
 				} else {
 					this.originalCode = this.code
@@ -153,12 +161,7 @@ export class EditorComponent implements OnInit {
 	}
 
 	unpublish() {
-		const dialogRef = this.dialog.open(
-			ConfirmUnpublishDialogComponent,
-			{
-				width: '300px'
-			}
-		)
+		const dialogRef = this.dialog.open(ConfirmUnpublishDialogComponent)
 
 		dialogRef.afterClosed().subscribe(
 			(unpublish: boolean) => {
@@ -172,8 +175,7 @@ export class EditorComponent implements OnInit {
 								this.save()
 							} else {
 								this.snackbar.open(
-									'The project could not be unpublished.',
-									'Close'
+									'The project could not be unpublished.'
 								)
 							}
 
@@ -185,12 +187,7 @@ export class EditorComponent implements OnInit {
 	}
 
 	publish() {
-		const dialogRef = this.dialog.open(
-			ConfirmPublishDialogComponent,
-			{
-				width: '300px'
-			}
-		)
+		const dialogRef = this.dialog.open(ConfirmPublishDialogComponent)
 
 		dialogRef.afterClosed().subscribe(
 			(publish: boolean) => {
@@ -205,8 +202,7 @@ export class EditorComponent implements OnInit {
 								this.save()
 							} else {
 								this.snackbar.open(
-									'The project could not be published.',
-									'Close'
+									'The project could not be published.'
 								)
 							}
 
@@ -218,19 +214,13 @@ export class EditorComponent implements OnInit {
 	}
 
 	revert() {
-		const dialogRef = this.dialog.open(
-			ConfirmRevertDialogComponent,
-			{
-				width: '300px'
-			}
-		)
+		const dialogRef = this.dialog.open(ConfirmRevertDialogComponent)
 
 		dialogRef.afterClosed().subscribe((revert: boolean) => {
 			if (revert) {
 				if (!this.editor.setValue(this.originalCode)) {
 					this.snackbar.open(
-						'The code could not be reverted.',
-						'Close'
+						'The code could not be reverted.'
 					)
 				}
 			}
@@ -249,8 +239,7 @@ export class EditorComponent implements OnInit {
 		this.dialog.open(
 			ShareProjectDialogComponent,
 			{
-				width: '300px',
-				data : this.project
+				data: this.project
 			}
 		)
 	}
@@ -282,11 +271,7 @@ export class CanDeactivateEditor implements CanDeactivate<EditorComponent> {
 			observer => {
 				if (editor.unsaved) {
 					const dialogRef = editor.dialog.open(
-						ConfirmLeaveDialogComponent,
-						{
-							width: '300px'
-						}
-					)
+						ConfirmLeaveDialogComponent)
 
 					dialogRef.afterClosed().subscribe(
 						leave => {

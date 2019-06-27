@@ -1,17 +1,22 @@
-<mat-card *ngIf="!working">
-	<mat-card-content>
-		<app-projects>
-			<app-account-options [admin]="admin"></app-account-options>
-		</app-projects>
-	</mat-card-content>
-	<app-global-footer></app-global-footer>
-	<mat-divider></mat-divider>
-	<mat-card-content class="text-with-buttons">
-		<div class="buttons">
-			<app-admin-button *ngIf="admin"></app-admin-button>
-			<app-contact *ngIf="!admin"></app-contact>
-			<a mat-flat-button (click)="logout()">Logout</a>
+<mat-sidenav-container>
+	<mat-sidenav [mode]="sidebarMode" #sidenav>
+		<app-dashboard-sidenav></app-dashboard-sidenav>
+	</mat-sidenav>
+	<mat-sidenav-content>
+		<div class="container" [class.hidden]="working">
+			<mat-toolbar>
+				<button mat-icon-button (click)="sidenav.toggle()">
+					<mat-icon>
+						menu
+					</mat-icon>
+				</button>
+				{{service.componentData.title}}
+			</mat-toolbar>
+			<div class="content" [@routerAnimation]="service.componentData.id">
+				<router-outlet #routerOutlet></router-outlet>
+			</div>
 		</div>
-	</mat-card-content>
-</mat-card>
-<mat-progress-spinner mode="indeterminate" *ngIf="working"></mat-progress-spinner>
+		<mat-progress-spinner mode="indeterminate"
+		                      *ngIf="working"></mat-progress-spinner>
+	</mat-sidenav-content>
+</mat-sidenav-container>

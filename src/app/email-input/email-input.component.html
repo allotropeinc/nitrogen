@@ -1,0 +1,8 @@
+<mat-form-field>
+	<input matInput [placeholder]="placeholder" [formControl]="formControl"
+	       required [name]="name" autocomplete="email">
+	<mat-hint *ngIf="isNewEmail && hint">
+		Enter a valid email address
+	</mat-hint>
+	<mat-error>{{getErrorMessage()}}</mat-error>
+</mat-form-field>

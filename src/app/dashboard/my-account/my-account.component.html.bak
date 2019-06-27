@@ -1,0 +1,53 @@
+<mat-card>
+	<mat-card-title>
+		<h2>Account details</h2>
+	</mat-card-title>
+	<mat-card-subtitle>
+		Review your account details and make changes if needed.
+	</mat-card-subtitle>
+	<mat-divider></mat-divider>
+	<mat-card-content style="padding-top: 16px">
+		<div class="row">
+			<div>
+				<mat-hint class="label">Username</mat-hint>
+				<div>{{api.username}}</div>
+			</div>
+			<button mat-flat-button color="accent" (click)="changeUsername()">
+				Change
+			</button>
+		</div>
+		<div class="row">
+			<div>
+				<mat-hint class="label">Password</mat-hint>
+				<div>••••••••</div>
+			</div>
+			<button mat-flat-button color="accent" (click)="changePassword()">
+				Change
+			</button>
+		</div>
+		<div class="row">
+			<div>
+				<mat-hint class="label">Email address</mat-hint>
+				<app-account-dashboard-credentials-email
+					#emailComponent></app-account-dashboard-credentials-email>
+			</div>
+			<button mat-flat-button color="accent" (click)="manageEmail()">
+				Manage
+			</button>
+		</div>
+		<!--div class="row">
+			<div>
+				<mat-hint class="label">Recovery key</mat-hint>
+				<mat-hint>
+					Your recovery key is hidden by default for privacy.
+				</mat-hint>
+			</div>
+			<button mat-flat-button color="accent" (click)="showRecoveryKey()">
+				Show
+			</button>
+			<button mat-flat-button color="warn" (click)="resetRecoveryKey()">
+				Reset
+			</button>
+		</div-->
+	</mat-card-content>
+</mat-card>

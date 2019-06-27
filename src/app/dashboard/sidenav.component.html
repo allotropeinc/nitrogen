@@ -1,0 +1,25 @@
+<div class="noshrink">
+	<mat-toolbar>Dashboard</mat-toolbar>
+	<mat-divider></mat-divider>
+</div>
+<div class="expand">
+	<mat-nav-list class="noshrink">
+		<ng-container *ngFor="let group of sidebarData">
+			<h3 mat-subheader *ngIf="group.name !== ''">
+				{{group.name}}</h3>
+			<a mat-list-item *ngFor="let componentData of group.components"
+			   [routerLink]="['.', group.path, componentData.route.path]"
+			   [routerLinkActiveOptions]="{exact: componentData.route.pathMatch === 'full'}"
+			   routerLinkActive="active">
+				<mat-icon mat-list-icon>
+					{{componentData.icon}}
+				</mat-icon>
+				<span mat-line>{{componentData.title}}</span>
+			</a>
+		</ng-container>
+	</mat-nav-list>
+	<div class="expand"></div>
+	<p class="side-margin noshrink">
+		<app-global-footer></app-global-footer>
+	</p>
+</div>

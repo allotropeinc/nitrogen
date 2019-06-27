@@ -1,0 +1,20 @@
+<h2 mat-dialog-title>Revoke Verification Code</h2>
+<mat-dialog-content>
+	<mat-hint *ngIf="working">
+		<p>
+			<app-inline-spinner></app-inline-spinner>
+		</p>
+	</mat-hint>
+	<p class="box-warn" *ngIf="!working">
+		The email sent to <b>{{status.pending_email}}</b> will become invalid.
+	</p>
+</mat-dialog-content>
+<mat-dialog-actions>
+	<button mat-flat-button mat-dialog-close [disabled]="working">
+		Close
+	</button>
+	<button mat-flat-button color="warn" (click)="revert()"
+	        [disabled]="working">
+		Revoke
+	</button>
+</mat-dialog-actions>

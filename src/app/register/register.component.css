@@ -1,0 +1,47 @@
+:host {
+	padding: 24px;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	overflow: scroll;
+}
+
+:host > * {
+	margin: auto;
+}
+
+.container {
+	width: 100%;
+	max-width: 600px;
+}
+
+mat-card {
+	padding: 0 24px;
+}
+
+mat-card-title {
+	line-height: 72px;
+	margin: 0 !important;
+}
+
+mat-card-content {
+	margin-bottom: 24px;
+}
+
+mat-divider + * {
+	margin-top: 24px;
+}
+
+mat-card-actions {
+	padding: 24px 0 !important;
+	margin: 0 !important;
+}
+
+app-global-footer {
+	display: block;
+	margin: 0 8px;
+}
+
+mat-spinner {
+	margin: 0 auto;
+}

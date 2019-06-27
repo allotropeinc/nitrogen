@@ -1,0 +1,35 @@
+:host {
+	display: flex;
+	flex-direction: column;
+	width: 300px;
+	height: 100vh;
+	max-width: calc(100vw - 56px);
+	overflow: hidden;
+}
+
+:host .noshrink {
+	flex-shrink: 0;
+}
+
+:host .expand {
+	flex-basis: 0;
+	height: 0;
+	flex-grow: 1;
+	overflow: auto;
+	display: flex;
+	flex-direction: column;
+}
+
+mat-toolbar {
+	background: none;
+	flex-shrink: 0;
+}
+
+.side-margin {
+	margin-left: 16px;
+	margin-right: 16px;
+}
+
+[mat-list-item].active {
+
+}

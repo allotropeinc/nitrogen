@@ -1,9 +1,12 @@
 <h1>Unpublish Project</h1>
 <p>Are you sure you want to unpublish this project?</p>
-<p class="error">This project will be stored encrypted but no longer visible to anyone else.</p>
+<p class="error">This project will be stored encrypted but no longer visible to
+	anyone else.</p>
 <ng-container>
 	<button mat-button (click)="dialogRef.close()">Cancel</button>
 	<div class="buttons">
-		<button mat-flat-button color="warn" [mat-dialog-close]="true">Unpublish</button>
+		<button mat-flat-button color="warn" [mat-dialog-close]="true">
+			Unpublish
+		</button>
 	</div>
 </ng-container>

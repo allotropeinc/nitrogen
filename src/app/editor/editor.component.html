@@ -1,10 +1,10 @@
 <mat-sidenav-container (window:keydown)="hotkey($event)">
 	<mat-sidenav mode="push" #sidenav>
-		<app-editor-sidenav [settings]="settings"></app-editor-sidenav>
+		<app-editor-sidenav [accountSettings]="accountSettings"></app-editor-sidenav>
 	</mat-sidenav>
 	<mat-sidenav-content>
 		<mat-toolbar>
-			<a mat-icon-button class="menu-button" routerLink="/dashboard">
+			<a mat-icon-button class="menu-button" routerLink="/my-projects">
 				<mat-icon>
 					home
 				</mat-icon>

@@ -1,0 +1,17 @@
+<mat-card *ngIf="!working">
+	<mat-card-content>
+		<app-projects>
+			<app-account-options [admin]="admin"></app-account-options>
+		</app-projects>
+	</mat-card-content>
+	<app-global-footer></app-global-footer>
+	<mat-divider></mat-divider>
+	<mat-card-content class="text-with-buttons">
+		<div class="buttons">
+			<app-contact></app-contact>
+			<a mat-flat-button color="primary" (click)="logout()">Logout</a>
+		</div>
+	</mat-card-content>
+</mat-card>
+<mat-progress-spinner mode="indeterminate"
+                      *ngIf="working"></mat-progress-spinner>

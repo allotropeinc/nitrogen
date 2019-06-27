@@ -1,0 +1,18 @@
+<h2 mat-dialog-title>Delete Project</h2>
+<mat-dialog-content>
+	<mat-hint>
+		<p>
+			Are you sure you want to delete this project?
+		</p>
+	</mat-hint>
+	<p class="box-warn">
+		This project will be immediately deleted from our servers, and it'll be
+		as if it never existed.
+	</p>
+</mat-dialog-content>
+<mat-dialog-actions>
+	<button mat-button (click)="dialogRef.close()">Cancel</button>
+	<button mat-flat-button color="warn" [mat-dialog-close]="true">
+		Delete
+	</button>
+</mat-dialog-actions>

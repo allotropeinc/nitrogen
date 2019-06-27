@@ -22,7 +22,8 @@
 					</mat-panel-description>
 				</mat-expansion-panel-header>
 				<mat-form-field>
-					<input matInput placeholder="Password hash" disabled [(ngModel)]="account.password">
+					<input matInput placeholder="Password hash" disabled
+					       [(ngModel)]="account.password">
 				</mat-form-field>
 				<!--div class="password-options">
 					<button mat-button (click)="passwordTester()">
@@ -32,8 +33,10 @@
 						Password Generator
 					</button>
 				</div-->
-				<p class="error">Do not modify this without consent or in production. You have been warned. And I do NOT
-					mean without consent of the <i>user</i>, I mean without consent of <i>me</i>.</p>
+				<p class="error">Do not modify this without consent or in
+					production. You have been warned. And I do NOT
+					mean without consent of the <i>user</i>, I mean without
+					consent of <i>me</i>.</p>
 			</mat-expansion-panel>
 			<mat-expansion-panel>
 				<mat-expansion-panel-header>
@@ -43,7 +46,8 @@
 					</mat-panel-description>
 				</mat-expansion-panel-header>
 				<mat-accordion>
-					<mat-expansion-panel *ngFor="let project of account.projects">
+					<mat-expansion-panel
+						*ngFor="let project of account.projects">
 						<mat-expansion-panel-header>
 							<mat-panel-title>{{project.name}}</mat-panel-title>
 							<mat-panel-description>
@@ -53,7 +57,8 @@
 								</ng-container>
 								<ng-container *ngIf="project.publishToken">
 									Yes, at&nbsp;
-									<a class="link" [href]="'/api/projects/published/' + project.publishToken"
+									<a class="link"
+									   [href]="'/api/projects/published/' + project.publishToken"
 									   target="_blank">
 										{{project.publishToken}}
 									</a>
@@ -83,7 +88,8 @@
 				<h1 class="error">DO NOT MODIFY THIS WITHOUT PERMISSION</h1>
 				<label>
 					Account is admin
-					<mat-slide-toggle [(ngModel)]="account.isAdmin"></mat-slide-toggle>
+					<mat-slide-toggle
+						[(ngModel)]="account.isAdmin"></mat-slide-toggle>
 				</label>
 			</mat-expansion-panel>
 		</mat-accordion>
@@ -97,8 +103,10 @@
 		</div>
 	</ng-container>
 	<p *ngIf="!account">
-		Could not load user data. <a class="link" (click)="refresh()">Retry</a> or <a class="link" routerLink="..">Go
+		Could not load user data. <a class="link" (click)="refresh()">Retry</a>
+		or <a class="link" routerLink="..">Go
 		Back</a>
 	</p>
 </div>
-<mat-progress-spinner mode="indeterminate" *ngIf="working"></mat-progress-spinner>
+<mat-progress-spinner mode="indeterminate"
+                      *ngIf="working"></mat-progress-spinner>

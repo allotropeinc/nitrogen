@@ -35,8 +35,8 @@
 			</a>
 		</mat-nav-list>
 		<div>
-			<a mat-button class="dashboard-button" routerLink="/dashboard">
-				Return to Dashboard
+			<a mat-button class="my-projects-button" routerLink="/my-projects">
+				Return to My Projects
 			</a>
 			<app-global-footer></app-global-footer>
 		</div>
@@ -44,12 +44,13 @@
 	<mat-sidenav-content>
 		<ng-container *ngIf="!working">
 			<mat-toolbar>
-				<a mat-icon-button class="menu-button" routerLink="/dashboard">
+				<a mat-icon-button class="menu-button" routerLink="/">
 					<mat-icon>
 						home
 					</mat-icon>
 				</a>
-				<button mat-icon-button class="menu-button" (click)="sidenav.open()">
+				<button mat-icon-button class="menu-button"
+				        (click)="sidenav.open()">
 					<mat-icon>
 						menu
 					</mat-icon>
@@ -60,6 +61,7 @@
 				<router-outlet></router-outlet>
 			</div>
 		</ng-container>
-		<mat-progress-spinner mode="indeterminate" *ngIf="working"></mat-progress-spinner>
+		<mat-progress-spinner mode="indeterminate"
+		                      *ngIf="working"></mat-progress-spinner>
 	</mat-sidenav-content>
 </mat-sidenav-container>

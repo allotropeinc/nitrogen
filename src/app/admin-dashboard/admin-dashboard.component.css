@@ -14,7 +14,7 @@ mat-sidenav {
 	height: 100vh;
 }
 
-mat-sidenav > div {
+mat-sidenav div {
 	margin: 24px;
 }
 
@@ -62,6 +62,6 @@ mat-toolbar {
 	overflow: auto;
 }
 
-.dashboard-button {
+.my-projects-button {
 	width: 100%;
 }

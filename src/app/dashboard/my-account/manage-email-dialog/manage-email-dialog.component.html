@@ -1,0 +1,54 @@
+<h2 mat-dialog-title>Manage Email</h2>
+<mat-dialog-content>
+	<mat-hint *ngIf="working">
+		<p>
+			<app-inline-spinner></app-inline-spinner>
+		</p>
+	</mat-hint>
+	<ng-container *ngIf="!working" [ngSwitch]="status.verify_status">
+		<p class="box-info" *ngSwitchCase="'unset'">
+			Your email address is unset. You should set one!
+		</p>
+		<p class="box-info" *ngSwitchCase="'unverified'">
+			We've sent a verification email to <b>{{status.pending_email}}</b>.
+			Check your spam folder if you don't see it.
+		</p>
+		<p class="box-success" *ngSwitchCase="'verified'">
+			Your account's email address is currently verified as
+			<b>{{status.current_email}}</b>.
+		</p>
+		<p class="box-info" *ngSwitchCase="'pending_change'">
+			We're waiting to change your account's email address from
+			<b>{{status.current_email}}</b> to <b>{{status.pending_email}}</b>.
+		</p>
+		<p class="box-warn" *ngSwitchDefault>
+			Unknown email status, you should report this as a bug (status:
+			{{status.verify_status}})
+		</p>
+	</ng-container>
+	<mat-hint>
+		<p>
+			Submit an email address to verify, then check your inbox for a
+			verification link.
+		</p>
+	</mat-hint>
+	<form id="manage-email-form" (submit)="submit()">
+		<app-email-input [isNewEmail]="true" [disabled]="working"
+		                 (formControl)="emailControl = $event"></app-email-input>
+	</form>
+</mat-dialog-content>
+<mat-dialog-actions>
+	<button mat-flat-button mat-dialog-close>
+		Close
+	</button>
+	<button mat-flat-button color="warn" [disabled]="working"
+	        *ngIf="status && status.pending_email !== ''"
+	        (click)="openRevoke()">
+		Revoke
+	</button>
+	<button mat-flat-button color="primary"
+	        [disabled]="working || !emailControl.valid"
+	        form="manage-email-form">
+		Submit
+	</button>
+</mat-dialog-actions>

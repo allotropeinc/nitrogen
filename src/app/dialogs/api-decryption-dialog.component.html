@@ -1,22 +1,22 @@
-<h1>Provide Password</h1>
-<p>We failed to decrypt your project data. Enter in the password to decrypt it. Trying previous passwords is
-	advised.</p>
-<mat-form-field>
-	<input matInput placeholder="Password" [(ngModel)]="password" [type]="showPassword ? 'text' : 'password'"
-	       (ngModelChange)="decrypted = decrypt(encrypted, password)"
-	       (keydown.enter)="submit.disabled ? undefined : dialogRef.close(decrypted)">
-	<button mat-icon-button matSuffix (click)="showPassword = !showPassword">
-		<mat-icon>
-			{{showPassword ? 'visibility' : 'visibility_off'}}
-		</mat-icon>
-	</button>
-</mat-form-field>
-<ng-container>
+<h2 mat-dialog-title>Provide Password</h2>
+<mat-hint>
+	<p>
+		We failed to decrypt your project data. Enter in the password to decrypt
+		it. Trying previous passwords is advised.
+	</p>
+</mat-hint>
+<mat-dialog-content>
+	<form id="decryption-dialog-form"
+	      (submit)="submit.disabled ? undefined : dialogRef.close(getDecrypted(decrypted))">
+		<app-password-input name="password" [(ngModel)]="password"
+		                    (ngModelChange)="decrypted = decrypt(encrypted, password)"></app-password-input>
+	</form>
+</mat-dialog-content>
+<mat-dialog-actions>
 	<button mat-button (click)="dialogRef.close()">Cancel</button>
-	<div class="buttons">
-		<button mat-flat-button [disabled]="!getDecrypted(decrypted)"
-		        [mat-dialog-close]="decrypted" #submit>
-			Decrypt
-		</button>
-	</div>
-</ng-container>
+	<button mat-flat-button color="primary"
+	        [disabled]="!getDecrypted(decrypted)"
+	        [mat-dialog-close]="decrypted" #submit>
+		Decrypt
+	</button>
+</mat-dialog-actions>

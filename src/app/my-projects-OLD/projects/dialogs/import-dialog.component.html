@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>Import from JSFiddle</h2>
+<mat-dialog-content>
+	<mat-hint>
+		<p>
+			We'll migrate your Fiddle over to Nitrogen. Plus, we'll tidy it up
+			for you so it plays nicely.
+		</p>
+	</mat-hint>
+	<form id="import-dialog-form" (submit)="dialogRef.close(url)">
+		<mat-form-field>
+			<mat-label>URL</mat-label>
+			<input matInput [(ngModel)]="url" name="url">
+		</mat-form-field>
+	</form>
+</mat-dialog-content>
+<mat-dialog-actions>
+	<button mat-button (click)="dialogRef.close()">Cancel</button>
+	<button mat-flat-button color="primary" type="submit"
+	        form="import-dialog-form">
+		Import
+	</button>
+</mat-dialog-actions>

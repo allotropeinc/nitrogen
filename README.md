@@ -16,7 +16,7 @@ Before you run Nitrogen, development or not, you'll need to give the backend a f
 
 ### Setting yourself as admin
 
-Nitrogen features an admin panel, but to see it you'll have to set yourself as admin. There is currently no automatic way to do this if no admin already exists. Stop the backend if it's running, and edit the `data.json` file. Find your account in the `accounts` list and set `isAdmin` to `true`. Save and restart the backend and you should see the "Report Bug" button on the dashboard replaced by "Admin".
+Nitrogen features an admin panel, but to see it you'll have to set yourself as admin. There is currently no automatic way to do this if no admin already exists. Stop the backend if it's running, and edit the `data.json` file. Find your account in the `accounts` list and set `isAdmin` to `true`. Save and restart the backend and you should see the "Report Bug" button on the my-projects replaced by "Admin".
 
 ## Auto-update
 

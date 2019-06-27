@@ -1,0 +1,42 @@
+mat-progress-spinner {
+	margin: 0 auto;
+}
+
+@media screen and (min-width: 896px) {
+	mat-nav-list {
+		display: grid;
+		grid-template-columns: 50% 50%;
+	}
+
+	.full {
+		grid-column-start: 1;
+		grid-column-end: 3;
+	}
+}
+
+@media screen and (min-width: 1296px) {
+	mat-nav-list {
+		display: grid;
+		grid-template-columns: calc(100% / 3) calc(100% / 3) calc(100% / 3);
+	}
+
+	.full {
+		grid-column-start: 1;
+		grid-column-end: 4;
+	}
+}
+
+.buttons-flex {
+	display: flex;
+}
+
+.buttons-flex > :first-child {
+	margin: auto 0;
+	flex-grow: 1;
+}
+
+.buttons-flex > *:not(:first-child) {
+	flex-shrink: 0;
+	margin-left: 1em;
+	color: #fff;
+}

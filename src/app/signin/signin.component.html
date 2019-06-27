@@ -1,34 +1,43 @@
-<mat-card *ngIf="!working">
-	<mat-card-title>
-		Sign into your account
-	</mat-card-title>
-	<mat-card-subtitle>
-		An account is required to use save functionality.
-	</mat-card-subtitle>
-	<mat-divider></mat-divider>
-	<mat-card-content *ngIf="error">
-		<p class="error">
-			We failed to sign you in. Are you sure you entered your account details correctly?
-		</p>
-	</mat-card-content>
-	<mat-card-content (keydown.enter)="signIn()">
-		<mat-form-field>
-			<input matInput placeholder="Username" [(ngModel)]="username">
-		</mat-form-field>
-		<mat-form-field>
-			<input matInput placeholder="Password" [(ngModel)]="password" [type]="showPassword? 'text' : 'password'">
-			<button mat-icon-button matSuffix (click)="showPassword = !showPassword">
-				<mat-icon>visibility{{showPassword ? '' : '_off'}}</mat-icon>
-			</button>
-		</mat-form-field>
-	</mat-card-content>
+<div class="container" *ngIf="!working">
+	<mat-card>
+		<mat-card-title>
+			Sign into your account
+		</mat-card-title>
+		<mat-divider></mat-divider>
+		<mat-card-content *ngIf="error">
+			<p class="error">
+				We failed to sign you in. Are you sure you entered your account
+				details correctly?
+			</p>
+		</mat-card-content>
+		<mat-card-content>
+			<form id="signin" (submit)="signIn()">
+				<p>
+					<mat-form-field>
+						<input matInput placeholder="Username"
+						       [formControl]="username"
+						       name="username" autocomplete="username">
+					</mat-form-field>
+				</p>
+				<p>
+					<app-password-input name="password"
+					                    (formControl)="password = $event"></app-password-input>
+				</p>
+			</form>
+		</mat-card-content>
+		<mat-divider></mat-divider>
+		<mat-card-actions>
+			<a mat-button routerLink="/register">Register</a>
+			<div class="buttons">
+				<button mat-flat-button color="primary"
+				        [disabled]="!formGroup || !formGroup.valid"
+				        form="signin">
+					Sign In
+				</button>
+			</div>
+		</mat-card-actions>
+	</mat-card>
 	<app-global-footer></app-global-footer>
-	<mat-divider></mat-divider>
-	<mat-card-content>
-		<a mat-button routerLink="/register">Register</a>
-		<div class="buttons">
-			<a mat-flat-button (click)="signIn()">Sign In</a>
-		</div>
-	</mat-card-content>
-</mat-card>
-<mat-progress-spinner mode="indeterminate" *ngIf="working"></mat-progress-spinner>
+</div>
+<mat-progress-spinner mode="indeterminate"
+                      *ngIf="working"></mat-progress-spinner>

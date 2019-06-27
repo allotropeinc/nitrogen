@@ -1,9 +1,12 @@
 <h1>Publish Project</h1>
 <p>Are you sure you want to publish this project?</p>
-<p class="error">This project will be stored unencrypted and visible to anyone who knows the link.</p>
+<p class="error">This project will be stored unencrypted and visible to anyone
+	who knows the link.</p>
 <ng-container>
 	<button mat-button (click)="dialogRef.close()">Cancel</button>
 	<div class="buttons">
-		<button mat-flat-button [mat-dialog-close]="true">Publish</button>
+		<button mat-flat-button color="primary" [mat-dialog-close]="true">
+			Publish
+		</button>
 	</div>
 </ng-container>

@@ -1,51 +1,50 @@
-import { Component, OnInit } from '@angular/core'
-import { ApiService }        from '../../api.service'
-import { MatSnackBar }       from '@angular/material'
+import {Component, OnInit} from '@angular/core'
+import { MatSnackBar } from '@angular/material/snack-bar';
+import {ApiService}        from '../../api.service'
 
-@Component ( {
-	selector    : 'app-admin-dashboard-users',
-	templateUrl : './admin-dashboard-starterCode.component.html',
-	styleUrls   : [ './admin-dashboard-starterCode.component.css' ]
-} )
+@Component({
+	selector   : 'app-admin-dashboard-users',
+	templateUrl: './admin-dashboard-starterCode.component.html',
+	styleUrls  : ['./admin-dashboard-starterCode.component.css']
+})
 export class AdminDashboardStarterCodeComponent implements OnInit {
-	htmlCode : string
+	htmlCode: string
 	htmlWorking = true
-	mdCode : string
+	mdCode: string
 	mdWorking = true
 
-	constructor (
-		private api : ApiService,
-		private snackbar : MatSnackBar
+	constructor(
+		private api: ApiService,
+		private snackbar: MatSnackBar
 	) { }
 
-	ngOnInit () {
-		this.htmlRefresh ()
-		this.mdRefresh ()
+	ngOnInit() {
+		this.htmlRefresh()
+		this.mdRefresh()
 	}
 
-	htmlRefresh () {
+	htmlRefresh() {
 		this.htmlWorking = true
 
-		this.api.getStarterCode ( 0 ).subscribe (
-			( starterCode ) => {
+		this.api.getStarterCode(0).subscribe(
+			(starterCode) => {
 				this.htmlCode = starterCode
 				this.htmlWorking = false
 			}
 		)
 	}
 
-	htmlSave () {
+	htmlSave() {
 		this.htmlWorking = true
 
-		this.api.setStarterCode (
+		this.api.setStarterCode(
 			0,
 			this.htmlCode
-		).subscribe (
-			( success ) => {
-				if ( !success ) {
-					this.snackbar.open (
-						'The HTML starter code could not be saved.',
-						'Close'
+		).subscribe(
+			(success) => {
+				if (!success) {
+					this.snackbar.open(
+						'The HTML starter code could not be saved.'
 					)
 				}
 
@@ -54,29 +53,28 @@ export class AdminDashboardStarterCodeComponent implements OnInit {
 		)
 	}
 
-	mdRefresh () {
+	mdRefresh() {
 		this.mdWorking = true
 
-		this.api.getStarterCode ( 1 ).subscribe (
-			( starterCode ) => {
+		this.api.getStarterCode(1).subscribe(
+			(starterCode) => {
 				this.mdCode = starterCode
 				this.mdWorking = false
 			}
 		)
 	}
 
-	mdSave () {
+	mdSave() {
 		this.mdWorking = true
 
-		this.api.setStarterCode (
+		this.api.setStarterCode(
 			1,
 			this.mdCode
-		).subscribe (
-			( success ) => {
-				if ( !success ) {
-					this.snackbar.open (
-						'The Markdown starter code could not be saved.',
-						'Close'
+		).subscribe(
+			(success) => {
+				if (!success) {
+					this.snackbar.open(
+						'The Markdown starter code could not be saved.'
 					)
 				}
 
