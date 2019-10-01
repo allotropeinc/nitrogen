@@ -1,3 +1,7 @@
+**NOTE**: It was a good experience, but Nitrogen no longer runs in production. We at Allotrope hope that others can learn from the project, but we will not be accepting further contributions. Contact us directly at nitrogen@allotrope.xyz if you need data retrieved. We will provide a tool to decrypt your data without having to send us a password.
+
+---
+
 # Nitrogen
 
 Hello! We're happy you're interested in viewing the source code of the Nitrogen project. Nitrogen uses a combination of Angular and Express. The production version is running [here](https://nitrogenedit.com/).
